@@ -1,0 +1,18 @@
+// Gerar model + migration
+ npx sequelize-cli model:generate --name User --attributes id:integer,name:string,email:string,verified_email:boolean,
+ is_admin:boolean,phone:string,password:string
+
+npx sequelize-cli model:generate --name Channel --attributes id:integer,description:string,commission_fee:decimal // criar campos 
+// da tabela
+npx sequelize-cli db:migrate /// criar tabela 
+npx sequelize-cli db:migrate:undo // reverter tabela
+
+//Comando para gerar apenas uma migration (sem model)
+npx sequelize-cli migration:generate --name alter-table-customer-tags
+
+git add .
+git commit -m
+git push
+
+Relação (1,n) sempre sera HasMany para 1 e belongsTo para N
+Relação (N, N) sera belongsToMany e belongsToMany
