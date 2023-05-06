@@ -4,7 +4,9 @@ import Login from './beggining_pages/Login';
 import Register from './beggining_pages/Register';
 import About from './beggining_pages/About';
 import Contact from './beggining_pages/Contact';
-import PaginaInicial from './beggining_pages/system_pages/PaginaInicial'
+import PaginaInicial from './beggining_pages/system_pages/PaginaInicial';
+import CriarAgendas from './beggining_pages/system_pages/CriarAgendas';
+import Teste from './beggining_pages/system_pages/Teste';
 
 function AuthGuard({children}) {
   // Estaremos autenticados se tivermos um token gravado no localStorage
@@ -24,6 +26,8 @@ function App() {
           <Route path= "/sobre" element={<About/>}/>
           <Route path= "/contato" element={<Contact/>}/>
           <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
+          <Route path= "/criar_agenda" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+          <Route path= "/test" element={<Teste/>}/>
         </Routes>
       </BrowserRouter>
       

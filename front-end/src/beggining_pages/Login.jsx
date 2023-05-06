@@ -2,7 +2,7 @@ import StreamAdvisor from '../assets/sa.png'
 import React from 'react'
 import '../styles.css'
 import ImagemFundo from '../assets/back.jpg'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Snackbar from '@mui/material/Snackbar'
@@ -19,7 +19,7 @@ export default function LoginForm() {
     message: '',
     severity: 'success' // ou 'error'
   })
-
+  const navigate= useNavigate()
   async function handleSubmit(event) {
     event.preventDefault()      // Impede o recarregamento da página
     setShowWaiting(true)        // Mostra o spinner de espera
@@ -35,6 +35,7 @@ export default function LoginForm() {
         message: 'Autenticação realizada com sucesso!',
         severity: 'success'
       })
+      navigate('/pagina_inicial')
 
     }
     catch(error) {
