@@ -6,17 +6,18 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom'
 import MainMenu from './MainMenu'
+import sa3 from '../../assets/sa3.png'
 
 export default function HeaderBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="static" className='app-bar'>
         <Toolbar>
-          <MainMenu />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Stream Advisor
+          <MainMenu/>
+          <Typography style={{fontFamily: 'monospace'}} variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Menu
           </Typography>
-          <Button color="inherit" component={Link} to="/login">Log out</Button>
+            <img style={{height: '50px'}} src={sa3} alt='Stream Advisor logo' />
         </Toolbar>
       </AppBar>
     </Box>

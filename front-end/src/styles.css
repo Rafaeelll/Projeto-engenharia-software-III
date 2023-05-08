@@ -235,12 +235,7 @@
     transition: 0.7s ease;
     border-radius: 20px;
 }
-.contact-icon{
-    height: 25px;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-}
+/* }
 .calendar {
     display: flex;
     flex-direction: column;
@@ -305,4 +300,9 @@
 
   .blank {
     opacity: 0.5;
-  }
+  } */
+  .app-bar{
+    background: -webkit-linear-gradient(to left, #000, #b721ff);
+    background: -o-linear-gradient(to left, #000, #b721ff);
+    background: -moz-linear-gradient(to left, #000, #b721ff);
+    background: linear-gradient(to left, #000, #b721ff);  }
