@@ -79,7 +79,8 @@ export default function LoginForm() {
           {snack.message}
         </Alert>
       </Snackbar>
-        <div className="container-login" style={{ backgroundImage: `url(${ImagemFundo})`,
+        <div className="container-login"style={{ 
+          backgroundImage: `url(${ImagemFundo})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           height: '100vh',

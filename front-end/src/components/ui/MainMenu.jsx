@@ -47,7 +47,7 @@ export default function MainMenu() {
         
         <Divider />
 
-        <MenuItem onClick={handleClose} component={Link} to="/criar_agenda">
+        <MenuItem onClick={handleClose} component={Link} to="/agenda">
           Agendas
         </MenuItem>
         
