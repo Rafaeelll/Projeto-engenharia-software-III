@@ -5,8 +5,7 @@ import ImagemFundo from '../assets/back.jpg'
 import { Link, useNavigate } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
-import Snackbar from '@mui/material/Snackbar'
-import Alert from '@mui/material/Alert'
+import Notification from '../components/ui/Notification'
 import myfetch from '../utils/myfetch'
 
 
@@ -14,7 +13,7 @@ export default function LoginForm() {
   const [email, setEmail] = React.useState("")
   const [senha_acesso, setSenhaAcesso] = React.useState("")
   const [showWaiting, setShowWaiting] = React.useState(false)
-  const [snack, setSnack] = React.useState({
+  const [notif, setNotif] = React.useState({
     show: false,
     message: '',
     severity: 'success' // ou 'error'
@@ -30,7 +29,7 @@ export default function LoginForm() {
       window.localStorage.setItem('token', result.token)
 
       // Exibe o snackbar de sucesso
-      setSnack({
+      setNotif({
         show: true,
         message: 'Autenticação realizada com sucesso!',
         severity: 'success'
@@ -45,7 +44,7 @@ export default function LoginForm() {
       window.localStorage.removeItem('token')  
 
       // Exibe o snackbar de erro
-      setSnack({
+      setNotif({
         show: true,
         message: error.message,
         severity: 'error'
@@ -56,11 +55,11 @@ export default function LoginForm() {
     }
   }
 
-  function handleSnackClose(event, reason) {
+  function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {
       return;
     }
-    setSnack({ show: false })
+    setNotif({ show: false })
   };
 
 
@@ -71,14 +70,16 @@ export default function LoginForm() {
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
-        <CircularProgress color="inherit" />
+        <CircularProgress color="secondary" />
       </Backdrop>
 
-      <Snackbar open={snack.show} autoHideDuration={4000} onClose={handleSnackClose}>
-        <Alert onClose={handleSnackClose} severity={snack.severity} sx={{ width: '100%' }}>
-          {snack.message}
-        </Alert>
-      </Snackbar>
+      <Notification 
+        show={notif.show} 
+        onClose={handleNotifClose}
+        severity={notif.severity}
+      >
+        {notif.message}
+      </Notification>
         <div className="container-login"style={{ 
           backgroundImage: `url(${ImagemFundo})`,
           backgroundSize: 'cover',

@@ -305,4 +305,12 @@
     background: -webkit-linear-gradient(to left, #000, #b721ff);
     background: -o-linear-gradient(to left, #000, #b721ff);
     background: -moz-linear-gradient(to left, #000, #b721ff);
-    background: linear-gradient(to left, #000, #b721ff);  }
+    background: linear-gradient(to left, #000, #b721ff);  
+}
+.MuiDataGrid-row button {
+    visibility: hidden;
+  }
+  
+  .MuiDataGrid-row:hover button {
+    visibility: visible;
+  }
