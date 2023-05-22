@@ -7,6 +7,8 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../components/ui/Notification'
 import {useNavigate} from 'react-router-dom'
 import myfetch from '../utils/myfetch'
+import Usuario from '../../models/usuario'
+import getValidationMessages from '../utils/getValidationMessages'
 
 function Register(){
   const API_PATH = '/usuarios'
@@ -14,7 +16,14 @@ function Register(){
   const navigate = useNavigate()
 
   const [state, setState] = React.useState({
-    usuario: {}, // Objeto vazio
+    usuario: {
+      nome: '',
+      sobrenome: '',
+      email: '',
+      senha_acesso: '',
+      telefone: ''
+    },
+    erros: {},
     showWaiting: false,
     notif: {
       show: false,
@@ -24,6 +33,7 @@ function Register(){
   })
   const {
     usuario,
+    errors,
     showWaiting,
     notif
   } = state
@@ -42,8 +52,11 @@ function Register(){
   }
 
   async function sendData() {
-    setState({...state, showWaiting: true})
+    setState({...state, showWaiting: true, errors: {}})
     try {
+
+       // Chama a validação da biblioteca Joi
+       await Usuario.validateAsync(usuario, { abortEarly: false })
       await myfetch.post(API_PATH, usuario)
       //DAR FEEDBACK POSITIVO
       setState({
@@ -57,27 +70,33 @@ function Register(){
       })
     }
     catch(error) {
+      const { validationError, errorMessages } = getValidationMessages(error)
+
       console.error(error)
-      // DAR FEEDBACK NEGATIVO
+      
       setState({
         ...state, 
         showWaiting: false,
+        errors: errorMessages,
         notif: {
           severity: 'error',
-          show: true,
+          show: !validationError,
           message: 'ERRO: ' + error.message
         }
       })
     }
   }
+
   function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {
       return;
-    }        
+    }
+    
     // Se o item foi salvo com sucesso, retorna à página de listagem
     if(notif.severity === 'success') navigate(-1)
+
     setState({ ...state, notif: { ...notif, show: false } })
-  };
+  }
   return(  
       <div className="container">
           <Backdrop
@@ -118,7 +137,10 @@ function Register(){
                   className={usuario !== "" ? 'has-val input': 'input'}
                   type="name"
                   name='nome'
+                  required
                   value={usuario.nome}
+                  error={errors?.nome}
+                  helperText={errors?.nome}
                   onChange={handleFormFieldChange}
                 />
                 <span className="focus-input" data-placeholder="Nome"></span>
@@ -129,6 +151,9 @@ function Register(){
                   className={usuario !== "" ? 'has-val input': 'input'}
                   type="nome"
                   name='sobrenome'
+                  required
+                  error={errors?.sobrenome}
+                  helperText={errors?.sobrenome}
                   value={usuario.sobrenome}
                   onChange={handleFormFieldChange}
                 />
@@ -140,7 +165,10 @@ function Register(){
                   className={usuario !== "" ? 'has-val input': 'input'}
                   type="email"
                   name='email'
+                  required
                   value={usuario.email}
+                  error={errors?.email}
+                  helperText={errors?.email}
                   onChange={handleFormFieldChange}
                 />
                 <span className="focus-input" data-placeholder="Email"></span>
@@ -151,6 +179,9 @@ function Register(){
                   className={usuario !== "" ? 'has-val input': 'input'}
                   type="password"
                   name='senha_acesso'
+                  required
+                  error={errors?.senha_acesso}
+                  helperText={errors?.senha_acesso}
                   value={usuario.senha_acesso}
                   onChange={handleFormFieldChange}
                 />
@@ -161,13 +192,15 @@ function Register(){
                 <input 
                   className={usuario !== "" ? 'has-val input': 'input'}
                   type="phone"
+                  required
                   name='telefone'
+                  error={errors?.telefone}
+                  helperText={errors?.telefone}
                   value={usuario.telefone}
                   onChange={handleFormFieldChange}
                 />
                 <span className="focus-input" data-placeholder="Telefone"></span>
                 </div>
-
                 <div className="container-login-form-btn">
                   <button 
                     className="login-form-btn"

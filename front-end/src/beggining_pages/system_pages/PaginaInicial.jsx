@@ -89,13 +89,8 @@ export default function PaymentMethodList() {
       width: 150
     },
     {
-      field: 'duracao',
-      headerName: 'Duração',
-      width: 150
-    },
-    {
       field: 'titulo_agenda',
-      headerName: 'Tíitulo',
+      headerName: 'Título',
       width: 150
     },
     {
@@ -219,9 +214,9 @@ export default function PaymentMethodList() {
 
       <HeaderBar/>
 
-      <PageTitle title="Listagem de agendas Pendentes"  />
+      <PageTitle title="Listagem de agendas"  />
 
-      <Paper elevation={4} sx={{ height: 250, width: '70%', margin: '0 auto' }}>
+      <Paper elevation={4} sx={{ height: 500, width: '70%', margin: '0 auto' }}>
         <DataGrid
           rows={agendaPendentes}
           columns={columns}

@@ -60,10 +60,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    duracao:{
-      type: DataTypes.DATE,
-      allowNull:false
-    },
     titulo_agenda:{
       type: DataTypes.STRING(200),
       allowNull: false,
@@ -73,10 +69,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     descricao:{
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
     },
     status:{
-      type: DataTypes.STRING(50),
+      type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalizada'),
       allowNull: false
     },
   }, {

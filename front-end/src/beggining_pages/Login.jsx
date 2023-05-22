@@ -102,6 +102,7 @@ export default function LoginForm() {
                   className={email !== "" ? 'has-val input': 'input'}
                   type="email"
                   value={email}
+                  required
                   onChange={e => setEmail(e.target.value)}
                 />
                 <span className="focus-input" data-placeholder="Email"></span>
@@ -111,6 +112,7 @@ export default function LoginForm() {
                 <input 
                   className={senha_acesso !== "" ? 'has-val input': 'input'}
                   type="password"
+                  required
                   value={senha_acesso}
                   onChange={e => setSenhaAcesso(e.target.value)}
                 />

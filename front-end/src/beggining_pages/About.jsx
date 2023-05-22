@@ -33,8 +33,9 @@ function About(){
                 alignSelf: "center",
                 color: "whitesmoke",
                 fontWeight: 'normal'
-                }}> Questão Problema: Excessividade no uso da tecnologia de vídeo games por gamers-streamers.</p1>
-            <p2 className="text-principal" style={{ fontFamily: "monospace", textAlign: "center", alignSelf: "center", width: '680px', fontSize: '16px'}}>
+                }}> Questão Problema: Excessividade no uso da tecnologia de vídeo games por gamers-streamers.
+            </p1>
+            <p2 className="text-principal" style={{ fontFamily: "monospace", textAlign: "center", alignSelf: "center", width: '100%', fontSize: '16px'}}>
              O projeto proposto para a solução tem como objetivo de prevenir ou minimizar que os gamers-streamers use com 
             excessividade o seu tempo em transmissões jogando, criando um sistema para controlar melhor seu tempo e ainda 
             ser produtivo. Diante disso, será criado um sistema web para fazer essa função. Nessa plataforma o usuário terá 

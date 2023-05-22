@@ -32,7 +32,7 @@ export default function MainMenu() {
       >
         <MenuIcon />
       </IconButton>
-      <Menu
+      <Menu 
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
@@ -41,17 +41,17 @@ export default function MainMenu() {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={handleClose} component={Link} to="/pagina_inicial">
+        <MenuItem style={{fontFamily: 'monospace', color: 'purple', fontWeight: 'bold'}} onClick={handleClose} component={Link} to="/pagina_inicial">
           Página inicial
         </MenuItem>
         
         <Divider />
 
-        <MenuItem onClick={handleClose} component={Link} to="/agenda">
+        <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/agenda">
           Agendas
         </MenuItem>
         
-        <MenuItem onClick={handleClose} component={Link} to="/login">
+        <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/login">
           Log out
         </MenuItem>
       </Menu>

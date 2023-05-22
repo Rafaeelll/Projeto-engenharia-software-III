@@ -29,10 +29,6 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      duracao:{
-        type: Sequelize.DATE,
-        allowNull:false
-      },
       titulo_agenda:{
         type: Sequelize.STRING(200),
         allowNull: false,
@@ -42,10 +38,10 @@ module.exports = {
       },
       descricao:{
         type: Sequelize.TEXT,
-        allowNull: false
+        allowNull: false,
       },
       status:{
-        type: Sequelize.STRING(50),
+        type: Sequelize.ENUM('Agendado', 'Em andamento', 'Finalizada'),
         allowNull: false
       },
       createdAt: {

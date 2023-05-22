@@ -10,23 +10,46 @@ export default function Agendas() {
         <div>  
             <HeaderBar/>
         </div>
-            <div> 
+          <div> 
               <PageTitle title="Selecione uma das opções abaixo:"/>
-              <Link to = "/criar_agenda">
-                <button style={{margin: '5px'}}>
-                  Criar agendas
-                </button>
+              <div style={{margin: '0 auto', textAlign: 'center', marginTop: '200px'}}>
+                <Link to = "/criar_agenda">
+                  <button style={{
+                    margin: '10px',
+                    padding: '15px 30px 15px 30px',
+                    border: 'none',
+                    background: 'black',
+                    color: 'white',
+                    fontFamily: 'monospace',
+                    fontWeight: 'bold',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '20px',
+                    alignItems: 'center'
+
+                    }}>
+                    Criar agendas
+                  </button>
+                </Link>
+                <Link to = "/verificar_agenda">
+                  <button style={{
+                    margin: '10px',
+                    padding: '15px 30px 15px 30px',
+                    border: 'none',
+                    background: 'black',
+                    color: 'white',
+                    fontFamily: 'monospace',
+                    fontWeight: 'bold',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    fontSize: '20px',
+                    alignItems: 'center'
+                    }}>
+                    Verificar agendas
+                  </button>
               </Link>
-              <Link to = "/verificar_agenda">
-                <button>
-                  Verificar agendas
-                </button>
-              </Link>
-
-
-            </div>
-
-
+              </div>
+          </div>
     </div>
   )
 }
