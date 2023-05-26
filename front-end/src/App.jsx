@@ -8,6 +8,10 @@ import PaginaInicial from './beggining_pages/system_pages/PaginaInicial';
 import CriarAgendas from './beggining_pages/system_pages/CriarAgendas';
 import Agendas from './beggining_pages/system_pages/Agendas'
 import VerificarAgendas from './beggining_pages/system_pages/VerificarAgendas';
+import Perfil from './beggining_pages/system_pages/Perfil';
+import Jogos from './beggining_pages/system_pages/Jogos';
+import Configuracoes from './beggining_pages/system_pages/Configuracoes';
+import HistoricoJogos from './beggining_pages/system_pages/HistoricoJogos';
 
 function AuthGuard({children}) {
   // Estaremos autenticados se tivermos um token gravado no localStorage
@@ -30,6 +34,10 @@ function App() {
           <Route path= "/agenda" element={<AuthGuard> <Agendas/> </AuthGuard>}/>
           <Route path= "/criar_agenda" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
           <Route path= "/verificar_agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+          <Route path= "/perfil" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
+          <Route path= "/configuracao" element={<AuthGuard> <Configuracoes/> </AuthGuard>}/>
+          <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
+          <Route path= "/historico_jogo" element={<AuthGuard> <HistoricoJogos/> </AuthGuard>}/>
         </Routes>
       </BrowserRouter>
       

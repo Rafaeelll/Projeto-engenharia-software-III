@@ -11,7 +11,10 @@ import CircularProgress from '@mui/material/CircularProgress'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Notification from '../../components/ui/Notification';
 import HeaderBar from '../../components/ui/HeaderBar';
-
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import AddCircleIcon from '@mui/icons-material/AddCircle'
+import { Link } from 'react-router-dom';
 
 export default function PaymentMethodList() {
 
@@ -39,13 +42,15 @@ export default function PaymentMethodList() {
   async function fetchData() {
     setState({ ...state, showWaiting: true })
     try {
-      const result = await myfetch.get(API_PATH)
-      setState({ 
+      const result = await myfetch.get(API_PATH);
+      const agendaPendentes = result.filter(agenda => agenda.status === 'Agendado' || agenda.status === 'Em andamento');
+        setState({ 
         ...state, 
-        agendaPendentes: result, 
+        agendaPendentes,
         showWaiting: false,
         showDialog: false
-      })
+      });
+      
     }
     catch(error) {
       console.log(error)
@@ -65,13 +70,16 @@ export default function PaymentMethodList() {
     { field: 'id', headerName: 'Id agenda', width: 90 },
     {
       field: 'usuario_id',
-      headerName: 'Id do usuário',
-      width: 150
+      headerName: 'Id usuário',
+      width: 150,
+      valueGetter: params => params.row?.usuario.id  + ': ' + params.row?.usuario.nome + ' ' + params.row?.usuario.sobrenome
+
     },
     {
       field: 'jogo_id',
-      headerName: 'Id do jogo',
-      width: 150
+      headerName: 'Id Jogo',
+      width: 150,
+      valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
     },
     {
       field: 'data_agenda',
@@ -115,9 +123,11 @@ export default function PaymentMethodList() {
       align: 'center',
       width: 90,
       renderCell: params => (
-        <IconButton aria-label="Editar">
-          <EditIcon />
-        </IconButton>
+        <Link to={'./' + params.id}>
+          <IconButton aria-label="Editar">
+            <EditIcon />
+          </IconButton>
+        </Link>
       )
     },
     {
@@ -193,7 +203,7 @@ export default function PaymentMethodList() {
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
-        <CircularProgress color="inherit" />
+        <CircularProgress color="secondary" />
       </Backdrop>
 
       <ConfirmDialog 
@@ -214,7 +224,24 @@ export default function PaymentMethodList() {
 
       <HeaderBar/>
 
-      <PageTitle title="Listagem de agendas"  />
+      <PageTitle title="Listagem de agendas pendentes"/>
+
+      <Box sx={{
+        display: "flex",
+        justifyContent: "right",
+        marginBottom: "25px"
+      }}>
+        <Link to="/criar_agenda">
+          <Button style={{marginRight: '20px'}}
+          variant="contained"
+          size="large"
+          color="secondary"
+          startIcon={<AddCircleIcon/>}
+          >
+          Criar agenda
+          </Button>
+        </Link>
+      </Box>
 
       <Paper elevation={4} sx={{ height: 500, width: '70%', margin: '0 auto' }}>
         <DataGrid

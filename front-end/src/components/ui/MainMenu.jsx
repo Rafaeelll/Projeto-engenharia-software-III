@@ -50,7 +50,19 @@ export default function MainMenu() {
         <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/agenda">
           Agendas
         </MenuItem>
+
+        <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/jogo">
+          Jogos
+        </MenuItem>
         
+        <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/login">
+          Perfil
+        </MenuItem>
+
+        <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/configuracao">
+          Configuranções
+        </MenuItem>
+
         <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/login">
           Log out
         </MenuItem>

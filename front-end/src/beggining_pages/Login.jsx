@@ -92,7 +92,7 @@ export default function LoginForm() {
           fontFamily: 'monospace'}}>
           <div className="wrap-login">
             <form onSubmit={handleSubmit}className="login-form">
-                <span className="login-form-title" style={{fontFamily: 'monospace'}}>Autentique-se</span>
+                <span className="login-form-title" style={{fontFamily: 'monospace', fontWeight: 'bold', marginBottom: '15px'}}>Autentique-se</span>
                 <span className="login-form-title">
                   <img src={StreamAdvisor} alt="Stream Advisor"/>
                 </span>

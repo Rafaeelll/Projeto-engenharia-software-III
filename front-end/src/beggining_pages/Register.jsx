@@ -1,6 +1,6 @@
 import React from 'react'
 import ImagemFundo from '../assets/back.jpg'
-import StreamAdvisor from '../assets/sa.png'
+import StreamAdvisor from '../assets/sa4.png'
 import '../styles.css'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -9,6 +9,7 @@ import {useNavigate} from 'react-router-dom'
 import myfetch from '../utils/myfetch'
 import Usuario from '../../models/usuario'
 import getValidationMessages from '../utils/getValidationMessages'
+import TextField from '@mui/material/TextField'
 
 function Register(){
   const API_PATH = '/usuarios'
@@ -23,7 +24,7 @@ function Register(){
       senha_acesso: '',
       telefone: ''
     },
-    erros: {},
+    errors: {},
     showWaiting: false,
     notif: {
       show: false,
@@ -44,12 +45,32 @@ function Register(){
     setState({...state, usuario: usuariosCopy})
   }
 
-  function handleFormSubmit(event) {
+ async function handleFormSubmit(event) {
     event.preventDefault()    // Evita que a página seja recarregada
 
+  const { email } = usuario;
+  const emailAlreadyExists =  await checkEmailExists(email);
+
+  if (emailAlreadyExists) {
+    setState({
+      ...state,
+      errors: { email: 'Este email já está cadastrado' },
+    });
+  } else {
     // Envia os dados para o back-end
-    sendData()
+    sendData();
   }
+}
+  async function checkEmailExists(email) {
+    try {
+      const response = await myfetch.get(`/usuarios?email=${email}`);
+      return response.data.length > 0;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+  
 
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
@@ -125,16 +146,18 @@ function Register(){
           color: 'white',
           fontFamily: 'monospace'
         }}>
-          <div className="wrap-login">
+          <div className="wrap-register">
             <form onSubmit={handleFormSubmit} className="login-form">
-                <span className="login-form-title" style={{fontFamily: 'monospace'}}>Cadastrar-se</span>
+                <span className="login-form-title" style={{fontFamily: 'monospace', color: 'black', fontWeight: 'bold', marginBottom: '10px'}}>Cadastrar-se</span>
                 <span className="login-form-title">
                   <img src={StreamAdvisor} alt="Stream Advisor"/>
                 </span>
 
-                <div className="wrap-input">
-                <input 
-                  className={usuario !== "" ? 'has-val input': 'input'}
+                <div className="wrap-input2">
+                <TextField 
+                  className='input2'
+                  label='Nome'
+                  variant='filled'
                   type="name"
                   name='nome'
                   required
@@ -143,12 +166,14 @@ function Register(){
                   helperText={errors?.nome}
                   onChange={handleFormFieldChange}
                 />
-                <span className="focus-input" data-placeholder="Nome"></span>
                 </div>
 
-                <div className="wrap-input">
-                <input 
-                  className={usuario !== "" ? 'has-val input': 'input'}
+                <div className="wrap-input2">
+                <TextField 
+                  label='Sobrenome'
+                  color='secondary'
+                  className='input2'
+                  variant='filled'
                   type="nome"
                   name='sobrenome'
                   required
@@ -157,12 +182,13 @@ function Register(){
                   value={usuario.sobrenome}
                   onChange={handleFormFieldChange}
                 />
-                <span className="focus-input" data-placeholder="Sobrenome"></span>
                 </div>
 
-                <div className="wrap-input">
-                <input 
-                  className={usuario !== "" ? 'has-val input': 'input'}
+                <div className="wrap-input2">
+                <TextField 
+                  label='Email'
+                  className='input2'
+                  variant='filled'
                   type="email"
                   name='email'
                   required
@@ -171,12 +197,14 @@ function Register(){
                   helperText={errors?.email}
                   onChange={handleFormFieldChange}
                 />
-                <span className="focus-input" data-placeholder="Email"></span>
                 </div>
 
-                <div className="wrap-input">
-                <input 
-                  className={usuario !== "" ? 'has-val input': 'input'}
+                <div className="wrap-input2">
+                <TextField 
+                  label='Senha'
+                  color='secondary'
+                  className='input2'
+                  variant='filled'
                   type="password"
                   name='senha_acesso'
                   required
@@ -185,12 +213,13 @@ function Register(){
                   value={usuario.senha_acesso}
                   onChange={handleFormFieldChange}
                 />
-                <span className="focus-input" data-placeholder="Senha"></span>
                 </div>
 
-                <div className="wrap-input">
-                <input 
-                  className={usuario !== "" ? 'has-val input': 'input'}
+                <div className="wrap-input2">
+                <TextField
+                  className='input2'
+                  variant='filled'
+                  label='Telefone'
                   type="phone"
                   required
                   name='telefone'
@@ -199,7 +228,6 @@ function Register(){
                   value={usuario.telefone}
                   onChange={handleFormFieldChange}
                 />
-                <span className="focus-input" data-placeholder="Telefone"></span>
                 </div>
                 <div className="container-login-form-btn">
                   <button 
