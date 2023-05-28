@@ -15,6 +15,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Link } from 'react-router-dom';
+import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
 
 export default function PaymentMethodList() {
 
@@ -43,10 +45,17 @@ export default function PaymentMethodList() {
     setState({ ...state, showWaiting: true })
     try {
       const result = await myfetch.get(API_PATH);
-      const agendaPendentes = result.filter(agenda => agenda.status === 'Agendado' || agenda.status === 'Em andamento');
+      const agendaPendentes = result.filter(agenda => agenda.status === 'Agendado' || agenda.status === 'Em andamento'
+      );
+      const formattedAgendaPendentes = agendaPendentes.map(agenda => ({
+        ...agenda,
+        data_horario_inicio: format(parseISO(agenda.data_horario_inicio), 'dd/MM/yyyy - HH:mm'),
+        data_horario_fim: format(parseISO(agenda.data_horario_fim), 'dd/MM/yyyy - HH:mm')
+      }));
+      
         setState({ 
         ...state, 
-        agendaPendentes,
+        agendaPendentes: formattedAgendaPendentes,
         showWaiting: false,
         showDialog: false
       });
@@ -82,19 +91,15 @@ export default function PaymentMethodList() {
       valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
     },
     {
-      field: 'data_agenda',
-      headerName: 'Data',
-      width: 150
-    },
-    {
-      field: 'horario_inicio',
+      field: 'data_horario_inicio',
       headerName: 'Início',
-      width: 150
+      width: 150,
     },
+
     {
-      field: 'horario_fim',
+      field: 'data_horario_fim',
       headerName: 'Término',
-      width: 150
+      width: 150,
     },
     {
       field: 'titulo_agenda',

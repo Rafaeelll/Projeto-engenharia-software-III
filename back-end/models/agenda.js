@@ -33,6 +33,8 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
   }
+
+
   Agenda.init({
     id: {
       allowNull: false,
@@ -48,15 +50,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    data_agenda:{
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    horario_inicio:{
+    data_horario_inicio:{
       type: DataTypes.DATE,
       allowNull: false
     },
-    horario_fim:{
+    data_horario_fim:{
       type: DataTypes.DATE,
       allowNull: false,
     },

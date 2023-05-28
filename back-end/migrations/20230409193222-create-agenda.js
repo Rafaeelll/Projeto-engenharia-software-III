@@ -17,15 +17,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      data_agenda:{
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      horario_inicio:{
+      data_horario_inicio:{
         type: Sequelize.DATE,
         allowNull: false
       },
-      horario_fim:{
+      data_horario_fim:{
         type: Sequelize.DATE,
         allowNull: false,
       },

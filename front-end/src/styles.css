@@ -54,6 +54,11 @@
     position: relative;
     margin-bottom: 37px;
 }
+.wrap-input3{
+    width: 100;
+    position: relative;
+    margin-bottom: 20px;
+}
 .input{
     font-size: 15px;
     color: #fff;

@@ -1,22 +1,22 @@
 import * as React from 'react';
 import dayjs from 'dayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { MobileTimePicker } from '@mui/x-date-pickers/MobileTimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimeField } from '@mui/x-date-pickers/TimeField';
 
+export default function CustomTimeFormat() {
+  const [value, setValue] = React.useState(dayjs(''));
 
-export default function ResponsiveTimePickers() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DemoContainer
-        components={[
-          'MobileTimePicker',
-        ]}
-      >
-        <DemoItem label="Início">
-          <MobileTimePicker defaultValue={dayjs('')} />
-        </DemoItem>
+      <DemoContainer components={['TimeField', 'TimeField', 'TimeField']}>
+        <TimeField
+          label="Format without meridiem"
+          value={value}
+          onChange={(newValue) => setValue(newValue)}
+          format="HH:mm"
+        />
       </DemoContainer>
     </LocalizationProvider>
   );

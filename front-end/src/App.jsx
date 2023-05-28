@@ -5,7 +5,7 @@ import Register from './beggining_pages/Register';
 import About from './beggining_pages/About';
 import Contact from './beggining_pages/Contact';
 import PaginaInicial from './beggining_pages/system_pages/PaginaInicial';
-import CriarAgendas from './beggining_pages/system_pages/CriarAgendas';
+import CriarAgendas from './beggining_pages/system_pages/system_pages_forms/AgendaForm';
 import Agendas from './beggining_pages/system_pages/Agendas'
 import VerificarAgendas from './beggining_pages/system_pages/VerificarAgendas';
 import Perfil from './beggining_pages/system_pages/Perfil';

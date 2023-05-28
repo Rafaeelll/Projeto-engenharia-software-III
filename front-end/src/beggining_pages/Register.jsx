@@ -114,7 +114,7 @@ function Register(){
     }
     
     // Se o item foi salvo com sucesso, retorna à página de listagem
-    if(notif.severity === 'success') navigate(-1)
+    if(notif.severity === 'success') navigate('/login')
 
     setState({ ...state, notif: { ...notif, show: false } })
   }
