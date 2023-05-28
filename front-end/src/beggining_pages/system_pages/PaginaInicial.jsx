@@ -18,7 +18,7 @@ import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 
-export default function PaymentMethodList() {
+export default function PaginaInicial() {
 
   const API_PATH = '/agendas'
 
@@ -128,7 +128,7 @@ export default function PaymentMethodList() {
       align: 'center',
       width: 90,
       renderCell: params => (
-        <Link to={'./' + params.id}>
+        <Link to={'/criar_agenda/' + params.id}>
           <IconButton aria-label="Editar">
             <EditIcon />
           </IconButton>

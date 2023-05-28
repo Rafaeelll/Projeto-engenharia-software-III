@@ -6,6 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom'
 import Divider from '@mui/material/Divider'
 
+
 export default function MainMenu() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -54,17 +55,21 @@ export default function MainMenu() {
         <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/jogo">
           Jogos
         </MenuItem>
+
+        <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/visualizacao">
+          Visualizações
+        </MenuItem>
         
         <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/login">
           Perfil
         </MenuItem>
 
         <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/configuracao">
-          Configuranções
+          Configurações
         </MenuItem>
 
         <MenuItem style={{fontFamily: 'monospace'}} onClick={handleClose} component={Link} to="/login">
-          Log out
+          Sair
         </MenuItem>
       </Menu>
     </div>

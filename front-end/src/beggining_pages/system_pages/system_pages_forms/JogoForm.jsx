@@ -8,23 +8,18 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
-import Agenda from '../../../../models/Agenda'
+import Jogo from '../../../../models/Jogo'
 import PageTitle from '../../../components/ui/PageTitle';
 
-export default function CriarAgendas() {
-  const API_PATH = '/agendas';
+export default function jogos() {
+  const API_PATH = '/jogos';
   const params = useParams()
 
   const navigate = useNavigate();
 
   const [state, setState] = React.useState({
-    criarAgendas: {
-      titulo_agenda: '',
-      usuario_id: '',
-      plt_transm: '',
-      jogo_id: '',
-      descricao: '',
-      status: '',
+    jogos: {
+      nome: '',
     },
     errors: {},
     showWaiting: false,
@@ -34,25 +29,12 @@ export default function CriarAgendas() {
       severity: 'success' // ou 'error'
     }
   });
-  const { criarAgendas, errors, showWaiting, notif } = state;
+  const { jogos, errors, showWaiting, notif } = state;
   
   function handleFormFieldChange(event) {
-    const { name, value } = event.target;
-  
-    let updatedValue = value;
-  
-    // Verifica se o campo requer conversão de hora
-    if (name === 'data_horario_inicio' || name === 'data_horario_fim') {
-      const [hours, minutes] = value.split(':');
-      const formattedValue = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      updatedValue = formattedValue;
-    }
-  
-    // Atualiza o valor do campo correspondente no objeto criarAgendas
-    const criarAgendasCopy = { ...criarAgendas, [name]: updatedValue };
-  
-    // Atualiza o estado com o novo objeto criarAgendasCopy
-    setState({ ...state, criarAgendas: criarAgendasCopy });
+    const jogosCopy = {...jogos}
+    jogosCopy[event.target.name] = event.target.value
+    setState({...state, jogos: jogosCopy})
   }
   
   
@@ -74,7 +56,7 @@ export default function CriarAgendas() {
       const result = await myfetch.get(`${API_PATH}/${params.id}`)
       setState({
         ...state,
-        criarAgendas: result,
+        jogos: result,
         showWaiting: false
       })
     }
@@ -98,13 +80,13 @@ export default function CriarAgendas() {
     try {
       
       // Chama a validação da biblioteca Joi
-      await Agenda.validateAsync(criarAgendas, { abortEarly: false })
+      await Jogo.validateAsync(jogos, { abortEarly: false })
 
       // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendas)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogos)
       
       // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, criarAgendas)
+      else await myfetch.post(API_PATH, jogos)
 
       setState({
         ...state, 
@@ -169,10 +151,10 @@ export default function CriarAgendas() {
       </div>
 
       <PageTitle 
-        title={params.id ? "Editar agenda" : "Criar agendas"} 
+        title={params.id ? "Editar Jogo" : "Cadastrar jogos"} 
       />
       <div
-        className="agenda-container"
+        className="Jogo-container"
         style={{
           width: '30%',
           margin: '0 auto',
@@ -180,7 +162,7 @@ export default function CriarAgendas() {
           marginTop: '15px',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
           borderRadius: '5px',
-          height: '98%'
+          height: '30%'
         }}
       >
         <form style={{ width: '100%' }} onSubmit={handleFormSubmit}>
@@ -199,127 +181,25 @@ export default function CriarAgendas() {
               marginBottom: '20px'
             }}
           >
-            Crie sua agenda
+            Registre o jogo
           </span>
           <div className='wrap-input3'>
             <TextField
               id="standard-basic"
+              color='secondary'
               label="Título"
+              variant='filled'
               type="name"
-              variant='filled'
-              color='secondary'
               required
               fullWidth
-              name="titulo_agenda"
-              value={criarAgendas.titulo_agenda}
+              name="nome"
+              value={jogos.nome}
               onChange={handleFormFieldChange}
-              error={errors?.titulo_agenda}
-              helperText={errors?.titulo_agenda}
+              error={errors?.nome}
+              helperText={errors?.nome}
             />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              label="Id usuario"
-              type="number"
-              variant='filled'
-              fullWidth
-              required
-              name="usuario_id" // Nome do campo na tabela
-              value={criarAgendas.usuario_id} // Nome do campo na tabela
-              onChange={handleFormFieldChange}
-              error={errors?.usuario_id}
-              helperText={errors?.usuario_id}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              id="standard-basic"
-              label="Id jogo"
-              fullWidth
-              type="number"
-              color='secondary'
-              variant='filled'
-              required
-              name="jogo_id"
-              value={criarAgendas.jogo_id}
-              onChange={handleFormFieldChange}
-              error={errors?.jogo_id}
-              helperText={errors?.jogo_id}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              required
-              type="datetime-local"
-              label='Início'
-              name="data_horario_inicio"
-              fullWidth
-              value={criarAgendas.data_horario_inicio}
-              onChange={handleFormFieldChange}
-            />
-          </div>
-          
-          <div className='wrap-input3'>
-            <TextField
-              required
-              label='Fim'
-              color='secondary'
-              type="datetime-local"
-              name="data_horario_fim"
-              fullWidth
-              value={criarAgendas.data_horario_fim}
-              onChange={handleFormFieldChange}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              required
-              fullWidth
-              name="status"
-              variant='filled'
-              type='text'
-              label='Status'
-              color="secondary"
-              value={criarAgendas.status}
-              onChange={handleFormFieldChange}
-              error={errors?.status}
-              helperText={errors?.status}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              label='Plataforma'
-              type="name"
-              fullWidth
-              name="plt_transm"
-              variant='filled'
-              color="secondary"
-              value={criarAgendas.plt_transm}
-              onChange={handleFormFieldChange}
-              error={errors?.plt_transm}
-              helperText={errors?.plt_transm}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              required
-              label='Descrição'
-              type="name"
-              variant='filled'
-              name="descricao"
-              value={criarAgendas.descricao}
-              onChange={handleFormFieldChange}
-              error={errors?.descricao}
-              helperText={errors?.descricao}
-            />
-          </div>
-          <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
+          </div> 
+          <div className='jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
             <button
               style={{
                 margin: '10px',
@@ -348,11 +228,11 @@ export default function CriarAgendas() {
                 borderRadius: '5px',
                 cursor: 'pointer',
               }}
-              onClick={() => navigate('/agenda')}
+              onClick={() => navigate('/jogo')}
             >
               Cancelar
             </button>
-          </div>       
+          </div>         
         </form>
       </div>
     </div>
