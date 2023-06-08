@@ -7,15 +7,20 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/usuarios');
+
 
 var app = express();
- // conecta ao BD
- // Acessar o back-end
- const cors = require('cors')
- app.use(cors())
 
+// Habilita que apenas o front-end indicado
+// na variável process.env.FRONT_ORIGIN possa
+// acessar o back-end
+const cors = require('cors')
+app.use(cors({
+  origin: process.env.FRONT_ORIGIN,
+  credentials: true // Exige o envio de cookie com credenciais
+}))
+
+// Conexão ao BD ------------------------------------------
  const db = require('./models')
 
  try {
@@ -33,9 +38,23 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// chama a verificação de autenticação para qualquer rota
-const auth = require('./lib/auth')
-app.use(auth)
+// chama a verificação de autenticação para todas as rotas, exceto a rota de cadastro de usuários
+const auth = require('./lib/auth');
+
+// ...
+
+app.use((req, res, next) => {
+  if (req.url === '/usuarios/cadastro' && req.method === 'POST') {
+    // Ignora a verificação de autenticação para a rota de cadastro de usuários
+    next();
+  } else {
+    auth(req, res, next);
+  }
+});
+
+// Resto do código...
+
+
 
 /*********************ROTAS*****************************/
 const usuarios = require('./routes/usuarios')

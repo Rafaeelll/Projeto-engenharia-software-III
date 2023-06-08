@@ -15,7 +15,6 @@ module.exports = {
       },
       jogo_id:{
         type: Sequelize.INTEGER,
-        allowNull: false,
       },
       data_horario_inicio:{
         type: Sequelize.DATE,
@@ -34,7 +33,6 @@ module.exports = {
       },
       descricao:{
         type: Sequelize.TEXT,
-        allowNull: false,
       },
       status:{
         type: Sequelize.ENUM('Agendado', 'Em andamento', 'Finalizada'),

@@ -17,9 +17,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      data_visualizacao: {
-        type: Sequelize.DATE,
-        allowNull: false
+      jogo_id:{
+        type: Sequelize.INTEGER,
       },
       numero_visualizacao: {
         type: Sequelize.INTEGER,

@@ -11,11 +11,11 @@ import Usuario from '../../models/usuario'
 import getValidationMessages from '../utils/getValidationMessages'
 import TextField from '@mui/material/TextField'
 
+
 function Register(){
-  const API_PATH = '/usuarios'
+  const API_PATH = '/usuarios/cadastro'
 
   const navigate = useNavigate()
-
   const [state, setState] = React.useState({
     usuario: {
       nome: '',
@@ -39,38 +39,34 @@ function Register(){
     notif
   } = state
 
+
+
   function handleFormFieldChange(event) {
-    const usuariosCopy = {...usuario}
-    usuariosCopy[event.target.name] = event.target.value
-    setState({...state, usuario: usuariosCopy})
-  }
-
- async function handleFormSubmit(event) {
-    event.preventDefault()    // Evita que a página seja recarregada
-
-  const { email } = usuario;
-  const emailAlreadyExists =  await checkEmailExists(email);
-
-  if (emailAlreadyExists) {
-    setState({
-      ...state,
-      errors: { email: 'Este email já está cadastrado' },
-    });
-  } else {
-    // Envia os dados para o back-end
-    sendData();
-  }
-}
-  async function checkEmailExists(email) {
-    try {
-      const response = await myfetch.get(`/usuarios?email=${email}`);
-      return response.data.length > 0;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  }
+    const { name, value } = event.target;
   
+    let updatadedValue = value;
+    if (name === 'telefone') {
+    // Remove qualquer caractere que não seja dígito
+    const cleanedValue = value.replace(/\D/g, '');
+    // Formata o valor
+    const formattedValue = cleanedValue.replace(
+      /(\d{2})(\d{4,5})(\d{4})/,
+      '($1) $2-$3'
+    )
+    updatadedValue = formattedValue
+    }
+    
+    const usuariosCopy = {...usuario, [name]: updatadedValue};
+
+    setState({...state, usuario: usuariosCopy})
+} 
+  
+
+function handleFormSubmit(event) {
+  event.preventDefault()    // Evita que a página seja recarregada
+  // Envia os dados para o back-end
+  sendData()
+}
 
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
@@ -220,13 +216,17 @@ function Register(){
                   className='input2'
                   variant='filled'
                   label='Telefone'
-                  type="phone"
+                  type="tel"
                   required
                   name='telefone'
                   error={errors?.telefone}
                   helperText={errors?.telefone}
                   value={usuario.telefone}
-                  onChange={handleFormFieldChange}
+                  inputProps={{
+                    maxLength: 15,
+                    pattern: '\\([0-9]{2}\\) [0-9]{4,5}-[0-9]{4}',
+                    onChange: handleFormFieldChange,
+                  }}
                 />
                 </div>
                 <div className="container-login-form-btn">

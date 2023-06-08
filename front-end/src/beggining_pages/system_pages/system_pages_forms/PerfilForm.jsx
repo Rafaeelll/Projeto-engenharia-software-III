@@ -1,28 +1,35 @@
-import React from 'react';
+import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
-import '../../../styles.css'
 import myfetch from '../../../utils/myfetch';
+import '../../../styles.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
-import Jogo from '../../../../models/Jogo'
-import Paper from '@mui/material/Paper'
-import Typography  from '@mui/material/Typography';
+import Perfil from '../../../../models/Perfil';
+import Paper  from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
 
-export default function jogos() {
-  const API_PATH = '/jogos';
+export default function PerfilForm() {
+  const API_PATH = '/usuarios'
   const params = useParams()
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const [state, setState] = React.useState({
-    jogos: {
+    perfils: {
       nome: '',
-      data_jogo: ''
+      sobrenome: '',
+      email: '',
+      senha_acesso: '',
+      telefone: '',
+      plataforma_fav: '',
+      data_nasc: '',
+      jogo_fav: '',
+      foto_perfil: '',
     },
     errors: {},
     showWaiting: false,
@@ -32,25 +39,37 @@ export default function jogos() {
       severity: 'success' // ou 'error'
     }
   });
-  const { jogos, errors, showWaiting, notif } = state;
+  const { perfils, errors, showWaiting, notif } = state;
   
-function handleFormFieldChange(event) {
+  function handleFormFieldChange(event) {
     const { name, value } = event.target;
   
-    let updatedValue = value;
+    let updatedValueDate = value;
   
     // Verifica se o campo requer conversão de hora
-    if (name === 'data_jogo'){
+    if (name === 'data_nasc') {
       const [hours, minutes] = value.split(':');
       const formattedValue = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      updatedValue = formattedValue;
+      updatedValueDate = formattedValue;
     }
+    let updatedValueTel = value;
+    if (name === 'telefone') {
+    // Remove qualquer caractere que não seja dígito
+    const cleanedValue = value.replace(/\D/g, '');
+    // Formata o valor
+    const formattedValue = cleanedValue.replace(
+      /(\d{2})(\d{4,5})(\d{4})/,
+      '($1) $2-$3'
+    )
+    updatedValueTel = formattedValue
+    }
+
   
-    // Atualiza o valor do campo correspondente no objeto historicoJogos
-    const jogosCopy = { ...jogos, [name]: updatedValue };
+    // Atualiza o valor do campo correspondente no objeto perfils
+    const perfilsCopy = { ...perfils, [name]: updatedValueDate, [name]: updatedValueTel };
   
-    // Atualiza o estado com o novo objeto jogosCopy
-    setState({ ...state, jogos: jogosCopy });
+    // Atualiza o estado com o novo objeto perfilsCopy
+    setState({ ...state, perfils: perfilsCopy });
   }
   
   
@@ -72,7 +91,7 @@ function handleFormFieldChange(event) {
       const result = await myfetch.get(`${API_PATH}/${params.id}`)
       setState({
         ...state,
-        jogos: result,
+        perfils: result,
         showWaiting: false
       })
     }
@@ -96,13 +115,13 @@ function handleFormFieldChange(event) {
     try {
       
       // Chama a validação da biblioteca Joi
-      await Jogo.validateAsync(jogos, { abortEarly: false })
+      await Perfil.validateAsync(perfils, { abortEarly: false })
 
       // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogos)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, perfils)
       
       // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, jogos)
+      else await myfetch.post(API_PATH, perfils)
 
       setState({
         ...state, 
@@ -152,20 +171,20 @@ function handleFormFieldChange(event) {
       }}
       className="pai"
     >
-        <Backdrop
+      <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
         <CircularProgress sx={{margin: '5px'}} color="secondary" />
         Por favor, aguarde.
       </Backdrop>
-      
+
       <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose}>
         {notif.message}
       </Notification>
 
       <Paper
-        className="Jogo-container"
+        className="Perfil-container"
         sx={{
           width: '512px',
           background: 'whitesmoke',
@@ -177,41 +196,130 @@ function handleFormFieldChange(event) {
         }}
       >
         <FormTitle
-          title={params.id ? "Editar Jogo" : "Cadastrar jogos"} 
+          title="Editar perfil"
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
           <div className='wrap-input3'>
             <TextField
               id="standard-basic"
-              color='secondary'
-              label="Título"
-              variant='filled'
+              label="Nome"
               type="name"
+              variant='filled'
+              color='secondary'
               required
               fullWidth
               name="nome"
-              value={jogos.nome}
+              value={perfils.nome}
               onChange={handleFormFieldChange}
               error={errors?.nome}
               helperText={errors?.nome}
             />
-          </div> 
+          </div>
+
           <div className='wrap-input3'>
             <TextField
-              required
+              label="Sobrenome"
+              type="name"
               variant='filled'
-              label='Data de aquisição'
-              type="datetime-local"
-              name="data_jogo"
               fullWidth
-              value={jogos.data_jogo}
+              required
+              name="sobrenome" // Nome do campo na tabela
+              value={perfils.sobrenome} // Nome do campo na tabela
               onChange={handleFormFieldChange}
+              error={errors?.sobrenome}
+              helperText={errors?.sobrenome}
+            />
+          </div>
+
+          <div className='wrap-input3'>
+            <TextField
+              label="Senha"
+              type="password"
+              variant='filled'
+              fullWidth
+              required
+              name="senha_acesso" // Nome do campo na tabela
+              value={perfils.senha_acesso} // Nome do campo na tabela
+              onChange={handleFormFieldChange}
+              error={errors?.senha_acesso}
+              helperText={errors?.senha_acesso}
+            />
+          </div>
+
+          <div className="wrap-input3">
+            <TextField
+              variant='filled'
+              label='Telefone'
+              type="tel"
+              fullWidth
+              required
+              name='telefone'
+              error={errors?.telefone}
+              helperText={errors?.telefone}
+              value={perfils.telefone}
+              inputProps={{
+                maxLength: 15,
+                pattern: '\\([0-9]{2}\\) [0-9]{4,5}-[0-9]{4}',
+                onChange: handleFormFieldChange,
+              }}
             />
           </div>
           
-          <div className='jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
-            <Button
+          <div className='wrap-input3'>
+            <TextField
+              label='Data nascimento'
+              color='secondary'
+              type="datetime-local"
+              name="data_nasc"
+              fullWidth
+              value={perfils.data_nasc}
+              onChange={handleFormFieldChange}
+            />
+          </div>
+
+          <div className='wrap-input3'>
+            <TextField
+              fullWidth
+              name="plataforma_fav"
+              variant='filled'
+              type='name'
+              label='Plataforma favorita'
+              color="secondary"
+              value={perfils.plataforma_fav}
+              onChange={handleFormFieldChange}
+              error={errors?.plataforma_fav}
+              helperText={errors?.plataforma_fav}
+            />
+          </div>
+
+          <div className='wrap-input3'>
+            <TextField
+              label='Jogo Favorito'
+              type="name"
+              fullWidth
+              name="jogo_fav"
+              variant='filled'
+              color="secondary"
+              value={perfils.jogo_fav}
+              onChange={handleFormFieldChange}
+              error={errors?.jogo_fav}
+              helperText={errors?.jogo_fav}
+            />
+          </div>
+
+          <div className='wrap-input3'>
+            <TextField
+              label='Foto de perfil'
+              variant='filled'
+              type="file"
+              name="foto_perfil"
+              value={perfils.foto_perfil}
+              onChange={handleFormFieldChange}
+            />
+          </div>
+          <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
+          <Button
               sx={{
                 margin: '10px',
                 padding: '5px 15px 5px 15px',
@@ -241,11 +349,11 @@ function handleFormFieldChange(event) {
               }}
               color="error"
               variant='contained'
-              onClick={() => navigate('/jogo')}
+              onClick={() => navigate('/perfil')}
             >
               Cancelar
             </Button>
-          </div>         
+          </div>       
         </form>
         </Typography>
       </Paper>

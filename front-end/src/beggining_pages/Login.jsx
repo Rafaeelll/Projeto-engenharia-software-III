@@ -7,9 +7,11 @@ import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../components/ui/Notification'
 import myfetch from '../utils/myfetch'
+import  Button  from '@mui/material/Button'
+import LoginIcon from '@mui/icons-material/Login';
 
 
-export default function LoginForm() {
+export default function LoginForm({onLoginLogout}) {
   const [email, setEmail] = React.useState("")
   const [senha_acesso, setSenhaAcesso] = React.useState("")
   const [showWaiting, setShowWaiting] = React.useState(false)
@@ -18,7 +20,8 @@ export default function LoginForm() {
     message: '',
     severity: 'success' // ou 'error'
   })
-  const navigate= useNavigate()
+  const navigate = useNavigate()
+
   async function handleSubmit(event) {
     event.preventDefault()      // Impede o recarregamento da página
     setShowWaiting(true)        // Mostra o spinner de espera
@@ -34,6 +37,7 @@ export default function LoginForm() {
         message: 'Autenticação realizada com sucesso!',
         severity: 'success'
       })
+      onLoginLogout(true)
       navigate('/pagina_inicial')
 
     }
@@ -89,7 +93,8 @@ export default function LoginForm() {
           justifyContent: 'center',
           alignItems: 'center',
           color: 'white',
-          fontFamily: 'monospace'}}>
+          fontFamily: 'monospace'
+          }}>
           <div className="wrap-login">
             <form onSubmit={handleSubmit}className="login-form">
                 <span className="login-form-title" style={{fontFamily: 'monospace', fontWeight: 'bold', marginBottom: '15px'}}>Autentique-se</span>
@@ -120,12 +125,18 @@ export default function LoginForm() {
               </div>
 
               <div className="container-login-form-btn">
-                <button className="login-form-btn">Login</button>
+                <Button type='submit'
+                sx={{ 
+                  color: 'inherit', 
+                  fontFamily: 'monospace', 
+                  fontSize: '20px', 
+                  fontWeight: 'bold',
+                  }} 
+                  className="login-form-btn">Entrar {<LoginIcon sx={{margin: '5px'}}/>} </Button>
               </div>
-
+              
               <div className="text-center">
                 <span className="txt1">Não possui conta?</span>
-
                 <Link className ="txt2" to="/cadastro"><p><u>Criar conta</u></p></Link>
               </div>
             </form>

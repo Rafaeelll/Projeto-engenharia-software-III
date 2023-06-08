@@ -10,7 +10,6 @@ import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Notification from '../../components/ui/Notification';
-import HeaderBar from '../../components/ui/HeaderBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -227,8 +226,6 @@ export default function VerificarAgendas() {
         {notif.message}
       </Notification>
 
-      <HeaderBar/>
-
       <PageTitle title="Relatório de agendas"/>
 
       <Box sx={{
@@ -248,8 +245,8 @@ export default function VerificarAgendas() {
         </Link>
       </Box>
 
-      <Paper elevation={4} sx={{ height: 500, width: '70%', margin: '0 auto' }}>
-        <DataGrid
+      <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
+        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
           rows={agendaPendentes}
           columns={columns}
           initialState={{

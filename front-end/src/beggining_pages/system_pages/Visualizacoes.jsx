@@ -10,21 +10,10 @@ import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Notification from '../../components/ui/Notification';
-import HeaderBar from '../../components/ui/HeaderBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Link } from 'react-router-dom';
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${day}/${month}/${year} - ${hours}:${minutes}`;
-}
 
   export default function Visualizacoes() {
     const API_PATH = '/visualizacoes'
@@ -88,16 +77,17 @@ function formatDate(dateString) {
         valueGetter: params => params.row?.agenda.id  + ': ' + params.row?.agenda.titulo_agenda
       },
       {
+        field: 'jogo_id',
+        headerName: 'Id agenda',
+        width: 150,
+        valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
+      },
+      {
         field: 'numero_visualizacao',
         headerName: 'Visualizações',
         width: 150
       },
-      {
-        field: 'data_visualizacao',
-        headerName: 'Data de visualização',
-        width: 150,
-        valueFormatter: (params) => formatDate(params.value),
-      },
+      
       {
         field: 'edit',
         headerName: 'Editar',
@@ -204,8 +194,6 @@ function formatDate(dateString) {
           {notif.message}
         </Notification>
 
-        <HeaderBar/>
-
         <PageTitle title="Listagem de visualizações"  />
   
         <Box sx={{
@@ -225,8 +213,8 @@ function formatDate(dateString) {
           </Link>
         </Box>
   
-        <Paper elevation={4} sx={{ height: 500, width: '70%', margin: '0 auto' }}>
-          <DataGrid
+        <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
+        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
             rows={visualizacoes}
             columns={columns}
             initialState={{

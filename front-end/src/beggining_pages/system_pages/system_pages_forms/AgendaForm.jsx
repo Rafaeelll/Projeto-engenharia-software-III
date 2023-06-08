@@ -1,4 +1,3 @@
-import HeaderBar from '../../../components/ui/HeaderBar';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
@@ -9,11 +8,17 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import Agenda from '../../../../models/Agenda'
-import PageTitle from '../../../components/ui/PageTitle';
+import FormTitle from '../../../components/ui/FormTitle';
+import Autocomplete from '@mui/material/Autocomplete';
+import { format } from 'date-fns';
+import Paper from '@mui/material/Paper'
+import Typography  from '@mui/material/Typography';
+import Button  from '@mui/material/Button';
 
 export default function CriarAgendas() {
   const API_PATH = '/agendas';
   const params = useParams()
+  const statusOptions = ["Agendado", "Em andamento", "Finalizada"];
 
   const navigate = useNavigate();
 
@@ -25,6 +30,8 @@ export default function CriarAgendas() {
       jogo_id: '',
       descricao: '',
       status: '',
+      data_horario_inicio: '',
+      data_horario_fim: ''
     },
     errors: {},
     showWaiting: false,
@@ -58,10 +65,26 @@ export default function CriarAgendas() {
   
   function handleFormSubmit(event) {
     event.preventDefault(); // Evita que a página seja recarregada
-
+  
+    // Verifica se a data de término é maior do que a data de início
+    const inicio = new Date(criarAgendas.data_horario_inicio);
+    const fim = new Date(criarAgendas.data_horario_fim);
+    if (fim <= inicio) {
+      setState({
+        ...state,
+        notif: {
+          severity: 'error',
+          show: true,
+          message: 'A data de término deve ser maior do que a data de início!',
+        },
+      });
+      return;
+    }
+  
     // Envia os dados para o back-end
     sendData();
   }
+  
     React.useEffect(() => {
     // Se houver parâmetro id na rota, devemos carregar um registro
     // existente para edição
@@ -96,15 +119,31 @@ export default function CriarAgendas() {
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
     try {
+        // Formata os valores da data/hora antes de enviar
+        const formattedInicio = format(
+          new Date(criarAgendas.data_horario_inicio),
+          'yyyy-MM-dd HH:mm' // Formato desejado
+        );
+        const formattedFim = format(
+          new Date(criarAgendas.data_horario_fim),
+          'yyyy-MM-dd HH:mm' // Formato desejado
+        );
+    
+        // Atualiza os valores formatados no objeto criarAgendas
+        const criarAgendasCopy = {
+          ...criarAgendas,
+          data_horario_inicio: formattedInicio,
+          data_horario_fim: formattedFim,
+        };
       
       // Chama a validação da biblioteca Joi
-      await Agenda.validateAsync(criarAgendas, { abortEarly: false })
+      await Agenda.validateAsync(criarAgendasCopy, { abortEarly: false })
 
       // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendas)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendasCopy)
       
       // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, criarAgendas)
+      else await myfetch.post(API_PATH, criarAgendasCopy)
 
       setState({
         ...state, 
@@ -118,9 +157,7 @@ export default function CriarAgendas() {
     }
     catch(error) {
       const { validationError, errorMessages } = getValidationMessages(error)
-
       console.error(error)
-      
       setState({
         ...state, 
         showWaiting: false,
@@ -158,49 +195,34 @@ export default function CriarAgendas() {
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
-        <CircularProgress color="secondary" />
+        <CircularProgress sx={{margin: '5px'}} color="secondary" />
+        Por favor, aguarde.
       </Backdrop>
 
       <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose}>
         {notif.message}
       </Notification>
-      <div>
-        <HeaderBar />
-      </div>
 
-      <PageTitle 
-        title={params.id ? "Editar agenda" : "Criar agendas"} 
-      />
-      <div
+      <Paper
         className="agenda-container"
-        style={{
-          width: '30%',
-          margin: '0 auto',
-          padding: '30px',
-          marginTop: '15px',
+        sx={{
+          width: '512px',
+          maxWidth: '90%',
+          margin: '25px auto 0 auto',
+          background: 'whitesmoke',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
           borderRadius: '5px',
-          height: '98%'
+          p: '12px',
+          height: '95%',
+          maxHeight: '100%'
+          
         }}
       >
-        <form style={{ width: '100%' }} onSubmit={handleFormSubmit}>
-          <span
-            style={{
-              textAlign: 'center',
-              width: '100%',
-              background: 'purple',
-              borderRadius: '5px',
-              fontFamily: 'monospace',
-              fontSize: '25px',
-              display: 'block',
-              fontWeight: 'bold',
-              color: 'whitesmoke',
-              top: 'auto',
-              marginBottom: '20px'
-            }}
-          >
-            Crie sua agenda
-          </span>
+        <FormTitle
+          title={params.id ? "Editar agenda" : "Criar agendas"} 
+        /> 
+        <Typography variant="h5" component="div">
+        <form onSubmit={handleFormSubmit}>        
           <div className='wrap-input3'>
             <TextField
               id="standard-basic"
@@ -241,7 +263,6 @@ export default function CriarAgendas() {
               type="number"
               color='secondary'
               variant='filled'
-              required
               name="jogo_id"
               value={criarAgendas.jogo_id}
               onChange={handleFormFieldChange}
@@ -276,20 +297,27 @@ export default function CriarAgendas() {
           </div>
 
           <div className='wrap-input3'>
-            <TextField
-              required
-              fullWidth
-              name="status"
-              variant='filled'
-              type='text'
-              label='Status'
-              color="secondary"
-              value={criarAgendas.status}
-              onChange={handleFormFieldChange}
-              error={errors?.status}
-              helperText={errors?.status}
-            />
-          </div>
+          <Autocomplete
+            id="status-autocomplete"
+            options={statusOptions}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                required
+                fullWidth
+                name="status"
+                variant='filled'
+                type='text'
+                label='Status'
+                color="secondary"
+                value={criarAgendas.status}
+                onChange={handleFormFieldChange}
+                error={errors?.status}
+                helperText={errors?.status}
+              />
+            )}
+          />
+        </div>
 
           <div className='wrap-input3'>
             <TextField
@@ -308,10 +336,9 @@ export default function CriarAgendas() {
 
           <div className='wrap-input3'>
             <TextField
-              required
               label='Descrição'
-              type="name"
-              variant='filled'
+              fullWidth
+              type="text"
               name="descricao"
               value={criarAgendas.descricao}
               onChange={handleFormFieldChange}
@@ -319,42 +346,45 @@ export default function CriarAgendas() {
               helperText={errors?.descricao}
             />
           </div>
-          <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
-            <button
-              style={{
+          <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+          <Button
+              sx={{
                 margin: '10px',
-                padding: '5px 20px 5px 20px',
+                padding: '5px 15px 5px 15px',
                 border: 'none',
                 background: 'black',
-                color: 'white',
                 fontFamily: 'monospace',
                 fontWeight: 'bold',
                 borderRadius: '5px',
                 cursor: 'pointer',
               }}
+              color="secondary"
+              variant='contained'
               type="submit"
             > 
               Salvar
-            </button>
-            <button
-              style={{
+            </Button>
+            <Button
+              sx={{
                 margin: '10px',
-                padding: '5px 20px 5px 20px',
+                padding: '5px 15px 5px 15px',
                 border: 'none',
                 background: 'black',
-                color: 'white',
                 fontFamily: 'monospace',
                 fontWeight: 'bold',
                 borderRadius: '5px',
                 cursor: 'pointer',
               }}
+              color="error"
+              variant='contained'
               onClick={() => navigate('/agenda')}
             >
               Cancelar
-            </button>
+            </Button>
           </div>       
         </form>
-      </div>
+        </Typography>
+      </Paper>
     </div>
   );
 }

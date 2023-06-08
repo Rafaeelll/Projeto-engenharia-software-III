@@ -3,7 +3,7 @@ import {useNavigate } from 'react-router-dom'
 import PageTitle from '../../components/ui/PageTitle'
 import  Button  from '@mui/material/Button'
 
-export default function Configuracoes() {
+export default function Notificacoes() {
   const nav = useNavigate()
 
   return (

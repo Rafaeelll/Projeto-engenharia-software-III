@@ -133,8 +133,18 @@ controller.login = async (req, res) => {
         { expiresIn: '24h' }         // Duração do token
       )
 
-      // Retorna o token ~> HTTP 200: OK (implícito)
-      res.json({ auth: true, token })
+        // Retorna o token ~> HTTP 200: OK (implícito)
+      //res.json({ auth: true, token })
+      
+      res.cookie('AUTH', token, { 
+        httpOnly: true, 
+        secure: true,
+        sameSite: 'None',
+        path: '/',
+        maxAge: 24 * 60 * 60  // 24 horas, em segundos
+      })
+      res.json({auth: true})
+      
     }
     else {
       // Senha errada ~> HTTP 401: Unauthorized
@@ -144,6 +154,26 @@ controller.login = async (req, res) => {
   catch(error) {
     console.error(error)
   }
+}
+
+controller.logout = (req, res) => {
+  res.clearCookie('AUTH') // Apaga o cookie
+  res.json({ auth: false })
+}
+controller.cadastro = async (req, res)=>{
+  try {
+
+    // Criptografa a senha
+    req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso , 12)
+
+    await Usuario.create(req.body)
+    // HTTP 201: Created
+    res.status(201).end()
+  }
+  catch(error) {
+    console.error(error)
+  }
+
 }
 
 module.exports = controller

@@ -1,4 +1,3 @@
-import HeaderBar from '../../../components/ui/HeaderBar';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
@@ -9,7 +8,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import Visualizacao from '../../../../models/Visualizacao'
-import PageTitle from '../../../components/ui/PageTitle';
+import Paper from '@mui/material/Paper'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
+import FormTitle from '../../../components/ui/FormTitle';
+
 
 export default function VisualizacaoForm() {
   const API_PATH = '/visualizacoes';
@@ -21,6 +24,7 @@ export default function VisualizacaoForm() {
     visualizacoes: {
       usuario_id: '',
       agenda_id: '',
+      jogo_id: '',
       numero_visualizacao: ''
     },
     errors: {},
@@ -34,24 +38,10 @@ export default function VisualizacaoForm() {
   const { visualizacoes, errors, showWaiting, notif } = state;
   
   function handleFormFieldChange(event) {
-    const { name, value } = event.target;
-  
-    let updatedValue = value;
-  
-    // Verifica se o campo requer conversão de hora
-    if (name === 'data_visualizacao'){
-      const [hours, minutes] = value.split(':');
-      const formattedValue = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      updatedValue = formattedValue;
-    }
-  
-    // Atualiza o valor do campo correspondente no objeto visualizacoes
-    const visualizacoesCopy = { ...visualizacoes, [name]: updatedValue };
-  
-    // Atualiza o estado com o novo objeto visualizacoesCopy
-    setState({ ...state, visualizacoes: visualizacoesCopy });
+    const visualizacoesCopy = {...visualizacoes}
+    visualizacoesCopy[event.target.name] = event.target.value
+    setState({...state, visualizacoes: visualizacoesCopy})
   }
-  
   
   function handleFormSubmit(event) {
     event.preventDefault(); // Evita que a página seja recarregada
@@ -155,49 +145,31 @@ export default function VisualizacaoForm() {
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
-        <CircularProgress color="secondary" />
+        <CircularProgress sx={{margin: '5px'}} color="secondary" />
+        Por favor, aguarde.
       </Backdrop>
 
       <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose}>
         {notif.message}
       </Notification>
-      <div>
-        <HeaderBar />
-      </div>
 
-      <PageTitle 
-        title={params.id ? "Editar Historico de Jogos" : "Criar histórico de jogos"} 
-      />
-      <div
-        className="visualicao-form-container"
-        style={{
-          width: '30%',
-          margin: '0 auto',
-          padding: '30px',
-          marginTop: '15px',
-          boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
+      <Paper
+        className="visualizacao-container"
+        sx={{
+          width: '512px',
+          maxWidth: '90%',
+          margin: '25px auto 0 auto',
+          background: 'whitesmoke',
           borderRadius: '5px',
-          height: '65%'
+          p: '12px',
+          boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >
-        <form style={{ width: '100%' }} onSubmit={handleFormSubmit}>
-          <span
-            style={{
-              textAlign: 'center',
-              width: '100%',
-              background: 'purple',
-              borderRadius: '5px',
-              fontFamily: 'monospace',
-              fontSize: '25px',
-              display: 'block',
-              fontWeight: 'bold',
-              color: 'whitesmoke',
-              top: 'auto',
-              marginBottom: '20px'
-            }}
-          >
-            Crie suas visualizaçoes
-          </span>
+        <FormTitle
+          title={params.id ? "Editar visualização" : "Crie sua visualização"} 
+        /> 
+        <Typography variant="h5" component="div">
+        <form onSubmit={handleFormSubmit}>
           <div className='wrap-input3'>
             <TextField
               label="Id usuario"
@@ -232,15 +204,17 @@ export default function VisualizacaoForm() {
 
           <div className='wrap-input3'>
             <TextField
-              required
-              label='Data de visualização'
-              type="datetime-local"
-              variant='filled'
-              color='secondary'
-              name="data_visualizacao"
+              id="standard-basic"
+              label="Id jogo"
               fullWidth
-              value={visualizacoes.data_visualizacao}
+              type="number"
+              color='secondary'
+              variant='filled'
+              name="jogo_id"
+              value={visualizacoes.jogo_id}
               onChange={handleFormFieldChange}
+              error={errors?.jogo_id}
+              helperText={errors?.jogo_id}
             />
           </div>
 
@@ -257,43 +231,44 @@ export default function VisualizacaoForm() {
             />
           </div>
           <div className="visualicao-form-btn" style={{ display: 'flex', justifyContent: 'center' }}>
-            <button
-              style={{
+            <Button
+              sx={{
                 margin: '10px',
-                padding: '5px 20px',
+                padding: '5px 15px 5px 15px',
                 border: 'none',
                 background: 'black',
-                color: 'white',
                 fontFamily: 'monospace',
                 fontWeight: 'bold',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                marginTop: '25px'
               }}
+              color="secondary"
+              variant='contained'
               type="submit"
-            >
+            > 
               Salvar
-            </button>
-            <button
-              style={{
+            </Button>
+            <Button
+              sx={{
                 margin: '10px',
-                padding: '5px 20px',
+                padding: '5px 15px 5px 15px',
                 border: 'none',
                 background: 'black',
-                color: 'white',
                 fontFamily: 'monospace',
                 fontWeight: 'bold',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                marginTop: '25px'
               }}
+              color="error"
+              variant='contained'
               onClick={() => navigate('/visualizacao')}
             >
               Cancelar
-            </button>
+            </Button>
           </div>
         </form>
-      </div>
+        </Typography>
+      </Paper>
     </div>
   );
 }

@@ -48,7 +48,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     jogo_id:{
       type: DataTypes.INTEGER,
-      allowNull: false,
     },
     data_horario_inicio:{
       type: DataTypes.DATE,
@@ -67,7 +66,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     descricao:{
       type: DataTypes.TEXT,
-      allowNull: false,
     },
     status:{
       type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalizada'),

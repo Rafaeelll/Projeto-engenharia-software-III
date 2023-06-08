@@ -1,4 +1,3 @@
-import HeaderBar from '../../../components/ui/HeaderBar';
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
@@ -9,7 +8,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import HistoricoJogo from '../../../../models/HistoricoJogo'
-import PageTitle from '../../../components/ui/PageTitle';
+import Paper from '@mui/material/Paper'
+import Typography  from '@mui/material/Typography';
+import FormTitle from '../../../components/ui/FormTitle';
+import Button  from '@mui/material/Button';
+
 
 export default function HistoricoJogosForm() {
   const API_PATH = '/historico_jogos';
@@ -33,23 +36,11 @@ export default function HistoricoJogosForm() {
   });
   const { historicoJogos, errors, showWaiting, notif } = state;
   
+  
   function handleFormFieldChange(event) {
-    const { name, value } = event.target;
-  
-    let updatedValue = value;
-  
-    // Verifica se o campo requer conversão de hora
-    if (name === 'data_jogo'){
-      const [hours, minutes] = value.split(':');
-      const formattedValue = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      updatedValue = formattedValue;
-    }
-  
-    // Atualiza o valor do campo correspondente no objeto historicoJogos
-    const historicoJogosCopy = { ...historicoJogos, [name]: updatedValue };
-  
-    // Atualiza o estado com o novo objeto historicoJogosCopy
-    setState({ ...state, historicoJogos: historicoJogosCopy });
+    const historicoJogosCopy = {...historicoJogos}
+    historicoJogosCopy[event.target.name] = event.target.value
+    setState({...state, historicoJogos: historicoJogosCopy})
   }
   
   
@@ -155,49 +146,31 @@ export default function HistoricoJogosForm() {
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
-        <CircularProgress color="secondary" />
+        <CircularProgress sx={{margin: '5px'}} color="secondary" />
+        Por favor, aguarde.
       </Backdrop>
 
       <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose}>
         {notif.message}
       </Notification>
-      <div>
-        <HeaderBar />
-      </div>
 
-      <PageTitle 
-        title={params.id ? "Editar Historico de Jogos" : "Criar histórico de jogos"} 
-      />
-      <div
+      <Paper
         className="HistoricoJogo-container"
-        style={{
-          width: '30%',
-          margin: '0 auto',
-          padding: '30px',
-          marginTop: '15px',
-          boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
+        sx={{
+          width: '512px',
+          maxWidth: '90%',
+          background: 'whitesmoke',
+          margin: '25px auto 0 auto',
           borderRadius: '5px',
-          height: '60%'
+          p: '12px',
+          boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >
-        <form style={{ width: '100%' }} onSubmit={handleFormSubmit}>
-          <span
-            style={{
-              textAlign: 'center',
-              width: '100%',
-              background: 'purple',
-              borderRadius: '5px',
-              fontFamily: 'monospace',
-              fontSize: '25px',
-              display: 'block',
-              fontWeight: 'bold',
-              color: 'whitesmoke',
-              top: 'auto',
-              marginBottom: '20px'
-            }}
-          >
-            Crie o Histórico de Jogos
-          </span>
+        <FormTitle
+          title={params.id ? "Editar Historico de Jogos" : "Criar histórico de jogos"} 
+        /> 
+        <Typography variant="h5" component="div">
+        <form onSubmit={handleFormSubmit}>
           <div className='wrap-input3'>
             <TextField
               label="Id usuario"
@@ -231,18 +204,6 @@ export default function HistoricoJogosForm() {
 
           <div className='wrap-input3'>
             <TextField
-              required
-              label='Data de aquisição'
-              type="datetime-local"
-              name="data_jogo"
-              fullWidth
-              value={historicoJogos.data_jogo}
-              onChange={handleFormFieldChange}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
               fullWidth
               name="pontuacao"
               variant='filled'
@@ -256,41 +217,44 @@ export default function HistoricoJogosForm() {
             />
           </div>
           <div className='historico-jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
-            <button
-              style={{
+          <Button
+              sx={{
                 margin: '10px',
-                padding: '5px 20px 5px 20px',
+                padding: '5px 15px 5px 15px',
                 border: 'none',
                 background: 'black',
-                color: 'white',
                 fontFamily: 'monospace',
                 fontWeight: 'bold',
                 borderRadius: '5px',
                 cursor: 'pointer',
               }}
+              color="secondary"
+              variant='contained'
               type="submit"
             > 
               Salvar
-            </button>
-            <button
-              style={{
+            </Button>
+            <Button
+              sx={{
                 margin: '10px',
-                padding: '5px 20px 5px 20px',
+                padding: '5px 15px 5px 15px',
                 border: 'none',
                 background: 'black',
-                color: 'white',
                 fontFamily: 'monospace',
                 fontWeight: 'bold',
                 borderRadius: '5px',
                 cursor: 'pointer',
               }}
+              color="error"
+              variant='contained'
               onClick={() => navigate('/historico_jogo')}
             >
               Cancelar
-            </button>
+            </Button>
           </div>       
         </form>
-      </div>
+        </Typography>
+      </Paper>
     </div>
   );
 }

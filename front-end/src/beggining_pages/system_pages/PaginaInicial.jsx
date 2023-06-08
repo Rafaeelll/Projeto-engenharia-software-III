@@ -10,13 +10,13 @@ import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Notification from '../../components/ui/Notification';
-import HeaderBar from '../../components/ui/HeaderBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
+
 
 export default function PaginaInicial() {
 
@@ -50,9 +50,16 @@ export default function PaginaInicial() {
       const formattedAgendaPendentes = agendaPendentes.map(agenda => ({
         ...agenda,
         data_horario_inicio: format(parseISO(agenda.data_horario_inicio), 'dd/MM/yyyy - HH:mm'),
-        data_horario_fim: format(parseISO(agenda.data_horario_fim), 'dd/MM/yyyy - HH:mm')
+        data_horario_fim: format(parseISO(agenda.data_horario_fim), 'dd/MM/yyyy - HH:mm'),
+        usuario_id: capitalizeName(agenda.usuario.nome) + ' ' + capitalizeName(agenda.usuario.sobrenome),
+        jogo_id: capitalizeName(agenda.jogo.nome)
       }));
       
+      function capitalizeName(name) {
+        const firstLetter = name.charAt(0).toUpperCase();
+        const restOfName = name.slice(1).toLowerCase();
+        return firstLetter + restOfName;
+      }
         setState({ 
         ...state, 
         agendaPendentes: formattedAgendaPendentes,
@@ -227,8 +234,6 @@ export default function PaginaInicial() {
         {notif.message}
       </Notification>
 
-      <HeaderBar/>
-
       <PageTitle title="Listagem de agendas pendentes"/>
 
       <Box sx={{
@@ -248,8 +253,8 @@ export default function PaginaInicial() {
         </Link>
       </Box>
 
-      <Paper elevation={4} sx={{ height: 500, width: '70%', margin: '0 auto' }}>
-        <DataGrid
+      <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
+        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
           rows={agendaPendentes}
           columns={columns}
           initialState={{

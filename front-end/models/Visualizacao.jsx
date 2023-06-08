@@ -9,10 +9,13 @@ const Views = Joi.object({
         .min(1)
         .required()
         .messages({'*': 'O id é obrigatorio ser igual ou maior que 1.'}),
+    jogo_id: Joi.number()
+        .min(1)
+        .messages({'*': 'O id é obrigatorio ser igual ou maior que 1.'}),
     numero_visualizacao: Joi.number()
         .min(0)
         .required()
-        .messages({'*': 'O numero de visualizações é obrigatorio ser igual ou maior que 0.'})
+        .messages({'*': 'O número de visualizações é obrigatorio ser igual ou maior que 0.'})
 })
 .options({allowUnknown: true})
 export default Views

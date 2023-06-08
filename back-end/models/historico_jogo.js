@@ -38,10 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     pontuacao: {
-      type: DataTypes.INTEGER
-    },
-    data_jogo: {
-      type: DataTypes.DATE,
+      type: DataTypes.INTEGER,
       allowNull: false
     },
     createdAt: {

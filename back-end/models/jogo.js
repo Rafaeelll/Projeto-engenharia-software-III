@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',          // Campo da tabela local 
         as: 'agendas'  // Nome do campo de associação (plural)
       })
+      this.hasMany(models.Visualizacao, {
+        foreignKey: 'jogo_id',    // Campo da tabela estrangeira
+        sourceKey: 'id',          // Campo da tabela local 
+        as: 'visualizacoes'  // Nome do campo de associação (plural)
+      })
       this.hasMany(models.HistoricoJogo, {
         foreignKey: 'jogo_id',    // Campo da tabela estrangeira
         sourceKey: 'id',          // Campo da tabela local 
@@ -32,6 +37,10 @@ module.exports = (sequelize, DataTypes) => {
     nome: {
       type: DataTypes.STRING(50),
       allowNull:false
+    },
+    data_jogo: {
+      type: DataTypes.DATE,
+      allowNull: false
     },
   }, {
     sequelize,

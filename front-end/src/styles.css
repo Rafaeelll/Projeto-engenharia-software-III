@@ -57,7 +57,7 @@
 .wrap-input3{
     width: 100;
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 .input{
     font-size: 15px;
@@ -262,6 +262,12 @@
     transition: 0.7s ease;
     border-radius: 20px;
 }
+.active {
+    background-color: black;
+    transition: 0.7s ease;
+    border-radius: 20px;
+  }
+  
 /* }
 .calendar {
     display: flex;

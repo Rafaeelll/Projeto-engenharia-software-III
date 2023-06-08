@@ -13,6 +13,10 @@ module.exports = {
         type: Sequelize.STRING(50),
         allowNull:false
       },
+      data_jogo: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
