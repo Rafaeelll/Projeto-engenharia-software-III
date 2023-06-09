@@ -2,6 +2,7 @@ import React from "react";
 import {Link} from 'react-router-dom'
 import StreamAdvisor from '../assets/sa2.png';
 import ImageSF from '../assets/SF.png'
+
 function About(){
     return (
         <div className="container-landing-page" style={{ backgroundSize: "cover", backgroundPosition: "center", height: "100vh", display: "flex", justifyContent: "center" }}>

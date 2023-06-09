@@ -10,6 +10,8 @@ import myfetch from '../utils/myfetch'
 import Usuario from '../../models/usuario'
 import getValidationMessages from '../utils/getValidationMessages'
 import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import HowToRegIcon from '@mui/icons-material/HowToReg';
 
 
 function Register(){
@@ -230,11 +232,15 @@ function handleFormSubmit(event) {
                 />
                 </div>
                 <div className="container-login-form-btn">
-                  <button 
+                  <Button 
+                    sx={{fontFamily:'monospace',
+                    fontWeight:'bold', fontSize: '20px'
+                  }}
                     className="login-form-btn"
                     type='submit'
-                    >Cadastrar
-                  </button>
+                    color='inherit'
+                    >Cadastrar {<HowToRegIcon sx={{m: '8px'}}/>}
+                  </Button>
               </div>
             </form>
           </div>
