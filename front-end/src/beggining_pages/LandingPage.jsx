@@ -15,10 +15,10 @@ export default function LandingPage() {
         Desenvolvido por: <strong>Rafael Felipe Abnel Cintra</strong>
       </Typography>
       <div className="header" style={{ alignSelf: "flex-start", marginLeft: "auto", marginTop: "10px" }} >
-        <NavLink exact to="/" activeClassName="active" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Home</NavLink>
-        <NavLink to="/login" activeClassName="active" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Login</NavLink>
-        <NavLink to="/sobre" activeClassName="active" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Sobre</NavLink>
-        <NavLink to="/contato" activeClassName="active" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Contatos</NavLink>
+        <NavLink to="/" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Home</NavLink>
+        <NavLink to="/login" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Login</NavLink>
+        <NavLink to="/sobre" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Sobre</NavLink>
+        <NavLink to="/contato" className="login-btm" style={{ padding: "10px", color: "white", fontWeight: "bold", fontFamily: "monospace", fontSize: '15px' }}>Contatos</NavLink>
       </div>
 
       <div className="body-text" style={{ alignSelf: "center", marginLeft: "20px", marginRight: "20px" }}>
@@ -27,7 +27,7 @@ export default function LandingPage() {
           Sistema de agendas e monitoramento voltada a gamers, com objetividade de melhorar o seu desempenho e produtividade no ramo profissional de gamer-streamer.
         </p>
         <NavLink to="/cadastro">
-          <button className="cadastrar-se-btm" style={{ padding: "20px 100px 20px 100px", color: "white", border: "none", borderRadius: "5px", fontWeight: "bold", fontFamily: "monospace" }}>Cadastrar-se</button>
+          <button className="cadastrar-se-btm" style={{ padding: "20px 70px 20px 70px", color: "white", border: "none", borderRadius: "5px", fontWeight: "bold", fontFamily: "monospace" }}>Cadastrar-se</button>
         </NavLink>
       </div>
 

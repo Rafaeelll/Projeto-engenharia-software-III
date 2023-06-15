@@ -208,7 +208,7 @@ export default function HistoricoJogosForm() {
               name="pontuacao"
               variant='filled'
               type='number'
-              label='Pontuação'
+              label='Nível'
               color="secondary"
               value={historicoJogos.pontuacao}
               onChange={handleFormFieldChange}

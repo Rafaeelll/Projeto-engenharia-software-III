@@ -89,9 +89,8 @@ import { Link } from 'react-router-dom';
       },
       {
         field: 'pontuacao',
-        headerName: 'Pontuação',
-        width: 150,
-        valueFormatter: (params) => `Nível: ${params.value}`,
+        headerName: 'Nível',
+        width: 150
       },
       // {
       //   field: 'data_jogo',

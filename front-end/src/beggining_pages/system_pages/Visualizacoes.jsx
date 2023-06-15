@@ -78,7 +78,7 @@ import { Link } from 'react-router-dom';
       },
       {
         field: 'jogo_id',
-        headerName: 'Id agenda',
+        headerName: 'Id jogo',
         width: 150,
         valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
       },
