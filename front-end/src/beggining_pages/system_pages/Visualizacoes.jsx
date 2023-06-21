@@ -77,12 +77,6 @@ import { Link } from 'react-router-dom';
         valueGetter: params => params.row?.agenda.id  + ': ' + params.row?.agenda.titulo_agenda
       },
       {
-        field: 'jogo_id',
-        headerName: 'Id jogo',
-        width: 150,
-        valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
-      },
-      {
         field: 'numero_visualizacao',
         headerName: 'Visualizações',
         width: 150

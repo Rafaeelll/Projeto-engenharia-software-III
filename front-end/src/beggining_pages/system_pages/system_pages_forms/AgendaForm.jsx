@@ -135,6 +135,20 @@ export default function CriarAgendas() {
           data_horario_inicio: formattedInicio,
           data_horario_fim: formattedFim,
         };
+        
+        const jogoExists = await verifyJogoExists(criarAgendas.jogo_id);
+        if (!jogoExists) {
+          setState({
+            ...state,
+            showWaiting: false,
+            notif: {
+              severity: 'error',
+              show: true,
+              message: 'ID do jogo não encontrado! Crie um jogo ou informe um ID válido.',
+            },
+          });
+          return;
+        }
       
       // Chama a validação da biblioteca Joi
       await Agenda.validateAsync(criarAgendasCopy, { abortEarly: false })
@@ -169,6 +183,15 @@ export default function CriarAgendas() {
         }
       })
     }
+    async function verifyJogoExists(jogoId) {
+      try {
+        const result = await myfetch.get(`/jogos/${jogoId}`);
+        return !!result; // Retorna true se o jogo for encontrado, senão retorna false
+      } catch (error) {
+        return false; // Retorna false em caso de erro
+      }
+    }
+  
   }
 
   function handleNotifClose(event, reason) {
@@ -259,6 +282,7 @@ export default function CriarAgendas() {
             <TextField
               id="standard-basic"
               label="Id jogo"
+              required
               fullWidth
               type="number"
               color='secondary'

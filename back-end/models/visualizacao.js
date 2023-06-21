@@ -20,11 +20,6 @@ module.exports = (sequelize, DataTypes) => {
         targetKey: 'id',       // Nome do campo na tabela de DESTINO
         as: 'agenda'             // Nome do atributo para exibição
       })
-      this.belongsTo(models.Jogo,{
-        foreignKey: 'jogo_id', // Nome do campo na tabela de ORIGEM
-        targetKey: 'id',       // Nome do campo na tabela de DESTINO
-        as: 'jogo'             // Nome do atributo para exibição
-      })
     }
   }
   Visualizacao.init({
@@ -41,9 +36,6 @@ module.exports = (sequelize, DataTypes) => {
     agenda_id: {
       type: DataTypes.INTEGER,
       allowNull: false
-    },
-    jogo_id:{
-      type: DataTypes.INTEGER,
     },
     numero_visualizacao: {
       type: DataTypes.INTEGER,

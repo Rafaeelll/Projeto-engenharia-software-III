@@ -48,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     jogo_id:{
       type: DataTypes.INTEGER,
+      allowNull: false
     },
     data_horario_inicio:{
       type: DataTypes.DATE,

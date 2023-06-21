@@ -15,6 +15,7 @@ module.exports = {
       },
       jogo_id:{
         type: Sequelize.INTEGER,
+        allowNull: false
       },
       data_horario_inicio:{
         type: Sequelize.DATE,

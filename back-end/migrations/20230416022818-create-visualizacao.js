@@ -17,9 +17,6 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      jogo_id:{
-        type: Sequelize.INTEGER,
-      },
       numero_visualizacao: {
         type: Sequelize.INTEGER,
         allowNull: false

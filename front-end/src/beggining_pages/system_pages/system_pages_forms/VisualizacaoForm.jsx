@@ -24,7 +24,6 @@ export default function VisualizacaoForm() {
     visualizacoes: {
       usuario_id: '',
       agenda_id: '',
-      jogo_id: '',
       numero_visualizacao: ''
     },
     errors: {},
@@ -83,6 +82,19 @@ export default function VisualizacaoForm() {
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
     try {
+
+      const agendaExist = await verifyAgendaExist(visualizacoes.agenda_id)
+      if(!agendaExist){
+        setState({
+          ...state,
+          showWaiting: false,
+          notif:{
+            severity: 'error',
+            show: true,
+            message: 'ID da agenda não encontrado! Crie uma agenda ou informe um ID válido.'
+          }
+        })
+      }
       
       // Chama a validação da biblioteca Joi
       await Visualizacao.validateAsync(visualizacoes, { abortEarly: false })
@@ -118,6 +130,14 @@ export default function VisualizacaoForm() {
           message: 'ERRO: ' + error.message
         }
       })
+    }
+    async function verifyAgendaExist(agendaId){
+      try{
+        const result = await myfetch.get(`/agendas/${agendaId}`)
+        return !!result;
+      }catch(error){
+        return false
+      }
     }
   }
 
@@ -199,22 +219,6 @@ export default function VisualizacaoForm() {
               onChange={handleFormFieldChange}
               error={errors?.agenda_id}
               helperText={errors?.agenda_id}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              id="standard-basic"
-              label="Id jogo"
-              fullWidth
-              type="number"
-              color='secondary'
-              variant='filled'
-              name="jogo_id"
-              value={visualizacoes.jogo_id}
-              onChange={handleFormFieldChange}
-              error={errors?.jogo_id}
-              helperText={errors?.jogo_id}
             />
           </div>
 

@@ -1,5 +1,5 @@
 // importar o model correspondente ao controller
-const {Visualizacao, Usuario, Agenda, Jogo} = require('../models')
+const {Visualizacao, Usuario, Agenda} = require('../models')
 
 const controller = {} // objeto vazio
 
@@ -28,7 +28,6 @@ controller.retrieve = async (req, res)=>{
             include: [
                 {model: Usuario, as: 'usuario'},
                 {model: Agenda, as: 'agenda'},
-                {model: Jogo, as: 'jogo'}
             ]
         })
         res.send(data)
