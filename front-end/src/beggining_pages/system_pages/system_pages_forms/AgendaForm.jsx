@@ -11,6 +11,8 @@ import Agenda from '../../../../models/Agenda'
 import FormTitle from '../../../components/ui/FormTitle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { format } from 'date-fns';
+import DatePicker from "react-datepicker"; 
+import "react-datepicker/dist/react-datepicker.css"
 import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import Button  from '@mui/material/Button';
@@ -22,6 +24,7 @@ export default function CriarAgendas() {
 
   const navigate = useNavigate();
 
+  // const [selectedDate, setselectedDate] = React.useState(null);
   const [state, setState] = React.useState({
     criarAgendas: {
       titulo_agenda: '',
@@ -44,22 +47,9 @@ export default function CriarAgendas() {
   const { criarAgendas, errors, showWaiting, notif } = state;
   
   function handleFormFieldChange(event) {
-    const { name, value } = event.target;
-  
-    let updatedValue = value;
-  
-    // Verifica se o campo requer conversão de hora
-    if (name === 'data_horario_inicio' || name === 'data_horario_fim') {
-      const [hours, minutes] = value.split(':');
-      const formattedValue = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      updatedValue = formattedValue;
-    }
-  
-    // Atualiza o valor do campo correspondente no objeto criarAgendas
-    const criarAgendasCopy = { ...criarAgendas, [name]: updatedValue };
-  
-    // Atualiza o estado com o novo objeto criarAgendasCopy
-    setState({ ...state, criarAgendas: criarAgendasCopy });
+    const criarAgendasCopy = {...criarAgendas}
+    criarAgendasCopy[event.target.name] = event.target.value
+    setState({...state, criarAgendas: criarAgendasCopy})
   }
   
   

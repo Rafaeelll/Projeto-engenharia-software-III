@@ -12,6 +12,10 @@ import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
+import DatePicker from "react-datepicker"; 
+import "react-datepicker/dist/react-datepicker.css"
+import format from 'date-fns/format';
+
 
 export default function jogos() {
   const API_PATH = '/jogos';
@@ -19,10 +23,12 @@ export default function jogos() {
 
   const navigate = useNavigate();
 
+  // const [selectedDate, setselectedDate] = React.useState(null);
+
   const [state, setState] = React.useState({
     jogos: {
       nome: '',
-      data_jogo: ''
+      data_jogo: '',
     },
     errors: {},
     showWaiting: false,
@@ -34,25 +40,11 @@ export default function jogos() {
   });
   const { jogos, errors, showWaiting, notif } = state;
   
-function handleFormFieldChange(event) {
-    const { name, value } = event.target;
-  
-    let updatedValue = value;
-  
-    // Verifica se o campo requer conversão de hora
-    if (name === 'data_jogo'){
-      const [hours, minutes] = value.split(':');
-      const formattedValue = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      updatedValue = formattedValue;
-    }
-  
-    // Atualiza o valor do campo correspondente no objeto historicoJogos
-    const jogosCopy = { ...jogos, [name]: updatedValue };
-  
-    // Atualiza o estado com o novo objeto jogosCopy
-    setState({ ...state, jogos: jogosCopy });
+  function handleFormFieldChange(event) {
+    const jogosCopy = {...jogos}
+    jogosCopy[event.target.name] = event.target.value
+    setState({...state, jogos: jogosCopy})
   }
-  
   
   function handleFormSubmit(event) {
     event.preventDefault(); // Evita que a página seja recarregada
@@ -94,15 +86,27 @@ function handleFormFieldChange(event) {
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
     try {
-      
+      // Formata os valores da data/hora antes de enviar
+      const formattedDateJogo = format(
+        new Date(jogos.data_jogo),
+        'yyyy-MM-dd HH:mm' // Formato desejado
+      );
+
+      // Atualiza os valores formatados no objeto jogos
+      const jogosCopy = {
+        ...jogos,
+        data_jogo: formattedDateJogo,
+      };
+      console.log(jogosCopy);
+
       // Chama a validação da biblioteca Joi
-      await Jogo.validateAsync(jogos, { abortEarly: false })
+      await Jogo.validateAsync(jogosCopy, { abortEarly: false })
 
       // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogos)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogosCopy)
       
       // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, jogos)
+      else await myfetch.post(API_PATH, jogosCopy)
 
       setState({
         ...state, 

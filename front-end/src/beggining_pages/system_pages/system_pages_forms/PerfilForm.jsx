@@ -12,6 +12,8 @@ import Paper  from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
+import DatePicker from "react-datepicker"; 
+import "react-datepicker/dist/react-datepicker.css"
 
 export default function PerfilForm() {
   const API_PATH = '/usuarios'
@@ -19,6 +21,7 @@ export default function PerfilForm() {
 
   const navigate = useNavigate()
 
+  // const [selectedDate, setselectedDate] = React.useState(null);
   const [state, setState] = React.useState({
     perfils: {
       nome: '',
@@ -43,15 +46,7 @@ export default function PerfilForm() {
   
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
-  
-    let updatedValueDate = value;
-  
-    // Verifica se o campo requer conversão de hora
-    if (name === 'data_nasc') {
-      const [hours, minutes] = value.split(':');
-      const formattedValue = `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
-      updatedValueDate = formattedValue;
-    }
+
     let updatedValueTel = value;
     if (name === 'telefone') {
     // Remove qualquer caractere que não seja dígito
@@ -66,7 +61,7 @@ export default function PerfilForm() {
 
   
     // Atualiza o valor do campo correspondente no objeto perfils
-    const perfilsCopy = { ...perfils, [name]: updatedValueDate, [name]: updatedValueTel };
+    const perfilsCopy = { ...perfils, [name]: updatedValueTel };
   
     // Atualiza o estado com o novo objeto perfilsCopy
     setState({ ...state, perfils: perfilsCopy });
@@ -113,15 +108,25 @@ export default function PerfilForm() {
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
     try {
+      const formattedBirthDay = format(
+        new Date(perfils.data_nasc),
+        'yyyy-MM-dd HH:mm' // Formato desejado
+      );
+
+      // Atualiza os valores formatados no objeto perfils
+      const perfilsCopy = {
+        ...perfils,
+        data_nasc: formattedBirthDay,
+      };
       
       // Chama a validação da biblioteca Joi
-      await Perfil.validateAsync(perfils, { abortEarly: false })
+      await Perfil.validateAsync(perfilsCopy, { abortEarly: false })
 
       // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, perfils)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, perfilsCopy)
       
       // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, perfils)
+      else await myfetch.post(API_PATH, perfilsCopy)
 
       setState({
         ...state, 
