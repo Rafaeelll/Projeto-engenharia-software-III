@@ -41,8 +41,6 @@ function Register(){
     notif
   } = state
 
-
-
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
   
@@ -70,41 +68,55 @@ function handleFormSubmit(event) {
   sendData()
 }
 
-  async function sendData() {
-    setState({...state, showWaiting: true, errors: {}})
-    try {
+async function sendData() {
+  setState({ ...state, showWaiting: true, errors: {} });
+  try {
+    // Chama a validação da biblioteca Joi
+    await Usuario.validateAsync(usuario, { abortEarly: false });
+    await myfetch.post(API_PATH, usuario);
+    // DAR FEEDBACK POSITIVO
+    setState({
+      ...state,
+      showWaiting: false,
+      notif: {
+        severity: 'success',
+        show: true,
+        message: 'Novo cadastro salvo com sucesso!',
+      },
+    });
+  } catch (error) {
+    const { validationError, errorMessages } = getValidationMessages(error);
 
-       // Chama a validação da biblioteca Joi
-       await Usuario.validateAsync(usuario, { abortEarly: false })
-      await myfetch.post(API_PATH, usuario)
-      //DAR FEEDBACK POSITIVO
+    console.error(error);
+
+    // Verifica se o erro é de conflito (status 409)
+    if (error.response && error.response.status === 409) {
       setState({
-        ...state, 
+        ...state,
         showWaiting: false,
         notif: {
-          severity: 'success',
+          severity: 'error',
           show: true,
-          message: 'Novo cadastro salvo com sucesso!'
-        }
-      })
-    }
-    catch(error) {
-      const { validationError, errorMessages } = getValidationMessages(error)
-
-      console.error(error)
-      
+          message: 'O e-mail informado já está cadastrado.',
+        },
+      });
+    } else {
+      // Erro de validação ou outro erro
       setState({
-        ...state, 
+        ...state,
         showWaiting: false,
         errors: errorMessages,
         notif: {
           severity: 'error',
           show: !validationError,
-          message: 'ERRO: ' + error.message
-        }
-      })
+          message: 'ERRO: ' + error.message,
+        },
+      });
     }
   }
+}
+
+
 
   function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {

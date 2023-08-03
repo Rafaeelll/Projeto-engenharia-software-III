@@ -12,8 +12,8 @@ import Paper  from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
-import DatePicker from "react-datepicker"; 
-import "react-datepicker/dist/react-datepicker.css"
+// import DatePicker from "react-datepicker"; 
+// import "react-datepicker/dist/react-datepicker.css"
 
 export default function PerfilForm() {
   const API_PATH = '/usuarios'
@@ -104,47 +104,63 @@ export default function PerfilForm() {
       })
     }
   }
+  async function verifyEmailExists(email) {
+    try {
+      const result = await myfetch.get(`${API_PATH}?email=${email}`);
+      return !!result;
+    } catch (error) {
+      return false;
+    }
+  }
 
   async function sendData() {
-    setState({...state, showWaiting: true, errors: {}})
+    setState({ ...state, showWaiting: true, errors: {} });
     try {
+      const emailExists = await verifyEmailExists(perfils.email);
+      if (emailExists) {
+        setState({
+          ...state,
+          showWaiting: false,
+          notif: {
+            severity: 'error',
+            show: true,
+            message: 'O e-mail informado já está registrado no sistema!'
+          }
+        });
+        return;
+      }
+
       const formattedBirthDay = format(
         new Date(perfils.data_nasc),
-        'yyyy-MM-dd HH:mm' // Formato desejado
+        'yyyy-MM-dd HH:mm'
       );
 
-      // Atualiza os valores formatados no objeto perfils
       const perfilsCopy = {
         ...perfils,
         data_nasc: formattedBirthDay,
       };
-      
-      // Chama a validação da biblioteca Joi
-      await Perfil.validateAsync(perfilsCopy, { abortEarly: false })
 
-      // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, perfilsCopy)
-      
-      // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, perfilsCopy)
+      await Perfil.validateAsync(perfilsCopy, { abortEarly: false });
+
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, perfilsCopy);
+      else await myfetch.post(API_PATH, perfilsCopy);
 
       setState({
-        ...state, 
+        ...state,
         showWaiting: false,
         notif: {
           severity: 'success',
           show: true,
           message: 'Item salvo com sucesso'
         }
-      })
-    }
-    catch(error) {
-      const { validationError, errorMessages } = getValidationMessages(error)
+      });
+    } catch (error) {
+      const { validationError, errorMessages } = getValidationMessages(error);
 
-      console.error(error)
-      
+      console.error(error);
+
       setState({
-        ...state, 
+        ...state,
         showWaiting: false,
         errors: errorMessages,
         notif: {
@@ -152,7 +168,7 @@ export default function PerfilForm() {
           show: !validationError,
           message: 'ERRO: ' + error.message
         }
-      })
+      });
     }
   }
 

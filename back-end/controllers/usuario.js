@@ -160,20 +160,30 @@ controller.logout = (req, res) => {
   res.clearCookie('AUTH') // Apaga o cookie
   res.json({ auth: false })
 }
-controller.cadastro = async (req, res)=>{
-  try {
+
+// Método para verificar se o e-mail já existe no banco de dados
+controller.cadastro = async (req, res) => {
+   try {
+    // Verificação do e-mail antes de criar o usuário
+    const email = req.body.email;
+    const user = await Usuario.findOne({ where: { email } });
+
+    if (user) {
+      // Se encontrou o usuário com o email, retorna um erro de conflito
+      return res.status(409).json({ error: 'O e-mail informado já está em uso.' });
+    }
 
     // Criptografa a senha
-    req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso , 12)
+    req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso, 12);
 
-    await Usuario.create(req.body)
+    await Usuario.create(req.body);
     // HTTP 201: Created
-    res.status(201).end()
+    res.status(201).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro no servidor' });
   }
-  catch(error) {
-    console.error(error)
-  }
-
 }
+
 
 module.exports = controller

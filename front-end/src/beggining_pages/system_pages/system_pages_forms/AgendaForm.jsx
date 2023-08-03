@@ -11,8 +11,8 @@ import Agenda from '../../../../models/Agenda'
 import FormTitle from '../../../components/ui/FormTitle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { format } from 'date-fns';
-import DatePicker from "react-datepicker"; 
-import "react-datepicker/dist/react-datepicker.css"
+// import DatePicker from "react-datepicker"; 
+// import "react-datepicker/dist/react-datepicker.css"
 import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import Button  from '@mui/material/Button';
@@ -24,7 +24,6 @@ export default function CriarAgendas() {
 
   const navigate = useNavigate();
 
-  // const [selectedDate, setselectedDate] = React.useState(null);
   const [state, setState] = React.useState({
     criarAgendas: {
       titulo_agenda: '',
@@ -41,22 +40,44 @@ export default function CriarAgendas() {
     notif: {
       show: false,
       message: '',
-      severity: 'success' // ou 'error'
+      severity: 'success'
     }
   });
   const { criarAgendas, errors, showWaiting, notif } = state;
-  
+
   function handleFormFieldChange(event) {
-    const criarAgendasCopy = {...criarAgendas}
-    criarAgendasCopy[event.target.name] = event.target.value
-    setState({...state, criarAgendas: criarAgendasCopy})
+    const criarAgendasCopy = { ...criarAgendas };
+    criarAgendasCopy[event.target.name] = event.target.value;
+    setState({ ...state, criarAgendas: criarAgendasCopy });
   }
-  
-  
-  function handleFormSubmit(event) {
-    event.preventDefault(); // Evita que a página seja recarregada
-  
-    // Verifica se a data de término é maior do que a data de início
+
+  async function verifyAgendaExists(usuarioId, dataHorarioInicio, dataHorarioFim) {
+    try {
+      const result = await myfetch.get(`/agendas?usuario_id=${usuarioId}`);
+      const agendas = result || [];
+
+      const inicio = new Date(dataHorarioInicio);
+      const fim = new Date(dataHorarioFim);
+
+      for (const agenda of agendas) {
+        const agendaInicio = new Date(agenda.data_horario_inicio);
+        const agendaFim = new Date(agenda.data_horario_fim);
+
+        // Verifica se o intervalo informado colide com alguma agenda existente
+        if (inicio < agendaFim && fim > agendaInicio) {
+          return true; // Já existe uma agenda no intervalo informado
+        }
+      }
+
+      return false; // Não há colisão de intervalos
+    } catch (error) {
+      return false; // Retorna false em caso de erro
+    }
+  }
+
+  async function handleFormSubmit(event) {
+    event.preventDefault();
+
     const inicio = new Date(criarAgendas.data_horario_inicio);
     const fim = new Date(criarAgendas.data_horario_fim);
     if (fim <= inicio) {
@@ -70,31 +91,40 @@ export default function CriarAgendas() {
       });
       return;
     }
-  
-    // Envia os dados para o back-end
+
+    const agendaExists = await verifyAgendaExists(criarAgendas.usuario_id, criarAgendas.data_horario_inicio, criarAgendas.data_horario_fim);
+    if (agendaExists) {
+      setState({
+        ...state,
+        notif: {
+          severity: 'error',
+          show: true,
+          message: 'Já existe uma agenda programada nesse intervalo de horário para o usuário informado!',
+        },
+      });
+      return;
+    }
+
     sendData();
   }
-  
-    React.useEffect(() => {
-    // Se houver parâmetro id na rota, devemos carregar um registro
-    // existente para edição
-    if(params.id) fetchData()
-  }, [])
+
+  React.useEffect(() => {
+    if (params.id) fetchData();
+  }, []);
 
   async function fetchData() {
-    setState({...state, showWaiting: true, errors:{}})
+    setState({ ...state, showWaiting: true, errors: {} });
     try {
-      const result = await myfetch.get(`${API_PATH}/${params.id}`)
+      const result = await myfetch.get(`${API_PATH}/${params.id}`);
       setState({
         ...state,
         criarAgendas: result,
         showWaiting: false
-      })
-    }
-    catch(error) {
-      console.error(error)
+      });
+    } catch (error) {
+      console.error(error);
       setState({
-        ...state, 
+        ...state,
         showWaiting: false,
         errors: errorMessages,
         notif: {
@@ -102,68 +132,61 @@ export default function CriarAgendas() {
           show: true,
           message: 'ERRO: ' + error.message
         }
-      })
+      });
     }
   }
 
   async function sendData() {
-    setState({...state, showWaiting: true, errors: {}})
+    setState({ ...state, showWaiting: true, errors: {} });
     try {
-        // Formata os valores da data/hora antes de enviar
-        const formattedInicio = format(
-          new Date(criarAgendas.data_horario_inicio),
-          'yyyy-MM-dd HH:mm' // Formato desejado
-        );
-        const formattedFim = format(
-          new Date(criarAgendas.data_horario_fim),
-          'yyyy-MM-dd HH:mm' // Formato desejado
-        );
-    
-        // Atualiza os valores formatados no objeto criarAgendas
-        const criarAgendasCopy = {
-          ...criarAgendas,
-          data_horario_inicio: formattedInicio,
-          data_horario_fim: formattedFim,
-        };
-        
-        const jogoExists = await verifyJogoExists(criarAgendas.jogo_id);
-        if (!jogoExists) {
-          setState({
-            ...state,
-            showWaiting: false,
-            notif: {
-              severity: 'error',
-              show: true,
-              message: 'ID do jogo não encontrado! Crie um jogo ou informe um ID válido.',
-            },
-          });
-          return;
-        }
-      
-      // Chama a validação da biblioteca Joi
+      const formattedInicio = format(
+        new Date(criarAgendas.data_horario_inicio),
+        'yyyy-MM-dd HH:mm'
+      );
+      const formattedFim = format(
+        new Date(criarAgendas.data_horario_fim),
+        'yyyy-MM-dd HH:mm'
+      );
+
+      const criarAgendasCopy = {
+        ...criarAgendas,
+        data_horario_inicio: formattedInicio,
+        data_horario_fim: formattedFim,
+      };
+
+      const jogoExists = await verifyJogoExists(criarAgendas.jogo_id);
+      if (!jogoExists) {
+        setState({
+          ...state,
+          showWaiting: false,
+          notif: {
+            severity: 'error',
+            show: true,
+            message: 'ID do jogo não encontrado! Crie um jogo ou informe um ID válido.',
+          },
+        });
+        return;
+      }
+
       await Agenda.validateAsync(criarAgendasCopy, { abortEarly: false })
 
-      // Registro já existe: chama PUT para atualizar
       if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendasCopy)
-      
-      // Registro não existe: chama POST para criar
       else await myfetch.post(API_PATH, criarAgendasCopy)
 
       setState({
-        ...state, 
+        ...state,
         showWaiting: false,
         notif: {
           severity: 'success',
           show: true,
           message: 'Item salvo com sucesso'
         }
-      })
-    }
-    catch(error) {
+      });
+    } catch (error) {
       const { validationError, errorMessages } = getValidationMessages(error)
       console.error(error)
       setState({
-        ...state, 
+        ...state,
         showWaiting: false,
         errors: errorMessages,
         notif: {
@@ -171,24 +194,23 @@ export default function CriarAgendas() {
           show: !validationError,
           message: 'ERRO: ' + error.message
         }
-      })
+      });
     }
-    async function verifyJogoExists(jogoId) {
-      try {
-        const result = await myfetch.get(`/jogos/${jogoId}`);
-        return !!result; // Retorna true se o jogo for encontrado, senão retorna false
-      } catch (error) {
-        return false; // Retorna false em caso de erro
-      }
+  }
+
+  async function verifyJogoExists(jogoId) {
+    try {
+      const result = await myfetch.get(`/jogos/${jogoId}`);
+      return !!result;
+    } catch (error) {
+      return false;
     }
-  
   }
 
   function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {
       return;
     }
-    // Se o item foi salvo com sucesso, retorna à página de listagem
     if (notif.severity === 'success') navigate(-1);
     setState({ ...state, notif: { ...notif, show: false } });
   }
@@ -208,7 +230,7 @@ export default function CriarAgendas() {
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
-        <CircularProgress sx={{margin: '5px'}} color="secondary" />
+        <CircularProgress sx={{ margin: '5px' }} color="secondary" />
         Por favor, aguarde.
       </Backdrop>
 
@@ -226,177 +248,160 @@ export default function CriarAgendas() {
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
           borderRadius: '5px',
           p: '12px',
-          height: '95%',
+          height: '92%',
           maxHeight: '100%'
-          
         }}
       >
         <FormTitle
-          title={params.id ? "Editar agenda" : "Criar agendas"} 
-        /> 
+          title={params.id ? "Editar agenda" : "Criar agendas"}
+        />
         <Typography variant="h5" component="div">
-        <form onSubmit={handleFormSubmit}>        
-          <div className='wrap-input3'>
-            <TextField
-              id="standard-basic"
-              label="Título"
-              type="name"
-              variant='filled'
-              color='secondary'
-              required
-              fullWidth
-              name="titulo_agenda"
-              value={criarAgendas.titulo_agenda}
-              onChange={handleFormFieldChange}
-              error={errors?.titulo_agenda}
-              helperText={errors?.titulo_agenda}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              label="Id usuario"
-              type="number"
-              variant='filled'
-              fullWidth
-              required
-              name="usuario_id" // Nome do campo na tabela
-              value={criarAgendas.usuario_id} // Nome do campo na tabela
-              onChange={handleFormFieldChange}
-              error={errors?.usuario_id}
-              helperText={errors?.usuario_id}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              id="standard-basic"
-              label="Id jogo"
-              required
-              fullWidth
-              type="number"
-              color='secondary'
-              variant='filled'
-              name="jogo_id"
-              value={criarAgendas.jogo_id}
-              onChange={handleFormFieldChange}
-              error={errors?.jogo_id}
-              helperText={errors?.jogo_id}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-            <TextField
-              required
-              type="datetime-local"
-              label='Início'
-              name="data_horario_inicio"
-              fullWidth
-              value={criarAgendas.data_horario_inicio}
-              onChange={handleFormFieldChange}
-            />
-          </div>
-          
-          <div className='wrap-input3'>
-            <TextField
-              required
-              label='Fim'
-              color='secondary'
-              type="datetime-local"
-              name="data_horario_fim"
-              fullWidth
-              value={criarAgendas.data_horario_fim}
-              onChange={handleFormFieldChange}
-            />
-          </div>
-
-          <div className='wrap-input3'>
-          <Autocomplete
-            id="status-autocomplete"
-            options={statusOptions}
-            renderInput={(params) => (
-              <TextField
-                {...params}
+          <form onSubmit={handleFormSubmit}>
+              <TextField sx={{marginTop: '10px'}}
+                id="standard-basic"
+                label="Título"
+                type="name"
+                variant='filled'
+                color='secondary'
                 required
                 fullWidth
-                name="status"
-                variant='filled'
-                type='text'
-                label='Status'
-                color="secondary"
-                value={criarAgendas.status}
+                name="titulo_agenda"
+                value={criarAgendas.titulo_agenda}
                 onChange={handleFormFieldChange}
-                error={errors?.status}
-                helperText={errors?.status}
+                error={errors?.titulo_agenda}
+                helperText={errors?.titulo_agenda}
               />
-            )}
-          />
-        </div>
 
-          <div className='wrap-input3'>
-            <TextField
-              label='Plataforma'
-              type="name"
-              fullWidth
-              name="plt_transm"
-              variant='filled'
-              color="secondary"
-              value={criarAgendas.plt_transm}
-              onChange={handleFormFieldChange}
-              error={errors?.plt_transm}
-              helperText={errors?.plt_transm}
-            />
-          </div>
+              <TextField sx={{marginTop: '10px'}}
+                label="Id usuario"
+                type="number"
+                variant='filled'
+                fullWidth
+                required
+                name="usuario_id"
+                value={criarAgendas.usuario_id}
+                onChange={handleFormFieldChange}
+                error={errors?.usuario_id}
+                helperText={errors?.usuario_id}
+              />
 
-          <div className='wrap-input3'>
-            <TextField
-              label='Descrição'
-              fullWidth
-              type="text"
-              name="descricao"
-              value={criarAgendas.descricao}
-              onChange={handleFormFieldChange}
-              error={errors?.descricao}
-              helperText={errors?.descricao}
-            />
-          </div>
-          <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-          <Button
-              sx={{
-                margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
-                background: 'black',
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-              color="secondary"
-              variant='contained'
-              type="submit"
-            > 
-              Salvar
-            </Button>
-            <Button
-              sx={{
-                margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
-                background: 'black',
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
-              color="error"
-              variant='contained'
-              onClick={() => navigate('/agenda')}
-            >
-              Cancelar
-            </Button>
-          </div>       
-        </form>
+              <TextField sx={{marginTop: '10px'}}
+                id="standard-basic"
+                label="Id jogo"
+                required
+                fullWidth
+                type="number"
+                color='secondary'
+                variant='filled'
+                name="jogo_id"
+                value={criarAgendas.jogo_id}
+                onChange={handleFormFieldChange}
+                error={errors?.jogo_id}
+                helperText={errors?.jogo_id}
+              />
+
+              <TextField sx={{marginTop: '10px'}}
+                required
+                type="datetime-local"
+                label='Início'
+                name="data_horario_inicio"
+                fullWidth
+                value={criarAgendas.data_horario_inicio}
+                onChange={handleFormFieldChange}
+              />
+
+              <TextField sx={{marginTop: '10px'}}
+                required
+                label='Fim'
+                color='secondary'
+                type="datetime-local"
+                name="data_horario_fim"
+                fullWidth
+                value={criarAgendas.data_horario_fim}
+                onChange={handleFormFieldChange}
+              />
+
+              <Autocomplete
+                id="status-autocomplete"
+                options={statusOptions}
+                renderInput={(params) => (
+                <TextField sx={{marginTop: '10px'}}
+                    {...params}
+                    required
+                    fullWidth
+                    name="status"
+                    variant='filled'
+                    type='text'
+                    label='Status'
+                    color="secondary"
+                    value={criarAgendas.status}
+                    onChange={handleFormFieldChange}
+                    error={errors?.status}
+                    helperText={errors?.status}
+                  />
+                )}
+              />
+
+              <TextField sx={{marginTop: '10px'}}
+                label='Plataforma'
+                type="name"
+                fullWidth
+                name="plt_transm"
+                variant='filled'
+                color="secondary"
+                value={criarAgendas.plt_transm}
+                onChange={handleFormFieldChange}
+                error={errors?.plt_transm}
+                helperText={errors?.plt_transm}
+              />
+
+              <TextField sx={{marginTop: '10px'}}
+                label='Descrição'
+                fullWidth
+                type="text"
+                name="descricao"
+                value={criarAgendas.descricao}
+                onChange={handleFormFieldChange}
+                error={errors?.descricao}
+                helperText={errors?.descricao}
+              />
+            <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+              <Button
+                sx={{
+                  margin: '10px',
+                  padding: '5px 15px 5px 15px',
+                  border: 'none',
+                  background: 'black',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                }}
+                color="secondary"
+                variant='contained'
+                type="submit"
+              >
+                Salvar
+              </Button>
+              <Button
+                sx={{
+                  margin: '10px',
+                  padding: '5px 15px 5px 15px',
+                  border: 'none',
+                  background: 'black',
+                  fontFamily: 'monospace',
+                  fontWeight: 'bold',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                }}
+                color="error"
+                variant='contained'
+                onClick={() => navigate('/agenda')}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
         </Typography>
       </Paper>
     </div>

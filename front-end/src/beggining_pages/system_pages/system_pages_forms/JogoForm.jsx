@@ -87,26 +87,26 @@ export default function jogos() {
     setState({...state, showWaiting: true, errors: {}})
     try {
       // Formata os valores da data/hora antes de enviar
-      const formattedDateJogo = format(
-        new Date(jogos.data_jogo),
-        'yyyy-MM-dd HH:mm' // Formato desejado
-      );
+      // const formattedDateJogo = format(
+      //   new Date(jogos.data_jogo),
+      //   'yyyy-MM-dd HH:mm' // Formato desejado
+      // );
 
-      // Atualiza os valores formatados no objeto jogos
-      const jogosCopy = {
-        ...jogos,
-        data_jogo: formattedDateJogo,
-      };
-      console.log(jogosCopy);
+      // // Atualiza os valores formatados no objeto jogos
+      // const jogosCopy = {
+      //   ...jogos,
+      //   data_jogo: formattedDateJogo,
+      // };
+      // console.log(jogosCopy);
 
       // Chama a validação da biblioteca Joi
-      await Jogo.validateAsync(jogosCopy, { abortEarly: false })
+      await Jogo.validateAsync(jogos, { abortEarly: false })
 
       // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogosCopy)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogos)
       
       // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, jogosCopy)
+      else await myfetch.post(API_PATH, jogos)
 
       setState({
         ...state, 

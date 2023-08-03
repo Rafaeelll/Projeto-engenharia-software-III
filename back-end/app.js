@@ -38,23 +38,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// chama a verificação de autenticação para todas as rotas, exceto a rota de cadastro de usuários
-const auth = require('./lib/auth');
-
-// ...
-
-app.use((req, res, next) => {
-  if (req.url === '/usuarios/cadastro' && req.method === 'POST') {
-    // Ignora a verificação de autenticação para a rota de cadastro de usuários
-    next();
-  } else {
-    auth(req, res, next);
-  }
-});
-
-// Resto do código...
-
-
+// Chama a verificação de autenticação para qualquer rota
+const auth = require('./lib/auth')
+app.use(auth)
 
 /*********************ROTAS*****************************/
 const usuarios = require('./routes/usuarios')
