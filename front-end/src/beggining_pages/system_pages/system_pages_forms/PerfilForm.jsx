@@ -12,6 +12,7 @@ import Paper  from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
+import format from 'date-fns/format';
 // import DatePicker from "react-datepicker"; 
 // import "react-datepicker/dist/react-datepicker.css"
 
@@ -104,47 +105,27 @@ export default function PerfilForm() {
       })
     }
   }
-  async function verifyEmailExists(email) {
-    try {
-      const result = await myfetch.get(`${API_PATH}?email=${email}`);
-      return !!result;
-    } catch (error) {
-      return false;
-    }
-  }
 
   async function sendData() {
     setState({ ...state, showWaiting: true, errors: {} });
     try {
-      const emailExists = await verifyEmailExists(perfils.email);
-      if (emailExists) {
-        setState({
-          ...state,
-          showWaiting: false,
-          notif: {
-            severity: 'error',
-            show: true,
-            message: 'O e-mail informado já está registrado no sistema!'
-          }
-        });
-        return;
-      }
-
+      // Remova a chamada para verifyEmailExists e a verificação subsequente do e-mail existente
+  
       const formattedBirthDay = format(
         new Date(perfils.data_nasc),
         'yyyy-MM-dd HH:mm'
       );
-
+  
       const perfilsCopy = {
         ...perfils,
         data_nasc: formattedBirthDay,
       };
-
+  
       await Perfil.validateAsync(perfilsCopy, { abortEarly: false });
-
+  
       if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, perfilsCopy);
       else await myfetch.post(API_PATH, perfilsCopy);
-
+  
       setState({
         ...state,
         showWaiting: false,

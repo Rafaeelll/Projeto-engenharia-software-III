@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',          // Campo da tabela local 
         as: 'historico_jogos'  // Nome do campo de associação (plural)
       })
+      this.belongsTo(models.Usuario,{
+        foreignKey: 'usuario_id', // Nome do campo na tabela de ORIGEM
+        targetKey: 'id',       // Nome do campo na tabela de DESTINO
+        as: 'usuario'             // Nome do atributo para exibição
+      })
     }
   }
   Jogo.init({
@@ -32,6 +37,10 @@ module.exports = (sequelize, DataTypes) => {
     nome: {
       type: DataTypes.STRING(50),
       allowNull:false
+    },
+    usuario_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     data_jogo: {
       type: DataTypes.DATE,

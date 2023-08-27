@@ -1,5 +1,7 @@
 // importar o model correspondente ao controller
-const {Jogo, Agenda, HistoricoJogo} = require('../models')
+const {Jogo, Agenda, Usuario, HistoricoJogo} = require('../models')
+const authorizationMiddleware = require('../lib/authorizationMiddleware');
+
 
 const controller = {} // objeto vazio
 
@@ -27,32 +29,34 @@ controller.retrieve = async (req, res)=>{
         const data = await Jogo.findAll({
             include: [
                 {model: Agenda, as: 'agendas'},
+                {model: Usuario, as: 'usuario'},
                 {model: HistoricoJogo, as: 'historico_jogos'},
-            ]
+            ],
+            where: {usuario_id: req.authUser.id}
         })
         res.send(data)
-
     }
     catch(error){
         console.error(error)
     }
 }
 controller.retrieveOne = async (req, res)=>{
-    try{
-        const data = await Jogo.findByPk(req.params.id)
-        if(data) res.send(data)
-        
-        else res.status(404).end()
+    try {
+        const data = await Jogo.findOne({
+            where: { id: req.params.id, usuario_id: req.authUser.id } // Filtra pelo id do jogo e do usuário autenticado
+        });
+        if (data) res.send(data);
+        else res.status(404).end();
+    } catch (error) {
+        console.error(error);
     }
-    catch(error){
-        console.error(error)
-    }
-}
+};
+
 controller.update = async(req, res) =>{
     try{
         const response = await Jogo.update(
             req.body,
-            {where: {id: req.params.id}}
+            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pelo id do jogo e do usuário autenticado
         )
         /// response retorna um vetor. O primeiro elemento
         // do vetor indica quantos registros foram afetados
@@ -73,7 +77,7 @@ controller.update = async(req, res) =>{
 controller.delete = async (req, res) =>{
     try{
         const response = await Jogo.destroy(
-            {where: {id: req.params.id}}
+            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pelo id do jogo e do usuário autenticado
         )
         if(response){// encontrou e excluiu
             // HTTP 204: No content

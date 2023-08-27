@@ -31,81 +31,64 @@ controller.create = async (req, res) => {
 
 controller.retrieve = async (req, res) => {
   try {
-    const data = await Usuario.findAll()
-    // HTTP 200: OK (implícito)
-    res.send(data)
+    const data = await Usuario.findAll({
+      where: { id: req.user.id }  // Filtre pelos dados do usuário autenticado
+    });
+    res.send(data);
+  } catch (error) {
+    console.error(error);
   }
-  catch(error) {
-    console.error(error)
-  }
-}
+};
 
 controller.retrieveOne = async (req, res) => {
   try {
-    const data = await Usuario.findByPk(req.params.id)
-    
-    // HTTP 200: OK (implícito)
-    if(data) res.send(data)
-    
-    // HTTP 404: Not Found
-    else res.status(404).end()
-    
+    const data = await Usuario.findOne({
+      where: { id: req.params.id, id: req.user.id } // Filtre pelo ID e pelo usuário autenticado
+    });
+
+    if (data) {
+      res.send(data);
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.error(error);
   }
-  catch(error) {
-    console.error(error)
-  }
-}
+};
 
 controller.update = async (req, res) => {
   try {
-
-    // Se houver sido passado o campo "senha_acesso",
-    // criptografa a senha
-    if(req.body.senha_acesso) {
-      req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso, 12)
-    }
-
     const response = await Usuario.update(
       req.body,
-      { where: { id: req.params.id }}
-    )
+      { where: { id: req.params.id, id: req.user.id } } // Filtre pelo ID e pelo usuário autenticado
+    );
 
-    // response retorna um vetor. O primeiro elemento
-    // do vetor indica quantos registros foram afetados
-    // pelo update
-    if(response[0] > 0) {
-      // HTTP 204: No content
-      res.status(204).end()
+    if (response[0] > 0) {
+      res.status(204).end();
+    } else {
+      res.status(404).end();
     }
-    else {  // Não encontrou o registro para atualizar
-      // HTTP 404: Not found
-      res.status(404).end()
-    }
+  } catch (error) {
+    console.error(error);
   }
-  catch(error) {
-    console.error(error)
-  }
-}
+};
 
 controller.delete = async (req, res) => {
   try {
     const response = await Usuario.destroy(
-      { where: { id: req.params.id } }
-    )
+      { where: { id: req.params.id, id: req.user.id } } // Filtre pelo ID e pelo usuário autenticado
+    );
 
-    if(response) {  // Encontrou e excluiu
-      // HTTP 204: No content
-      res.status(204).end()
+    if (response) {
+      res.status(204).end();
+    } else {
+      res.status(404).end();
     }
-    else {          // Não encontrou e não excluiu
-      // HTTP 404: Not found
-      res.status(404).end()
-    }
+  } catch (error) {
+    console.error(error);
   }
-  catch(error) {
-    console.error(error)
-  }
-}
+};
+
 
 controller.login = async (req, res) => {
   try {

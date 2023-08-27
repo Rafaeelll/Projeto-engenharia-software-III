@@ -79,13 +79,23 @@ import { Link } from 'react-router-dom';
         field: 'usuario_id',
         headerName: 'Id usuário',
         width: 150,
-        valueGetter: params => params.row?.usuario.id  + ': ' + params.row?.usuario.nome + ' ' + params.row?.usuario.sobrenome
+        valueGetter: params => {
+          if (params.row?.usuario) {
+            return params.row.usuario.id + ': ' + params.row.usuario.nome + ' ' + params.row.usuario.sobrenome;
+          }
+          return '';
+        }
       },
       {
         field: 'jogo_id',
         headerName: 'Id jogo',
         width: 150,
-        valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
+        valueGetter: params => {
+          if (params.row?.jogo) {
+            return params.row.jogo.id + ': ' + params.row.jogo.nome;
+          }
+          return '';
+        }
       },
       {
         field: 'pontuacao',

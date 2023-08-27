@@ -28,6 +28,7 @@ export default function jogos() {
   const [state, setState] = React.useState({
     jogos: {
       nome: '',
+      usuario_id: '',
       data_jogo: '',
     },
     errors: {},
@@ -201,6 +202,22 @@ export default function jogos() {
               helperText={errors?.nome}
             />
           </div> 
+
+          <div className='wrap-input3'>
+            <TextField sx={{marginTop: '10px'}}
+                label="Id usuario"
+                type="number"
+                variant='filled'
+                fullWidth
+                required
+                name="usuario_id"
+                value={jogos.usuario_id}
+                onChange={handleFormFieldChange}
+                error={errors?.usuario_id}
+                helperText={errors?.usuario_id}
+              />
+          </div> 
+
           <div className='wrap-input3'>
             <TextField
               required

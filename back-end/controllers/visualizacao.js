@@ -1,5 +1,6 @@
 // importar o model correspondente ao controller
 const {Visualizacao, Usuario, Agenda} = require('../models')
+const authorizationMiddleware = require('../lib/authorizationMiddleware');
 
 const controller = {} // objeto vazio
 
@@ -28,7 +29,9 @@ controller.retrieve = async (req, res)=>{
             include: [
                 {model: Usuario, as: 'usuario'},
                 {model: Agenda, as: 'agenda'},
-            ]
+            ],
+            where: { usuario_id: req.authUser.id } // Filtra apenas os visualizações do usuário autenticado
+
         })
         res.send(data)
 
@@ -38,21 +41,21 @@ controller.retrieve = async (req, res)=>{
     }
 }
 controller.retrieveOne = async (req, res)=>{
-    try{
-        const data = await Visualizacao.findByPk(req.params.id)
-        if(data) res.send(data)
-        
-        else res.status(404).end()
+    try {
+        const data = await Visualizacao.findOne({
+            where: { id: req.params.id, usuario_id: req.authUser.id }
+        });
+        if (data) res.send(data);
+        else res.status(404).end();
+    } catch (error) {
+        console.error(error);
     }
-    catch(error){
-        console.error(error)
-    }
-}
+};
 controller.update = async(req, res) =>{
     try{
         const response = await Visualizacao.update(
             req.body,
-            {where: {id: req.params.id}}
+            {where: { id: req.params.id, usuario_id: req.authUser.id }}
         )
         /// response retorna um vetor. O primeiro elemento
         // do vetor indica quantos registros foram afetados
@@ -73,8 +76,7 @@ controller.update = async(req, res) =>{
 controller.delete = async (req, res) =>{
     try{
         const response = await Visualizacao.destroy(
-            {where: {id: req.params.id}}
-        )
+            { where: { id: req.params.id, usuario_id: req.authUser.id } }        )
         if(response){// encontrou e excluiu
             // HTTP 204: No content
             res.status(204).end()

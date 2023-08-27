@@ -75,6 +75,7 @@ async function sendData() {
     await Usuario.validateAsync(usuario, { abortEarly: false });
     await myfetch.post(API_PATH, usuario);
     // DAR FEEDBACK POSITIVO
+    
     setState({
       ...state,
       showWaiting: false,

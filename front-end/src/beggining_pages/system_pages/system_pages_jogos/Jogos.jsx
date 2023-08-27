@@ -82,6 +82,13 @@ function formatDate(dateString) {
         width: 150
       },
       {
+        field: 'usuario_id',
+        headerName: 'Id usuário',
+        width: 150,
+        valueGetter: params => params.row?.usuario.id  + ': ' + params.row?.usuario.nome + ' ' + params.row?.usuario.sobrenome,
+
+      },
+      {
         field: 'data_jogo',
         headerName: 'Data de aquisição',
         width: 150,

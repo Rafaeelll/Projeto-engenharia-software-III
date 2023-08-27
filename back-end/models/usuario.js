@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',          // Campo da tabela local 
         as: 'historico_jogos'  // Nome do campo de associação (plural)
       })
+      this.hasMany(models.Jogo, {
+        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
+        sourceKey: 'id',          // Campo da tabela local 
+        as: 'jogos'  // Nome do campo de associação (plural)
+      })
       this.hasMany(models.Visualizacao, {
         foreignKey: 'usuario_id',    // Campo da tabela estrangeira
         sourceKey: 'id',          // Campo da tabela local 
