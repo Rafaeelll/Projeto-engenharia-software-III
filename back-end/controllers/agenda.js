@@ -1,6 +1,5 @@
 // importar o model correspondente ao controller
 const {Agenda, Usuario, Jogo, Visualizacao} = require('../models')
-const authorizationMiddleware = require('../lib/authorizationMiddleware');
 
 
 const controller = {} // objeto vazio
@@ -15,7 +14,22 @@ const controller = {} // objeto vazio
 */
 
 controller.create = async (req, res) =>{
+    req.body.usuario_id = req.authUser.id; // Adiciona o id do usuário ao corpo da requisição
+
     try{
+        const { data_horario_inicio, data_horario_fim } = req.body;
+
+        // Verifique se a data de início é anterior à data atual
+        const dataAtual = new Date();
+        if (data_horario_inicio < dataAtual && data_horario_fim < dataAtual || 
+            data_horario_inicio < dataAtual && data_horario_fim <= dataAtual) {
+            req.body.status = 'Finalizada';
+        } else if (data_horario_inicio <= dataAtual && data_horario_fim >= dataAtual) {
+            req.body.status = 'Em andamento';
+        } else {
+            req.body.status = 'Agendado';
+        }
+
         await Agenda.create(req.body)
         // HTTP 201: Created
         res.status(201).end()

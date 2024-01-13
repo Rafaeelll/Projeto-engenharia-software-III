@@ -13,8 +13,7 @@ import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
 import format from 'date-fns/format';
-// import DatePicker from "react-datepicker"; 
-// import "react-datepicker/dist/react-datepicker.css"
+
 
 export default function PerfilForm() {
   const API_PATH = '/usuarios'
@@ -272,7 +271,7 @@ export default function PerfilForm() {
             <TextField
               label='Data nascimento'
               color='secondary'
-              type="datetime-local"
+              type="date"
               name="data_nasc"
               fullWidth
               value={perfils.data_nasc}

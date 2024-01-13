@@ -47,7 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     confirmacao_presenca: {
       type: DataTypes.BOOLEAN,
-      allowNull: false
+    },
+    configuracao: {
+      type: DataTypes.JSON, // Ou outro tipo de dados apropriado
+      allowNull: true // Ou false, dependendo se a configuração é obrigatória ou não
     },
   }, {
     sequelize,

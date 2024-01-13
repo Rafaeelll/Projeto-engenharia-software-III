@@ -1,6 +1,5 @@
 // importar o model correspondente ao controller
 const {Jogo, Agenda, Usuario, HistoricoJogo} = require('../models')
-const authorizationMiddleware = require('../lib/authorizationMiddleware');
 
 
 const controller = {} // objeto vazio
@@ -15,15 +14,24 @@ const controller = {} // objeto vazio
 */
 
 controller.create = async (req, res) =>{
+    req.body.usuario_id = req.authUser.id; // Adiciona o id do usuário ao corpo da requisição
+
     try{
         await Jogo.create(req.body)
         // HTTP 201: Created
         res.status(201).end()
     }
     catch(error){
-        console.error(error)
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            // Tratamento do erro de violação de chave única
+            res.status(400).send({ error: 'Nome do jogo já existe.' });
+        } else {
+            console.error(error);
+            res.status(500).json({ error: 'Erro interno do servidor.' });
+        }
     }
 }
+
 controller.retrieve = async (req, res)=>{
     try{
         const data = await Jogo.findAll({
@@ -92,4 +100,5 @@ controller.delete = async (req, res) =>{
         console.error(error)
     }
 }
+
 module.exports = controller;

@@ -12,9 +12,7 @@ import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
-import DatePicker from "react-datepicker"; 
-import "react-datepicker/dist/react-datepicker.css"
-import format from 'date-fns/format';
+
 
 
 export default function jogos() {
@@ -22,8 +20,6 @@ export default function jogos() {
   const params = useParams()
 
   const navigate = useNavigate();
-
-  // const [selectedDate, setselectedDate] = React.useState(null);
 
   const [state, setState] = React.useState({
     jogos: {
@@ -46,6 +42,7 @@ export default function jogos() {
     jogosCopy[event.target.name] = event.target.value
     setState({...state, jogos: jogosCopy})
   }
+
   
   function handleFormSubmit(event) {
     event.preventDefault(); // Evita que a página seja recarregada
@@ -87,55 +84,58 @@ export default function jogos() {
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
     try {
-      // Formata os valores da data/hora antes de enviar
-      // const formattedDateJogo = format(
-      //   new Date(jogos.data_jogo),
-      //   'yyyy-MM-dd HH:mm' // Formato desejado
-      // );
+        // Chama a validação da biblioteca Joi
+        await Jogo.validateAsync(jogos, { abortEarly: false })
 
-      // // Atualiza os valores formatados no objeto jogos
-      // const jogosCopy = {
-      //   ...jogos,
-      //   data_jogo: formattedDateJogo,
-      // };
-      // console.log(jogosCopy);
+        // Registro já existe: chama PUT para atualizar
+        if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogos)
+        
+        // Registro não existe: chama POST para criar
+        else await myfetch.post(API_PATH, jogos)
 
-      // Chama a validação da biblioteca Joi
-      await Jogo.validateAsync(jogos, { abortEarly: false })
-
-      // Registro já existe: chama PUT para atualizar
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, jogos)
-      
-      // Registro não existe: chama POST para criar
-      else await myfetch.post(API_PATH, jogos)
-
-      setState({
-        ...state, 
-        showWaiting: false,
-        notif: {
-          severity: 'success',
-          show: true,
-          message: 'Item salvo com sucesso'
-        }
-      })
+        setState({
+            ...state, 
+            showWaiting: false,
+            notif: {
+                severity: 'success',
+                show: true,
+                message: 'Item salvo com sucesso'
+            }
+        })
     }
     catch(error) {
-      const { validationError, errorMessages } = getValidationMessages(error)
+        const { validationError, errorMessages } = getValidationMessages(error)
 
-      console.error(error)
-      
-      setState({
-        ...state, 
-        showWaiting: false,
-        errors: errorMessages,
-        notif: {
-          severity: 'error',
-          show: !validationError,
-          message: 'ERRO: ' + error.message
+        console.error(error)
+        
+        if (error.response && error.response.status === 400) {
+            // Erro de validação personalizado
+            setState({
+                ...state, 
+                showWaiting: false,
+                errors: { nome: error.response.data.error }, // Defina o erro de validação para o campo 'nome'
+                notif: {
+                    severity: 'error',
+                    show: true,
+                    message: error.response.data.error // Exiba a mensagem de erro personalizada
+                }
+            })
+        } else {
+            // Outro erro interno do servidor
+            setState({
+                ...state, 
+                showWaiting: false,
+                errors: errorMessages,
+                notif: {
+                    severity: 'error',
+                    show: !validationError,
+                    message: 'ERRO: ' + error.message
+                }
+            })
         }
-      })
     }
-  }
+}
+
 
   function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {
@@ -186,11 +186,10 @@ export default function jogos() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-          <div className='wrap-input3'>
-            <TextField
+            <TextField sx={{marginTop: '12px'}}
               id="standard-basic"
               color='secondary'
-              label="Título"
+              label="Nome"
               variant='filled'
               type="name"
               required
@@ -201,11 +200,8 @@ export default function jogos() {
               error={errors?.nome}
               helperText={errors?.nome}
             />
-          </div> 
-
-          <div className='wrap-input3'>
-            <TextField sx={{marginTop: '10px'}}
-                label="Id usuario"
+            <TextField sx={{marginTop: '12px'}}
+                label="Id usuario (Este campo é preenchido automaticamente)"
                 type="number"
                 variant='filled'
                 fullWidth
@@ -215,21 +211,20 @@ export default function jogos() {
                 onChange={handleFormFieldChange}
                 error={errors?.usuario_id}
                 helperText={errors?.usuario_id}
-              />
-          </div> 
+                disabled
 
-          <div className='wrap-input3'>
-            <TextField
+              />
+
+            <TextField sx={{marginTop: '12px'}}
               required
               variant='filled'
               label='Data de aquisição'
-              type="datetime-local"
+              type="date"
               name="data_jogo"
               fullWidth
               value={jogos.data_jogo}
               onChange={handleFormFieldChange}
             />
-          </div>
           
           <div className='jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
             <Button

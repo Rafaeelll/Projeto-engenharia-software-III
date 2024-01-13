@@ -61,6 +61,4 @@ app.use('/notificacoes', notificacoes)
 const visualizacoes = require('./routes/visualizacoes')
 app.use('/visualizacoes', visualizacoes)
 
-const configuracoes = require('./routes/configuracoes')
-app.use('/configuracoes', configuracoes)
 module.exports = app;

@@ -1,6 +1,5 @@
 // importar o model correspondente ao controller
 const {Visualizacao, Usuario, Agenda} = require('../models')
-const authorizationMiddleware = require('../lib/authorizationMiddleware');
 
 const controller = {} // objeto vazio
 
@@ -14,6 +13,8 @@ const controller = {} // objeto vazio
 */
 
 controller.create = async (req, res) =>{
+    req.body.usuario_id = req.authUser.id; // Adiciona o id do usuário ao corpo da requisição
+
     try{
         await Visualizacao.create(req.body)
         // HTTP 201: Created

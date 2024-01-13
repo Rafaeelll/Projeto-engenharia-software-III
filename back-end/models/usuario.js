@@ -59,7 +59,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     email: {
       type: DataTypes.STRING(200),
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     senha_acesso: {
       type: DataTypes.STRING(200),
@@ -70,7 +71,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     data_nasc: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
     },
     plataforma_fav: {
       type: DataTypes.STRING(50)

@@ -10,7 +10,7 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import HomeIcon from '@mui/icons-material/Home';
 import GamesIcon from '@mui/icons-material/Games';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+// import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleSharpIcon from '@mui/icons-material/AccountCircleSharp';
 
@@ -137,20 +137,6 @@ export default function MainMenu() {
             startIcon={<AccountCircleSharpIcon/>}
           >
             Perfil
-          </Button>
-        </MenuItem>
-
-        <MenuItem onClick={handleClose} component={Link} to="/configuracao">
-          <Button style={{fontFamily: 'monospace', 
-            display: 'flex', justifyContent:'left', textAlign: 'left',
-            backgroundColor: location.pathname === '/configuracao' ? '#21d4fd' : 'transparent',
-            color: location.pathname === '/configuracao' ? 'white' : 'black',
-          }}
-            color='inherit'
-            fullWidth
-            startIcon={<ManageAccountsIcon/>}
-          >
-            Configurações
           </Button>
         </MenuItem>
 

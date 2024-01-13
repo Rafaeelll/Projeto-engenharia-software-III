@@ -11,14 +11,15 @@ module.exports = {
       },
       nome: {
         type: Sequelize.STRING(50),
-        allowNull:false
+        allowNull:false,
+        unique: true
       },
       usuario_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
       data_jogo: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
         allowNull: false
       },
       createdAt: {

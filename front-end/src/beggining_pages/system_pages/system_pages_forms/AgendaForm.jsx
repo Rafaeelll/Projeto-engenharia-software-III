@@ -11,8 +11,6 @@ import Agenda from '../../../../models/Agenda'
 import FormTitle from '../../../components/ui/FormTitle';
 import Autocomplete from '@mui/material/Autocomplete';
 import { format } from 'date-fns';
-// import DatePicker from "react-datepicker"; 
-// import "react-datepicker/dist/react-datepicker.css"
 import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import Button  from '@mui/material/Button';
@@ -20,8 +18,6 @@ import Button  from '@mui/material/Button';
 export default function CriarAgendas() {
   const API_PATH = '/agendas';
   const params = useParams()
-  const statusOptions = ["Agendado", "Em andamento", "Finalizada"];
-
   const navigate = useNavigate();
 
   const [state, setState] = React.useState({
@@ -45,9 +41,40 @@ export default function CriarAgendas() {
   });
   const { criarAgendas, errors, showWaiting, notif } = state;
 
+  function getStatusOptions() {
+    const currentDate = new Date();
+    const inicio = new Date(criarAgendas.data_horario_inicio);
+    const fim = new Date(criarAgendas.data_horario_fim);
+
+    if (inicio < currentDate && fim < currentDate || inicio < currentDate && fim <= currentDate) {
+      return ['Finalizada'];
+    } else if (inicio <= currentDate && fim >= currentDate) {
+      return ['Em andamento'];
+    } else {
+      return ['Agendado'];
+    }
+  }
+
+  const statusOptions = getStatusOptions();
+
+
   function handleFormFieldChange(event) {
     const criarAgendasCopy = { ...criarAgendas };
     criarAgendasCopy[event.target.name] = event.target.value;
+
+    // Adicione a lógica para calcular o status com base nas datas aqui
+    const currentDate = new Date();
+    const inicio = new Date(criarAgendasCopy.data_horario_inicio);
+    const fim = new Date(criarAgendasCopy.data_horario_fim);
+
+    if (inicio < currentDate && fim < currentDate || inicio < currentDate && fim <= currentDate) {
+      criarAgendasCopy.status = 'Finalizada';
+    } else if (inicio <= currentDate && fim >= currentDate) {
+      criarAgendasCopy.status = 'Em andamento';
+    } else {
+      criarAgendasCopy.status = 'Agendado';
+    }
+
     setState({ ...state, criarAgendas: criarAgendasCopy });
   }
 
@@ -272,8 +299,9 @@ export default function CriarAgendas() {
                 helperText={errors?.titulo_agenda}
               />
 
-              <TextField sx={{marginTop: '10px'}}
-                label="Id usuario"
+              <TextField sx={{marginTop: '12px'}}
+                label="Id usuario 
+                (Este campo é preenchido automaticamente)"
                 type="number"
                 variant='filled'
                 fullWidth
@@ -281,11 +309,10 @@ export default function CriarAgendas() {
                 name="usuario_id"
                 value={criarAgendas.usuario_id}
                 onChange={handleFormFieldChange}
-                error={errors?.usuario_id}
-                helperText={errors?.usuario_id}
+                disabled
               />
 
-              <TextField sx={{marginTop: '10px'}}
+              <TextField sx={{marginTop: '12px'}}
                 id="standard-basic"
                 label="Id jogo"
                 required
@@ -300,7 +327,7 @@ export default function CriarAgendas() {
                 helperText={errors?.jogo_id}
               />
 
-              <TextField sx={{marginTop: '10px'}}
+              <TextField sx={{marginTop: '12px'}}
                 required
                 type="datetime-local"
                 label='Início'
@@ -310,7 +337,7 @@ export default function CriarAgendas() {
                 onChange={handleFormFieldChange}
               />
 
-              <TextField sx={{marginTop: '10px'}}
+              <TextField sx={{marginTop: '12px'}}
                 required
                 label='Fim'
                 color='secondary'
@@ -325,8 +352,8 @@ export default function CriarAgendas() {
                 id="status-autocomplete"
                 options={statusOptions}
                 renderInput={(params) => (
-                <TextField sx={{marginTop: '10px'}}
-                    {...params}
+                  <TextField sx={{marginTop: '12px'}}
+                  {...params}
                     required
                     fullWidth
                     name="status"
@@ -342,7 +369,7 @@ export default function CriarAgendas() {
                 )}
               />
 
-              <TextField sx={{marginTop: '10px'}}
+              <TextField sx={{marginTop: '12px'}}
                 label='Plataforma'
                 type="name"
                 fullWidth
@@ -355,7 +382,7 @@ export default function CriarAgendas() {
                 helperText={errors?.plt_transm}
               />
 
-              <TextField sx={{marginTop: '10px'}}
+              <TextField sx={{marginTop: '12px'}}
                 label='Descrição'
                 fullWidth
                 type="text"

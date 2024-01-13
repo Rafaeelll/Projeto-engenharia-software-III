@@ -19,7 +19,8 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING(200),
-        allowNull: false
+        allowNull: false,
+        unique: true
       },
       senha_acesso: {
         type: Sequelize.STRING(200),
@@ -30,7 +31,7 @@ module.exports = {
         allowNull: false
       },
       data_nasc: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       plataforma_fav: {
         type: Sequelize.STRING(50)

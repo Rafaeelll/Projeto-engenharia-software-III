@@ -1,10 +1,6 @@
 import Joi, { required } from 'joi'
 
 const Agenda = Joi.object({
-    usuario_id: Joi.number()
-        .min(1)
-        .required()
-        .messages({'*': 'O id é obrigatorio ser igual ou maior que 1.'}),
     jogo_id: Joi.number()
         .min(1)
         .required()

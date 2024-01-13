@@ -36,14 +36,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     nome: {
       type: DataTypes.STRING(50),
-      allowNull:false
+      allowNull:false,
+      unique: true
     },
     usuario_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
     data_jogo: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
   }, {

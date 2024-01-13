@@ -190,9 +190,8 @@ export default function VisualizacaoForm() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-          <div className='wrap-input3'>
-            <TextField
-              label="Id usuario"
+            <TextField sx={{marginTop: '12px'}}
+              label="Id usuario (Este campo é preenchido automaticamente)"
               type="number"
               variant='filled'
               fullWidth
@@ -203,11 +202,10 @@ export default function VisualizacaoForm() {
               onChange={handleFormFieldChange}
               error={errors?.usuario_id}
               helperText={errors?.usuario_id}
+              disabled
             />
-          </div>
 
-          <div className='wrap-input3'>
-            <TextField
+            <TextField sx={{marginTop: '12px'}}
               id="standard-basic"
               label="Id agenda"
               variant='filled'
@@ -220,10 +218,8 @@ export default function VisualizacaoForm() {
               error={errors?.agenda_id}
               helperText={errors?.agenda_id}
             />
-          </div>
 
-          <div className='wrap-input3'>
-            <TextField
+            <TextField sx={{marginTop: '12px'}}
               fullWidth
               name="numero_visualizacao"
               type='number'
@@ -233,7 +229,6 @@ export default function VisualizacaoForm() {
               error={errors?.numero_visualizacao}
               helperText={errors?.numero_visualizacao}
             />
-          </div>
           <div className="visualicao-form-btn" style={{ display: 'flex', justifyContent: 'center' }}>
             <Button
               sx={{

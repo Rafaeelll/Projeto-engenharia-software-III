@@ -15,16 +15,8 @@ import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import HistoryIcon from '@mui/icons-material/History';
 import { Link } from 'react-router-dom';
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  return `${day}/${month}/${year} - ${hours}:${minutes}`;
-}
+import format from 'date-fns/format';
+import parseISO from 'date-fns/parseISO';
 
   export default function Jogos() {
     const API_PATH = '/jogos'
@@ -92,7 +84,7 @@ function formatDate(dateString) {
         field: 'data_jogo',
         headerName: 'Data de aquisição',
         width: 150,
-        valueFormatter: (params) => formatDate(params.value),
+        valueFormatter: (params) => format(parseISO(params.value), 'dd/MM/yyyy'),
       },
       {
         field: 'edit',

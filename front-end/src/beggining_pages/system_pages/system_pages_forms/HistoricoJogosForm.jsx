@@ -194,7 +194,7 @@ export default function HistoricoJogosForm() {
         <form onSubmit={handleFormSubmit}>
           <div className='wrap-input3'>
             <TextField
-              label="Id usuario"
+              label="Id usuario (Este campo é preenchido automaticamente)"
               type="number"
               fullWidth
               variant='filled'

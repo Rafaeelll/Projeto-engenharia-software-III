@@ -43,34 +43,33 @@ function App() {
 
   return (
     <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path ="/" element={<LandingPage/>} />
-          <Route path= "/login" element={<Login onLoginLogout={onLoginLogout}/>}/>
-          <Route path= "/cadastro" element={<Register/>}/>
-          <Route path= "/sobre" element={<About/>}/>
-          <Route path= "/contato" element={<Contact/>}/>
-          <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
-          <Route path= "/agenda" element={<AuthGuard> <Agendas/> </AuthGuard>}/>
-          <Route path= "/criar_agenda" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-          <Route path= "/criar_agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-          <Route path= "/verificar_agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
-          <Route path= "/perfil" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
-          <Route path= "/perfil/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
-          <Route path= "/configuracao" element={<AuthGuard> <Configuracoes/> </AuthGuard>}/>
-          <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
-          <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
-          <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
-          <Route path= "/historico_jogo" element={<AuthGuard> <HistoricoJogos/> </AuthGuard>}/>
-          <Route path= "/historico_jogo/new" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
-          <Route path= "/historico_jogo/:id" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
-          <Route path= "/visualizacao" element={<AuthGuard> <Visualizacoes/> </AuthGuard>}/>
-          <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
-          <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
-          <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
-        </Routes>
-      </BrowserRouter>
-      
+        <BrowserRouter>
+          <Routes>
+            <Route path ="/" element={<LandingPage/>} />
+            <Route path= "/login" element={<Login onLoginLogout={onLoginLogout}/>}/>
+            <Route path= "/cadastro" element={<Register/>}/>
+            <Route path= "/sobre" element={<About/>}/>
+            <Route path= "/contato" element={<Contact/>}/>
+            <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
+            <Route path= "/agenda" element={<AuthGuard> <Agendas/> </AuthGuard>}/>
+            <Route path= "/criar_agenda" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+            <Route path= "/criar_agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+            <Route path= "/verificar_agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+            <Route path= "/perfil" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
+            <Route path= "/perfil/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
+            <Route path= "/configuracao" element={<AuthGuard> <Configuracoes/> </AuthGuard>}/>
+            <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
+            <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
+            <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
+            <Route path= "/historico_jogo" element={<AuthGuard> <HistoricoJogos/> </AuthGuard>}/>
+            <Route path= "/historico_jogo/new" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
+            <Route path= "/historico_jogo/:id" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
+            <Route path= "/visualizacao" element={<AuthGuard> <Visualizacoes/> </AuthGuard>}/>
+            <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
+            <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
+            <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
+          </Routes>
+        </BrowserRouter>
     </div>
   )
 }

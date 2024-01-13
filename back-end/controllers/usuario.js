@@ -153,7 +153,7 @@ controller.cadastro = async (req, res) => {
 
     if (user) {
       // Se encontrou o usuário com o email, retorna um erro de conflito
-      return res.status(409).json({ error: 'O e-mail informado já está em uso.' });
+      return res.status(409).send('O e-mail informado já está em uso.');
     }
 
     // Criptografa a senha
