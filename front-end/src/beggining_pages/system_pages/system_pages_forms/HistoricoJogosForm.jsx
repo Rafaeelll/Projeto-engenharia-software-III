@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
-import '../../../styles.css'
+import '../../../styles/styles.css'
 import myfetch from '../../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -204,6 +204,7 @@ export default function HistoricoJogosForm() {
               onChange={handleFormFieldChange}
               error={errors?.usuario_id}
               helperText={errors?.usuario_id}
+              disabled
             />
           </div>
 

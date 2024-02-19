@@ -221,7 +221,7 @@ controller.delete = async (req, res) =>{
     }
   };
   // Configurar o agendamento para rodar a cada X minutos (por exemplo, a cada 5 minutos)
-  cron.schedule('*/1 * * * *', controller.scheduleAlertFinishNotifications);
+  cron.schedule('*/10 * * * *', controller.scheduleAlertFinishNotifications);
 
 
   controller.scheduleStartNotifications = async()=>{
@@ -266,7 +266,7 @@ controller.delete = async (req, res) =>{
     }
   };
   // Configurar o agendamento para rodar a cada X minutos (por exemplo, a cada 5 minutos)
-cron.schedule('*/1 * * * *', controller.scheduleStartNotifications);
+cron.schedule('*/10 * * * *', controller.scheduleStartNotifications);
 
 // controller.scheduleFinishNotifications = async () => {
 //   try {

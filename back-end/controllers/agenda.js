@@ -16,7 +16,7 @@ const controller = {} // objeto vazio
 controller.create = async (req, res) =>{
     req.body.usuario_id = req.authUser.id; // Adiciona o id do usuário ao corpo da requisição
 
-    try{
+    try {
         const { data_horario_inicio, data_horario_fim } = req.body;
 
         // Verifique se a data de início é anterior à data atual

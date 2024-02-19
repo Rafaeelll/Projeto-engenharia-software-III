@@ -2,7 +2,7 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import myfetch from '../../../utils/myfetch';
-import '../../../styles.css'
+import '../../../styles/styles.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';

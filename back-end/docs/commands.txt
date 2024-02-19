@@ -2,7 +2,8 @@
  npx sequelize-cli model:generate --name User --attributes id:integer,name:string,email:string,verified_email:boolean,
  is_admin:boolean,phone:string,password:string
 
-npx sequelize-cli model:generate --name Channel --attributes id:integer,description:string,commission_fee:decimal // criar campos 
+npx sequelize-cli model:generate --name Channel --attributes id:integer,description:string,commission_fee:decimal // criar campos
+npx sequelize-cli model:generate --name UsuarioFoto --attributes id:integer,name:string, size:float,key:string,url:string
 // da tabela
 npx sequelize-cli db:migrate /// criar tabela 
 npx sequelize-cli db:migrate:undo // reverter tabela

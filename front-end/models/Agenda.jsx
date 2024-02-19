@@ -18,11 +18,7 @@ const Agenda = Joi.object({
         .min(2)
         .max(1000)
         .required()
-        .messages({'*': 'A descrição é obrigatorio entre (2 e 1000 caracteres).'}),
-    status: Joi.string()
-        .min(8)
-        .max(11)
-        .messages({'*': 'O status é obrigatorio entre (8 e 11 caracteres).'})
+        .messages({'*': 'A descrição é obrigatorio entre (2 e 1000 caracteres).'})
 })
 .options({allowUnknown: true})
 export default Agenda

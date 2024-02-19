@@ -27,10 +27,14 @@
     "jsonwebtoken": "^9.0.2",
     "react": "^18.2.0",
     "react-big-calendar": "^1.6.9",
+    "react-circular-progressbar": "^2.1.0",
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "react-icons": "^5.0.1",
     "react-numeric-input": "^2.2.3",
-    "react-router-dom": "^6.10.0"
+    "react-router-dom": "^6.10.0",
+    "styled-components": "^6.1.8"
   },
   "devDependencies": {
     "@types/react": "^18.0.28",

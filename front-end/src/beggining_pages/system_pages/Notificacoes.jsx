@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
 import PageTitle from '../../components/ui/PageTitle';
 import Button from '@mui/material/Button';
 import myfetch from '../../utils/myfetch';
 import { Paper } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid'
 import CircularProgress from '@mui/material/CircularProgress'
-import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Notification from '../../components/ui/Notification';
-import Divider from '@mui/material/Divider'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 import Backdrop from '@mui/material/Backdrop'
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
+import EditIcon from '@mui/icons-material/Edit'
+import IconButton from '@mui/material/IconButton'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 
 export default function Notificacoes() {
   const API_PATH = '/notificacoes';
-  const params = useParams()
+  const API_PATH2 = '/agendas';
+
 
 
   const [state, setState] = useState({
@@ -57,59 +60,115 @@ export default function Notificacoes() {
     fetchData();
   }, []);
 
-  async function cancelNotification(id) {
-    try {
-      await myfetch.delete(`/notificacoes/${id}`);
-      return true;
-    } catch (error) {
-      console.error('Erro ao cancelar notificação:', error);
-      return false;
+  const columns = [
+    { 
+      field: 'id', 
+      headerName: 'Cód.', 
+      width: 90 
+    },
+ 
+    {
+      field: 'data_notificacao',
+      headerName: 'Data da notificação',
+      width: 150,
+      valueFormatter: (params) => format(parseISO(params.value), 'dd/MM/yyyy' + ' - hh:mm'),
+    },
+
+    {
+      field: 'mensagem',
+      headerName: 'Mensagem',
+      width: 300,
+    },
+    {
+      field: 'confirmacao_presenca',
+      headerName: 'Presença confirmada',
+      width: 150,
+      valueGetter: (params) => params.value ? 'Sim' : 'Não'
+    },
+    
+    {
+      field: 'edit',
+      headerName: 'Editar',
+      headerAlign: 'center',
+      align: 'center',
+      width: 90,
+      renderCell: params => (
+        <Link to={'./' + params.id}>
+          <IconButton aria-label="Editar">
+            <EditIcon />
+          </IconButton>
+        </Link>
+      )
+    },
+    {
+      field: 'delete',
+      headerName: 'Excluir',
+      headerAlign: 'center',
+      align: 'center',
+      width: 90,
+      renderCell: params => (
+        <IconButton 
+          aria-label="excluir"
+          onClick={() => {
+            const agendaId = params.row.agenda_id; // Verifique se agenda_id está corretamente definido
+            if (agendaId) {
+              setState({
+                ...state,
+                deleteAgendaId: agendaId, // guarda o id do item a ser excluído
+                deleteId: params.id, 
+                showDialog: true      // mostra o diálogo de confirmação
+              });
+            } else {
+              console.error(error);
+            }
+          }}
+        >
+          <DeleteForeverIcon color="error" />
+        </IconButton>
+      )
     }
-  }
-  
-  async function cancelAgenda(id) {
-    try {
-      await myfetch.delete(`/agendas/${id}`);
-      return true;
-    } catch (error) {
-      console.error('Erro ao cancelar agenda:', error);
-      return false;
-    }
-  }
+  ];
   
 
   async function handleDialogClose(answer) {
-    if (answer) {
-      setState({ ...state, showWaiting: true, showDialog: false });
-      const notificationCancelled = await cancelNotification(deleteId);
-      const agendaCancelled = await cancelAgenda(deleteAgendaId);
-  
-      if (notificationCancelled && agendaCancelled) {
-        setState(prevState => ({
-          ...prevState,
-          showWaiting: false,
-          showDialog: false,
-          notif: {
+    if(answer) {
+      // Fecha o diálogo de confirmação e exibe o backdrop
+      setState({ ...state, showWaiting: true, showDialog: false })
+      try {
+        await myfetch.delete(`${API_PATH}/${deleteId}`)
+
+        await myfetch.delete(`${API_PATH2}/${deleteAgendaId}`)
+
+        setState({
+          ...state,
+          showWaiting: false,   // esconde o backdrop
+          showDialog: false,    // esconde o diálogo de confirmação
+          notif: {              // exibe a snackbar
             show: true,
-            message: 'Notificação e agenda canceladas com sucesso',
+            message: 'Itens excluídos com sucesso',
             severity: 'success'
           }
-        }));
-        fetchData();
-      } else {
-        setState(prevState => ({
-          ...prevState,
-          showWaiting: false,
-          showDialog: false,
-          notif: {
+        })
+        // Recarrega os dados da listagem
+        fetchData()
+      }
+      catch(error) {
+        console.error(error)
+        setState({
+          ...state,
+          showWaiting: false,   // esconde o backdrop
+          showDialog: false,    // esconde o diálogo de confirmação
+          notif: {              // exibe a snackbar
             show: true,
-            message: 'Erro ao cancelar notificação e/ou agenda',
+            message: 'ERRO: ' + error.message,
             severity: 'error'
           }
-        }));
+        })
       }
-    } else {
-      setState(prevState => ({ ...prevState, showDialog: false }));
+    }
+    else {
+      // Fecha o diálogo de confirmação
+      setState({ ...state, showDialog: false })
     }
   }
   
@@ -118,90 +177,7 @@ export default function Notificacoes() {
     if (reason === 'clickaway') {
       return;
     }
-    setState(prevState => ({ ...prevState, notif: { show: false } }));
-  }
-  
-  const handleCancelClick = (id, agenda_id) => {
-    setState(prevState => ({
-      ...prevState,
-      deleteId: id,
-      deleteAgendaId: agenda_id,
-      showDialog: true
-    }));
-  };
-  async function confirmarPresenca(id) {
-    try {
-      await myfetch.put(`${API_PATH}/${id}`, { confirmacao_presenca: true });
-      return true;
-    } catch (error) {
-      console.error('Erro ao confirmar presença:', error);
-      return false;
-    }
-  }
-  
-  const handleConfirmClick = async (id) => {
-    console.log('A função handleConfirmedClick está sendo chamada.');
-
-    const presencaConfirmada = await confirmarPresenca(id);
-  
-    if (presencaConfirmada) {
-      setState(prevState => ({
-        ...prevState,
-        showWaiting: false,
-        showDialog: false,
-        notif: {
-          show: true,
-          message: 'Presença confirmada',
-          severity: 'success'
-        }
-      }));
-      fetchData();
-    } else {
-      setState(prevState => ({
-        ...prevState,
-        showWaiting: false,
-        showDialog: false,
-        notif: {
-          show: true,
-          message: 'Erro ao confirmar presença',
-          severity: 'error'
-        }
-      }));
-    }
-  };
-  async function setNotConfirmed(id) {
-    try {
-      await myfetch.put(`${API_PATH}/${id}`, { confirmacao_presenca: false });
-      return true;
-    } catch (error) {
-      console.error('Erro ao definir como "Não Confirmado":', error);
-      return false;
-    }
-  }
-  async function handleNotConfirmedClick(id) {
-    console.log('A função handleNotConfirmedClick está sendo chamada.');
-
-    const notConfirmed = await setNotConfirmed(id);
-    if (notConfirmed) {
-      setState(prevState => ({
-        ...prevState,
-        notif: {
-          show: true,
-          message: 'Presença não confirmada',
-          severity: 'error',
-        },
-      }));
-      fetchData();
-    } else {
-      setState(prevState => ({
-        ...prevState,
-        notif: {
-          show: true,
-          message: 'Erro ao atualizar presença',
-          severity: 'error',
-        },
-      }));
-    }
+    setState({ ...state, notif: { show: false } })
   }
 
   return (
@@ -212,8 +188,10 @@ export default function Notificacoes() {
       >
         <CircularProgress color="secondary" />
       </Backdrop>
-  
-      <ConfirmDialog
+
+      <PageTitle title="Suas Notificações" />
+
+       <ConfirmDialog
         title="Confirmar operação"
         open={showDialog}
         onClose={handleDialogClose}
@@ -228,76 +206,24 @@ export default function Notificacoes() {
       >
         {notif.message}
       </Notification>
-  
-      <PageTitle title="Suas Notificações" />
-  
-      <Paper
-        sx={{ margin: '20px', background: 'whitesmoke', maxHeight: '400px', overflowY: 'auto' }}
-      >
-        {notificacoes.length > 0 ? (
-          notificacoes.map((notificacao) => (
-            <div key={notificacao.id}>
-              <h1 style={{ fontFamily: 'monospace', margin: '10px', fontSize: '12px', color: '#D4A6F8', fontWeight: 'bold' }}>
-                {format(parseISO(notificacao.data_notificacao), 'dd/MM/yyyy - HH:mm')}
-              </h1>
-              <p style={{ fontFamily: 'monospace', margin: '10px', fontSize: '15px', fontWeight: 'bolder'}}>
-                {notificacao.mensagem}
-              </p>
-              <Button
-                sx={{
-                  margin: '5px',
-                  justifyContent: 'center',
-                  fontSize: '10px',
-                  backgroundColor: 'black',
+
+      <Paper elevation={4} sx={{ height: 450, width: '60%', margin: '0 auto'}}>
+          <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
+                rows={notificacoes}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
+                  },
                 }}
-                color="secondary"
-                variant="contained"
-                onClick={() => handleCancelClick(notificacao.id, notificacao.agenda_id)}>
-                Cancelar
-              </Button>
-              <Button
-                sx={{
-                  margin: '5px',
-                  justifyContent: 'center',
-                  fontSize: '10px',
-                  backgroundColor: 'black',
-                }}
-                color="secondary"
-                variant="contained"
-                onClick={() =>
-                  notificacao.confirmacao_presenca
-                    ? handleConfirmClick(notificacao.id)
-                    : handleNotConfirmedClick(notificacao.id) // Adicione esta função
-                }
-              >
-                {notificacao.confirmacao_presenca ? 'Confirmado' : 'Não Confirmado'}
-              </Button>
-              <Button
-                sx={{
-                  margin: '5px',
-                  justifyContent: 'center',
-                  fontSize: '10px',
-                  backgroundColor: 'black',
-                }}
-                color="secondary"
-                variant="contained"
-                component={Link}
-                to={`/criar_agenda/${notificacao.agenda_id}`}
-                >
-                Adiar
-              </Button>
-  
-              <Divider sx={{marginTop: '5px'}}/>
-  
-            </div>
-          ))
-        ) : (
-          <div style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', color: 'gray' }}>
-            <p>Sem notificações</p>
-          </div>
-        )}
-      </Paper>
-    </>
+                pageSizeOptions={[5]}
+                disableRowSelectionOnClick
+                
+            />
+        </Paper>
+     </>
   );
   
 }

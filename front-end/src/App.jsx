@@ -19,6 +19,7 @@ import HistoricoJogosForm from './beggining_pages/system_pages/system_pages_form
 import Visualizacoes from './beggining_pages/system_pages/Visualizacoes';
 import VisualizacaoForm from './beggining_pages/system_pages/system_pages_forms/VisualizacaoForm';
 import Notificacoes from './beggining_pages/system_pages/Notificacoes';
+import NotificacaoForm from './beggining_pages/system_pages/system_pages_forms/NotificacaoForm';
 import HeaderBar from './components/ui/HeaderBar';
 
 
@@ -68,6 +69,7 @@ function App() {
             <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
             <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
             <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
+            <Route path= "/notificacao/:id" element={<AuthGuard> <NotificacaoForm/> </AuthGuard>}/>
           </Routes>
         </BrowserRouter>
     </div>

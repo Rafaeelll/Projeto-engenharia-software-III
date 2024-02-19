@@ -15,17 +15,32 @@ const controller = {}   // Objeto vazio
 */
 
 controller.create = async (req, res) => {
-  try {
+  const {originalname: name, size, key, location: url = ""} = req.file;
+  const email = req.body.email;
+  const user = await Usuario.findOne({ where: { email } });
 
-    // Criptografa a senha
-    req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso , 12)
-
-    await Usuario.create(req.body)
+   try {
+    // Verificação do e-mail antes de criar o usuário
+    if (user) {
+      // Se encontrou o usuário com o email, retorna um erro de conflito
+      return res.status(409).send('O e-mail informado já está em uso.');
+    }
+    // Verificação do e-mail antes de criar o usuário
+    await Usuario.create({
+      nome: req.body.nome,
+      sobrenome: req.body.sobrenome,
+      email,
+      senha_acesso: req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso, 12), // Criptografa a senha
+      telefone: req.body.telefone,
+      name,
+      size,
+      key,
+      url
+    });
     // HTTP 201: Created
-    res.status(201).end()
-  }
-  catch(error) {
-    console.error(error)
+    return res.status(201).json(Usuario); // HTTP 201: Created
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -110,7 +125,10 @@ controller.login = async (req, res) => {
           data_nasc: usuario.data_nasc,
           plataforma_fav: usuario.plataforma_fav,
           jogo_fav: usuario.jogo_fav,
-          foto_perfil: usuario.foto_perfil
+          name: usuario.name,
+          size: usuario.size,
+          key: usuario.key,
+          url: usuario.url
         },
         process.env.TOKEN_SECRET,    // Chave para criptografar o token
         { expiresIn: '24h' }         // Duração do token
@@ -146,25 +164,32 @@ controller.logout = (req, res) => {
 
 // Método para verificar se o e-mail já existe no banco de dados
 controller.cadastro = async (req, res) => {
+  const {originalname: name, size, key, location: url = ""} = req.file;
+  const email = req.body.email;
+  const user = await Usuario.findOne({ where: { email } });
+
    try {
     // Verificação do e-mail antes de criar o usuário
-    const email = req.body.email;
-    const user = await Usuario.findOne({ where: { email } });
-
     if (user) {
       // Se encontrou o usuário com o email, retorna um erro de conflito
       return res.status(409).send('O e-mail informado já está em uso.');
     }
-
-    // Criptografa a senha
-    req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso, 12);
-
-    await Usuario.create(req.body);
+    // Verificação do e-mail antes de criar o usuário
+    await Usuario.create({
+      nome: req.body.nome,
+      sobrenome: req.body.sobrenome,
+      email,
+      senha_acesso: req.body.senha_acesso = await bcrypt.hash(req.body.senha_acesso, 12), // Criptografa a senha
+      telefone: req.body.telefone,
+      name,
+      size,
+      key,
+      url
+    });
     // HTTP 201: Created
-    res.status(201).end();
+    return res.status(201).json(Usuario); // HTTP 201: Created
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erro no servidor' });
   }
 }
 

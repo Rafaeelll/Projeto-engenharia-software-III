@@ -81,20 +81,27 @@ export default function PaginaInicial() {
   React.useEffect(() => {
     fetchData()
   }, [])
+  
+  function getStatusColor(status){
+    switch (status){
+      case 'Agendado':
+        return 'red';
+      case 'Finalizada':
+        return 'green';
+      case 'Em andamento':
+        return 'lightblue';
+      default:
+        return 'black';
+    }
+  }
 
   const columns = [
     { field: 'id', headerName: 'Id agenda', width: 90 },
-    {
-      field: 'usuario_id',
-      headerName: 'Id usuário',
-      width: 150,
-      valueGetter: params => params.row?.usuario.id  + ': ' + params.row?.usuario.nome + ' ' + params.row?.usuario.sobrenome
 
-    },
     {
       field: 'jogo_id',
       headerName: 'Id Jogo',
-      width: 150,
+      width: 100,
       valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
     },
     {
@@ -111,22 +118,32 @@ export default function PaginaInicial() {
     {
       field: 'titulo_agenda',
       headerName: 'Título',
-      width: 150
+      width: 250
     },
     {
       field: 'plt_transm',
       headerName: 'Plataforma',
-      width: 150
+      width: 100
     },
     {
       field: 'descricao',
       headerName: 'Descrição',
-      width: 150
+      width: 300
     },
     {
       field: 'status',
       headerName: 'Status',
-      width: 150
+      width: 100,
+      renderCell: params =>(
+        <div
+          style={{
+            color: getStatusColor(params.value),
+            fontWeight: 'bold'
+          }}
+          >
+            {params.value}
+        </div>
+      )
     },
     {
       field: 'edit',

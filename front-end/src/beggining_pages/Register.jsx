@@ -1,17 +1,20 @@
 import React from 'react'
 import ImagemFundo from '../assets/back.jpg'
 import StreamAdvisor from '../assets/sa4.png'
-import '../styles.css'
+import '../styles/styles.css'
+import Upload from '../components/Upload'
+import FileList from '../components/FileList'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../components/ui/Notification'
 import {useNavigate} from 'react-router-dom'
 import myfetch from '../utils/myfetch'
-import Usuario from '../../models/usuario'
+import Usuario from  '../../models/Usuario'
 import getValidationMessages from '../utils/getValidationMessages'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import HowToRegIcon from '@mui/icons-material/HowToReg';
+import { Container, Content } from '../styles/styles-img-register'
 
 
 function Register(){
@@ -24,7 +27,8 @@ function Register(){
       sobrenome: '',
       email: '',
       senha_acesso: '',
-      telefone: ''
+      confirmar_senha: '',
+      telefone: '',
     },
     errors: {},
     showWaiting: false,
@@ -40,7 +44,7 @@ function Register(){
     showWaiting,
     notif
   } = state
-
+  
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
   
@@ -60,7 +64,6 @@ function Register(){
 
     setState({...state, usuario: usuariosCopy})
 } 
-  
 
 function handleFormSubmit(event) {
   event.preventDefault()    // Evita que a página seja recarregada
@@ -72,6 +75,8 @@ async function sendData() {
   setState({ ...state, showWaiting: true, errors: {} });
   try {
     // Chama a validação da biblioteca Joi
+    console.log('Dados a serem enviados:', usuario); // Adicione este console.log
+
     await Usuario.validateAsync(usuario, { abortEarly: false });
     await myfetch.post(API_PATH, usuario);
     // DAR FEEDBACK POSITIVO
@@ -84,7 +89,7 @@ async function sendData() {
         show: true,
         message: 'Novo cadastro salvo com sucesso!',
       },
-    });
+      });
   } catch (error) {
     const { validationError, errorMessages } = getValidationMessages(error);
 
@@ -116,8 +121,6 @@ async function sendData() {
     }
   }
 }
-
-
 
   function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {
@@ -185,7 +188,7 @@ async function sendData() {
                   color='secondary'
                   className='input2'
                   variant='filled'
-                  type="nome"
+                  type="name"
                   name='sobrenome'
                   required
                   error={errors?.sobrenome}
@@ -197,7 +200,7 @@ async function sendData() {
 
                 <div className="wrap-input2">
                 <TextField 
-                  label='Email'
+                  label='E-mail'
                   className='input2'
                   variant='filled'
                   type="email"
@@ -227,6 +230,22 @@ async function sendData() {
                 </div>
 
                 <div className="wrap-input2">
+                <TextField 
+                  label='Confirmar Senha'
+                  color='secondary'
+                  className='input2'
+                  variant='filled'
+                  type="password"
+                  name='confirmar_senha'
+                  required
+                  error={errors?.confirmar_senha}
+                  helperText={errors?.confirmar_senha}
+                  value={usuario.confirmar_senha}
+                  onChange={handleFormFieldChange}
+                />
+                </div>
+
+                <div className="wrap-input2">
                 <TextField
                   className='input2'
                   variant='filled'
@@ -244,6 +263,13 @@ async function sendData() {
                   }}
                 />
                 </div>
+                <Container>
+                  <Content>
+                    <Upload/>
+                    <FileList/>
+                  </Content>
+                </Container>
+
                 <div className="container-login-form-btn">
                   <Button 
                     sx={{fontFamily:'monospace',

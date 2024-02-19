@@ -15,21 +15,11 @@ import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Link } from 'react-router-dom';
 import { format, parseISO, isValid } from 'date-fns';
-import DefaultProfile from '../../assets/defaultprofile.png'
 
   export default function Perfil() {
     const API_PATH = '/usuarios'
 
-    
-  function renderProfileImage(fotoPerfil) {
-    if (fotoPerfil) {
-      return <img src={fotoPerfil} alt="Foto de perfil" style={{height: '35px', display: 'flex', justifyContent: 'center'}}/>;
-    } else {
-      return <img src={DefaultProfile} alt="Foto de perfil padrão" style={{height: '35px', display: 'flex', justifyContent: 'center'}} />;
-    }
-  }
 
-  
     const [state, setState] = React.useState({
       perfils: [],
       showWaiting: false,
@@ -116,11 +106,6 @@ import DefaultProfile from '../../assets/defaultprofile.png'
         width: 150
       },
       {
-        field: 'senha_acesso',
-        headerName: 'Senha',
-        width: 150
-      },
-      {
         field: 'telefone',
         headerName: 'Telefone',
         width: 150
@@ -144,7 +129,6 @@ import DefaultProfile from '../../assets/defaultprofile.png'
         field: 'foto_perfil',
         headerName: 'Foto de perfil',
         width: 150,
-        renderCell: params => renderProfileImage(params.value),
       },
 
       {

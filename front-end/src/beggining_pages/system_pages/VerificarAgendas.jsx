@@ -16,6 +16,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
+import { dividerClasses } from '@mui/material';
 
 export default function VerificarAgendas() {
 
@@ -74,6 +75,20 @@ export default function VerificarAgendas() {
     fetchData()
   }, [])
 
+  function getStatusColor(status){
+    switch (status){
+      case 'Agendado':
+        return 'red';
+      case 'Finalizada':
+        return 'green';
+      case 'Em andamento':
+        return 'green';
+      default:
+        return 'black';
+    }
+    
+  }
+
   const columns = [
     { field: 'id', headerName: 'Id agenda', width: 90 },
     {
@@ -118,7 +133,17 @@ export default function VerificarAgendas() {
     {
       field: 'status',
       headerName: 'Status',
-      width: 150
+      width: 150,
+      renderCell: params =>(
+        <div
+          style={{
+            color: getStatusColor(params.value),
+            fontWeight: 'bold'
+          }}
+          >
+            {params.value}
+        </div>
+      )
     },
     {
       field: 'edit',

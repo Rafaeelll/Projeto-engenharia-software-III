@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
-import '../../../styles.css'
+import '../../../styles/styles.css'
 import myfetch from '../../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -27,7 +27,6 @@ export default function CriarAgendas() {
       plt_transm: '',
       jogo_id: '',
       descricao: '',
-      status: '',
       data_horario_inicio: '',
       data_horario_fim: ''
     },
@@ -41,39 +40,10 @@ export default function CriarAgendas() {
   });
   const { criarAgendas, errors, showWaiting, notif } = state;
 
-  function getStatusOptions() {
-    const currentDate = new Date();
-    const inicio = new Date(criarAgendas.data_horario_inicio);
-    const fim = new Date(criarAgendas.data_horario_fim);
-
-    if (inicio < currentDate && fim < currentDate || inicio < currentDate && fim <= currentDate) {
-      return ['Finalizada'];
-    } else if (inicio <= currentDate && fim >= currentDate) {
-      return ['Em andamento'];
-    } else {
-      return ['Agendado'];
-    }
-  }
-
-  const statusOptions = getStatusOptions();
-
-
   function handleFormFieldChange(event) {
     const criarAgendasCopy = { ...criarAgendas };
     criarAgendasCopy[event.target.name] = event.target.value;
 
-    // Adicione a lógica para calcular o status com base nas datas aqui
-    const currentDate = new Date();
-    const inicio = new Date(criarAgendasCopy.data_horario_inicio);
-    const fim = new Date(criarAgendasCopy.data_horario_fim);
-
-    if (inicio < currentDate && fim < currentDate || inicio < currentDate && fim <= currentDate) {
-      criarAgendasCopy.status = 'Finalizada';
-    } else if (inicio <= currentDate && fim >= currentDate) {
-      criarAgendasCopy.status = 'Em andamento';
-    } else {
-      criarAgendasCopy.status = 'Agendado';
-    }
 
     setState({ ...state, criarAgendas: criarAgendasCopy });
   }
@@ -346,27 +316,6 @@ export default function CriarAgendas() {
                 fullWidth
                 value={criarAgendas.data_horario_fim}
                 onChange={handleFormFieldChange}
-              />
-
-              <Autocomplete
-                id="status-autocomplete"
-                options={statusOptions}
-                renderInput={(params) => (
-                  <TextField sx={{marginTop: '12px'}}
-                  {...params}
-                    required
-                    fullWidth
-                    name="status"
-                    variant='filled'
-                    type='text'
-                    label='Status'
-                    color="secondary"
-                    value={criarAgendas.status}
-                    onChange={handleFormFieldChange}
-                    error={errors?.status}
-                    helperText={errors?.status}
-                  />
-                )}
               />
 
               <TextField sx={{marginTop: '12px'}}

@@ -1,4 +1,8 @@
 'use strict';
+const aws = require('aws-sdk')
+const s3 = new aws.S3()
+const path = require("path");
+const { promisify } = require("util");
 const {
   Model
 } = require('sequelize');
@@ -40,6 +44,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',          // Campo da tabela local 
         as: 'configuracoes'  // Nome do campo de associação (plural)
       })
+      this.hasMany(models.UsuarioFoto, {
+        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
+        sourceKey: 'id',          // Campo da tabela local 
+        as: 'usuario_fotos'  // Nome do campo de associação (plural)
+      })
     }
   }
   Usuario.init({
@@ -79,7 +88,17 @@ module.exports = (sequelize, DataTypes) => {
     jogo_fav: {
       type: DataTypes.STRING(50)
     },
-    foto_perfil: {
+    /// user Img data
+    name: {
+      type: DataTypes.STRING
+    },
+    size: {
+      type: DataTypes.FLOAT
+    },
+    key: {
+      type: DataTypes.STRING
+    },
+    url: {
       type: DataTypes.STRING
     },
   }, {
@@ -100,6 +119,30 @@ module.exports = (sequelize, DataTypes) => {
           include: ['senha_acesso']
         }
       }
+    }
+  });
+
+    // Função para definir a URL antes de criar um registro
+  Usuario.beforeCreate((usuario, options) => {
+    if (!usuario.url) {
+        usuario.url = `${process.env.APP_URL}/files/${usuario.key}`;
+    }
+});
+  Usuario.beforeDestroy(async (usuario, options) => {
+    try {
+        if (process.env.STORAGE_TYPE === "s3") {
+            const response = await s3.deleteObject({
+                Bucket: process.env.BUCKET_NAME,
+                Key: usuario.key
+            }).promise();
+            console.log(response.status);
+        } else {
+            await promisify(fs.unlink)(
+                path.resolve(__dirname, "..", "tmp", "uploads", usuario.key)
+            );
+        }
+    } catch (error) {
+        console.error(error);
     }
   });
   return Usuario;

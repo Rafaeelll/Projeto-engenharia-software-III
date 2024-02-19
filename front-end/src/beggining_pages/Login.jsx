@@ -1,14 +1,16 @@
-import StreamAdvisor from '../assets/sa.png'
+import StreamAdvisor from '../assets/sa4.png'
 import React from 'react'
-import '../styles.css'
+import '../styles/styles.css'
 import ImagemFundo from '../assets/back.jpg'
 import { Link, useNavigate } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../components/ui/Notification'
 import myfetch from '../utils/myfetch'
-import  Button  from '@mui/material/Button'
+import Button  from '@mui/material/Button'
 import LoginIcon from '@mui/icons-material/Login';
+import TextField from '@mui/material/TextField'
+
 
 
 export default function LoginForm({onLoginLogout}) {
@@ -102,26 +104,30 @@ export default function LoginForm({onLoginLogout}) {
                   <img src={StreamAdvisor} alt="Stream Advisor"/>
                 </span>
 
-              <div className="wrap-input">
-                <input 
-                  className={email !== "" ? 'has-val input': 'input'}
-                  type="email"
-                  value={email}
+                <div className="wrap-input2">
+                <TextField
+                  className='input2'
+                  label='E-mail'
+                  variant='filled'
+                  type="name"
+                  name='email'
                   required
+                  value={email.nome}
                   onChange={e => setEmail(e.target.value)}
                 />
-                <span className="focus-input" data-placeholder="Email"></span>
-              </div>
+                </div>
 
-              <div className="wrap-input">
-                <input 
-                  className={senha_acesso !== "" ? 'has-val input': 'input'}
+              <div className="wrap-input2">
+                <TextField
+                  className='input2'
+                  color='secondary'
+                  label="Senha"
+                  variant='filled'
                   type="password"
                   required
                   value={senha_acesso}
                   onChange={e => setSenhaAcesso(e.target.value)}
                 />
-                <span className="focus-input" data-placeholder="Senha"></span>
               </div>
 
               <div className="container-login-form-btn">
@@ -136,8 +142,8 @@ export default function LoginForm({onLoginLogout}) {
               </div>
               
               <div className="text-center">
-                <span className="txt1">Não possui conta?</span>
-                <Link className ="txt2" to="/cadastro"><p><u>Criar conta</u></p></Link>
+                <span className="txt1">Não possui cadastro?</span>
+                <Link className ="txt2" to="/cadastro"><p><u>Criar cadastro</u></p></Link>
               </div>
             </form>
           </div>

@@ -4,7 +4,12 @@ module.exports = (req, res, next) => {
 
   const bypassRoutes = [
     { url: '/usuarios/login', method: 'POST' },
+    { url: '/usuarios', method: 'POST' },
     { url: '/usuarios/cadastro', method: 'POST' },
+    { url: '/usuario_fotos', method: 'POST' },
+    { url: '/usuario_fotos', method: 'DELETE' },
+
+
 
     // Adicione outras rotas que devem ser ignoradas aqui, se necessário
   ];

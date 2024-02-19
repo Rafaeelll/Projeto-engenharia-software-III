@@ -2,42 +2,16 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('usuarios', {
+    await queryInterface.createTable('usuario_fotos', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      nome: {
-        type: Sequelize.STRING(100),
+      usuario_id:{
+        type: Sequelize.INTEGER,
         allowNull: false
-      },
-      sobrenome: {
-        type: Sequelize.STRING(100),
-        allowNull: false
-      },
-      email: {
-        type: Sequelize.STRING(200),
-        allowNull: false,
-        unique: true
-      },
-      senha_acesso: {
-        type: Sequelize.STRING(200),
-        allowNull: false
-      },
-      telefone: {
-        type: Sequelize.STRING(20),
-        allowNull: false
-      },
-      data_nasc: {
-        type: Sequelize.DATEONLY,
-      },
-      plataforma_fav: {
-        type: Sequelize.STRING(50)
-      },
-      jogo_fav: {
-        type: Sequelize.STRING(50)
       },
       name: {
         type: Sequelize.STRING
@@ -62,6 +36,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('usuarios');
+    await queryInterface.dropTable('usuario_fotos');
   }
 };
