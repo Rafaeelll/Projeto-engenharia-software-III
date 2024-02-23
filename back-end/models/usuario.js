@@ -1,11 +1,20 @@
 'use strict';
-const aws = require('aws-sdk')
-const s3 = new aws.S3()
-const path = require("path");
-const { promisify } = require("util");
-const {
-  Model
-} = require('sequelize');
+/*
+  Este código define o modelo Usuario usando o Sequelize. 
+  Ele descreve a estrutura da tabela de usuários e suas associações com outros modelos.
+  Os campos definidos na tabela de usuários incluem id, nome, sobrenome, email, senha_acesso, 
+  telefone, data_nasc, plataforma_fav, jogo_fav, image e primeiro_login.
+
+  Além disso, o método associate define as associações do modelo Usuario com os modelos Agenda, 
+  HistoricoJogo, Jogo, Visualizacao, Notificacao e Configuracao, indicando os relacionamentos 
+  entre eles por meio de chaves estrangeiras.
+  O modelo Usuario é configurado com escopos para controlar a exibição do campo senha_acesso. 
+  O escopo padrão exclui o campo senha_acesso por padrão em operações de busca (retrieve), 
+  enquanto o escopo withPassword inclui o campo senha_acesso quando necessário (por exemplo, para operações de login).
+*/
+
+const { Model } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class Usuario extends Model {
     /**
@@ -14,43 +23,36 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
+      // Define as associações do modelo Usuario com outros modelos
       this.hasMany(models.Agenda, {
-        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'agendas'  // Nome do campo de associação (plural)
-      })
+        foreignKey: 'usuario_id',    // Chave estrangeira na tabela Agenda
+        sourceKey: 'id',              // Chave na tabela Usuario
+        as: 'agendas'                // Alias para a associação
+      });
       this.hasMany(models.HistoricoJogo, {
-        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'historico_jogos'  // Nome do campo de associação (plural)
-      })
+        foreignKey: 'usuario_id',    // Chave estrangeira na tabela HistoricoJogo
+        sourceKey: 'id',              // Chave na tabela Usuario
+        as: 'historico_jogos'        // Alias para a associação
+      });
       this.hasMany(models.Jogo, {
-        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'jogos'  // Nome do campo de associação (plural)
-      })
+        foreignKey: 'usuario_id',    // Chave estrangeira na tabela Jogo
+        sourceKey: 'id',              // Chave na tabela Usuario
+        as: 'jogos'                  // Alias para a associação
+      });
       this.hasMany(models.Visualizacao, {
-        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'visualizacoes'  // Nome do campo de associação (plural)
-      })
+        foreignKey: 'usuario_id',    // Chave estrangeira na tabela Visualizacao
+        sourceKey: 'id',              // Chave na tabela Usuario
+        as: 'visualizacoes'          // Alias para a associação
+      });
       this.hasMany(models.Notificacao, {
-        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'notificacoes'  // Nome do campo de associação (plural)
-      })
-      this.hasMany(models.Configuracao, {
-        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'configuracoes'  // Nome do campo de associação (plural)
-      })
-      this.hasMany(models.UsuarioFoto, {
-        foreignKey: 'usuario_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'usuario_fotos'  // Nome do campo de associação (plural)
-      })
+        foreignKey: 'usuario_id',    // Chave estrangeira na tabela Notificacao
+        sourceKey: 'id',              // Chave na tabela Usuario
+        as: 'notificacoes'           // Alias para a associação
+      });
     }
   }
+
+  // Definição dos campos e tipos na tabela Usuario
   Usuario.init({
     id: {
       allowNull: false,
@@ -88,62 +90,32 @@ module.exports = (sequelize, DataTypes) => {
     jogo_fav: {
       type: DataTypes.STRING(50)
     },
-    /// user Img data
-    name: {
-      type: DataTypes.STRING
+    image:{
+      type: DataTypes.STRING,
     },
-    size: {
-      type: DataTypes.FLOAT
-    },
-    key: {
-      type: DataTypes.STRING
-    },
-    url: {
-      type: DataTypes.STRING
+    primeiro_login:{
+      type: DataTypes.BOOLEAN,
+      defaultValue: true
     },
   }, {
     sequelize,
-    modelName: 'Usuario',
-    tableName: 'usuarios',
+    modelName: 'Usuario',      // Nome do modelo
+    tableName: 'usuarios',     // Nome da tabela no banco de dados
 
-    ///Esconde o campo "password" no retrieve e no retrieveOne
-    defaultScope:{
-      attributes:{
-        exclude: ['senha_acesso']
+    // Define os escopos para ocultar ou exibir o campo senha_acesso
+    defaultScope: {
+      attributes: {
+        exclude: ['senha_acesso']  // Exclui o campo senha_acesso por padrão
       }
     },
     scopes: {
-      // Inclui o campo "password" (necessario o login)
-      withPassword:{
-        attributes:{
-          include: ['senha_acesso']
+      withPassword: {
+        attributes: {
+          include: ['senha_acesso']  // Inclui o campo senha_acesso
         }
       }
     }
   });
 
-    // Função para definir a URL antes de criar um registro
-  Usuario.beforeCreate((usuario, options) => {
-    if (!usuario.url) {
-        usuario.url = `${process.env.APP_URL}/files/${usuario.key}`;
-    }
-});
-  Usuario.beforeDestroy(async (usuario, options) => {
-    try {
-        if (process.env.STORAGE_TYPE === "s3") {
-            const response = await s3.deleteObject({
-                Bucket: process.env.BUCKET_NAME,
-                Key: usuario.key
-            }).promise();
-            console.log(response.status);
-        } else {
-            await promisify(fs.unlink)(
-                path.resolve(__dirname, "..", "tmp", "uploads", usuario.key)
-            );
-        }
-    } catch (error) {
-        console.error(error);
-    }
-  });
   return Usuario;
 };

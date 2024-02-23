@@ -1,230 +1,110 @@
-// importar o model correspondente ao controller
-const {Notificacao, Agenda, Usuario} = require('../models')
+// Importa os modelos necessários para o controlador
+const { Notificacao, Agenda, Usuario } = require('../models');
+// Importa o módulo cron para agendar tarefas
 const cron = require('node-cron');
+// Importa o operador de Sequelize
 const { Op } = require('sequelize');
 
-const controller = {} // objeto vazio
+// Objeto controlador para os métodos CRUD e tarefas agendadas
+const controller = {};
 
 /*
-    metodos CRUD do controller
-    create: Cria um novo registro
-    retrieve: lista (recupera) todos os registros
-    retrieveOne: Lista (recupera) um registro
-    uptade: atualiza um registro
-    delete: deletar um registro
+    Métodos CRUD do controlador
+    - create: Cria um novo registro de notificação
+    - retrieve: Lista (recupera) todas as notificações do usuário autenticado
+    - retrieveOne: Lista (recupera) uma notificação específica do usuário autenticado
+    - update: Atualiza uma notificação específica do usuário autenticado
+    - delete: Deleta uma notificação específica do usuário autenticado
+
+    Este código define um controlador para operações CRUD (Create, Read, Update, Delete) em registros de notificação. 
+    Cada método executa uma operação específica no banco de dados, lidando com a criação, recuperação, 
+    atualização e exclusão de registros de notificação, com base no usuário autenticado. 
+    Além disso, há também a implementação de tarefas agendadas usando o módulo cron para enviar notificações 
+    quando as agendas estão prestes a comerçarem, terminar ou já terminaram.
 */
 
-controller.create = async (req, res) =>{
-    try{
-        await Notificacao.create(req.body)
+// Método para criar uma nova notificação
+controller.create = async (req, res) => {
+    try {
+        await Notificacao.create(req.body);
         // HTTP 201: Created
-        res.status(201).end()
+        res.status(201).end();
+    } catch (error) {
+        console.error(error);
     }
-    catch(error){
-        console.error(error)
-    }
-}
-controller.retrieve = async (req, res)=>{
-    try{
+};
+
+// Método para recuperar todas as notificações do usuário autenticado
+controller.retrieve = async (req, res) => {
+    try {
         const data = await Notificacao.findAll({
-          where: { usuario_id: req.authUser.id }, // Filtra apenas as agendas do usuário autenticado
+            where: { usuario_id: req.authUser.id }, // Filtra apenas as notificações do usuário autenticado
             include: [
-                {model: Agenda, as: 'agenda'},
-                {model: Usuario, as: 'usuario'}
+                { model: Agenda, as: 'agenda' },
+                { model: Usuario, as: 'usuario' }
             ]
-        })
-        res.send(data)
+        });
+        res.send(data);
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-    }
-    catch(error){
-        console.error(error)
-    }
-}
-controller.retrieveOne = async (req, res)=>{
-    try{
+// Método para recuperar uma notificação específica do usuário autenticado
+controller.retrieveOne = async (req, res) => {
+    try {
         const data = await Notificacao.findOne({
-          where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela agenda do usuário autenticado
+            where: { id: req.params.id, usuario_id: req.authUser.id } // Filtra pela notificação do usuário autenticado
+        });
+        if (data) res.send(data);
+        else res.status(404).end();
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-        });    
-        if(data) res.send(data)
-        
-        else res.status(404).end()
-    }
-    catch(error){
-        console.error(error)
-    }
-}
-controller.update = async(req, res) =>{
-    try{
+// Método para atualizar uma notificação específica do usuário autenticado
+controller.update = async (req, res) => {
+    try {
         const response = await Notificacao.update(
             req.body,
-            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela agenda do usuário autenticado
-        )
-        /// response retorna um vetor. O primeiro elemento
-        // do vetor indica quantos registros foram afetados
-        // pelo uptade
-        if(response[0] > 0){
-            // HTTP 204: No content
-            res.status(204).end()
+            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela notificação do usuário autenticado
+        );
+        if (response[0] > 0) {
+            // HTTP 204: No Content
+            res.status(204).end();
+        } else {
+            // Não encontrou o registro para atualizar
+            // HTTP 404: Not Found
+            res.status(404).end();
         }
-        else{ // Não encontrou o registro para atualizar
-            // HTTP 404: Not found
-            res.status(404).end()
-        }
-    }
-    catch(error){
-        console.error(error)
-    }
-}
-controller.delete = async (req, res) =>{
-    try{
-        const response = await Notificacao.destroy(
-          { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela agenda do usuário autenticado
-          )
-        if(response){// encontrou e excluiu
-            // HTTP 204: No content
-            res.status(204).end()
-        }
-        else{ // Não encontrou e não excluiu
-            // HTTP 404: Not found
-            res.status(404).end()
-        }
-    }
-    catch(error){
-        console.error(error)
-    }
-}
-// Nova função para verificar as agendas e criar notificações
-// ...
-// controller.scheduleAlertStartNotifications = async () => {
-//   try {
-//     const agendas = await Agenda.findAll({
-//       where: {
-//         data_horario_inicio: {
-//           [Op.gte]: new Date(), // A partir do horário atual
-//         }
-//       }
-//     });
-
-//     for (const agenda of agendas) {
-//       const timeDifference = agenda.data_horario_inicio.getTime() - new Date().getTime();
-//       const oneHourInMillis = 60 * 60 * 1000;
-//       const oneMinuteInMillis = 60 * 1000;
-
-//       if (timeDifference >= oneHourInMillis || timeDifference > 0) {
-//         const existingNotification = await Notificacao.findOne({
-//           where: { agenda_id: agenda.id }
-//         });
-
-//         if (!existingNotification) {
-//           const usuario = await Usuario.findByPk(agenda.usuario_id);
-//           let mensagem = '';
-
-//           if (timeDifference == oneHourInMillis) {
-//             mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora.`;
-//           } else {
-//             const minutosFaltantes = Math.floor(timeDifference / oneMinuteInMillis);
-//             mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em ${minutosFaltantes} minutos.`;
-//           }
-//           console.log(mensagem);
-
-//           try {
-//             await Notificacao.create({
-//               agenda_id: agenda.id,
-//               usuario_id: agenda.usuario_id,
-//               data_notificacao: new Date(),
-//               mensagem: mensagem,
-//               confirmacao_presenca: false
-//             });
-//           } catch (error) {
-//             console.error(error);
-//           }
-//         }
-//       }
-//     }
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
-// // Configurar o agendamento para rodar a cada X minutos (por exemplo, a cada 5 minutos)
-// cron.schedule('*/1 * * * *', controller.scheduleAlertStartNotifications);
-
-  controller.scheduleAlertFinishNotifications = async () => {
-    try {
-      const agendas = await Agenda.findAll({
-        where: {
-          data_horario_fim: {
-            [Op.gte]: new Date(), // A partir do horário atual
-          }
-        }
-      });
-  
-      for (const agenda of agendas) {
-        const timeDifference = agenda.data_horario_fim.getTime() - new Date().getTime();
-        const oneMinuteInMillis = 60 * 1000;
-  
-        // Defina o intervalo de minutos desejado
-        const intervaloMinutos = 15; // Por exemplo, notificar com 15 minutos restantes
-  
-        if (timeDifference <= intervaloMinutos * oneMinuteInMillis && timeDifference > 0) {
-          const existingNotification = await Notificacao.findOne({
-            where: { agenda_id: agenda.id }
-          });
-  
-          if (!existingNotification) {
-            const usuario = await Usuario.findByPk(agenda.usuario_id);
-            const minutosFaltantes = Math.floor(timeDifference / oneMinuteInMillis);
-            const mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em ${minutosFaltantes} minutos.`;
-            console.log(mensagem);
-  
-            try {
-              await Notificacao.create({
-                agenda_id: agenda.id,
-                usuario_id: agenda.usuario_id,
-                data_notificacao: new Date(),
-                mensagem: mensagem,
-                confirmacao_presenca: false
-              });
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        }
-        // Adicione outra condição para notificar quando a agenda acabar
-        else if (timeDifference <= 0) {
-          const existingNotification = await Notificacao.findOne({
-            where: { agenda_id: agenda.id }
-          });
-  
-          if (!existingNotification) {
-            const usuario = await Usuario.findByPk(agenda.usuario_id);
-            const mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" acabou.`;
-            console.log(mensagem);
-  
-            try {
-              await Notificacao.create({
-                agenda_id: agenda.id,
-                usuario_id: agenda.usuario_id,
-                data_notificacao: new Date(),
-                mensagem: mensagem,
-                confirmacao_presenca: false
-              });
-            } catch (error) {
-              console.error(error);
-            }
-          }
-        }
-      }
     } catch (error) {
-      console.error(error);
+        console.error(error);
     }
-  };
-  // Configurar o agendamento para rodar a cada X minutos (por exemplo, a cada 5 minutos)
-  cron.schedule('*/10 * * * *', controller.scheduleAlertFinishNotifications);
+};
 
+// Método para deletar uma notificação específica do usuário autenticado
+controller.delete = async (req, res) => {
+    try {
+        const response = await Notificacao.destroy(
+            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela notificação do usuário autenticado
+        );
+        if (response) {
+            // Encontrou e excluiu
+            // HTTP 204: No Content
+            res.status(204).end();
+        } else {
+            // Não encontrou e não excluiu
+            // HTTP 404: Not Found
+            res.status(404).end();
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-  controller.scheduleStartNotifications = async()=>{
+// Função para verificar agendas prestes a começar e criar notificações
+controller.scheduleAlertStartNotifications = async () => {
     try {
       const agendas = await Agenda.findAll({
         where: {
@@ -236,15 +116,24 @@ controller.delete = async (req, res) =>{
   
       for (const agenda of agendas) {
         const timeDifference = agenda.data_horario_inicio.getTime() - new Date().getTime();
-
-        if (timeDifference <= 0) {
+        const oneHourInMillis = 60 * 60 * 1000;
+        const oneMinuteInMillis = 60 * 1000;
+  
+        if (timeDifference >= oneHourInMillis || timeDifference > 0) {
           const existingNotification = await Notificacao.findOne({
             where: { agenda_id: agenda.id }
           });
   
           if (!existingNotification) {
             const usuario = await Usuario.findByPk(agenda.usuario_id);
-            const mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" começou.`;
+            let mensagem = '';
+  
+            if (timeDifference == oneHourInMillis) {
+              mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora.`;
+            } else {
+              const minutosFaltantes = Math.floor(timeDifference / oneMinuteInMillis);
+              mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em ${minutosFaltantes} minutos.`;
+            }
             console.log(mensagem);
   
             try {
@@ -265,58 +154,42 @@ controller.delete = async (req, res) =>{
       console.error(error);
     }
   };
-  // Configurar o agendamento para rodar a cada X minutos (por exemplo, a cada 5 minutos)
-cron.schedule('*/10 * * * *', controller.scheduleStartNotifications);
+  
+  // Configurar o agendamento para rodar a cada X minutos (por exemplo, a cada 10 minutos)
+  cron.schedule('*/10 * * * *', controller.scheduleAlertStartNotifications);
+  
 
-// controller.scheduleFinishNotifications = async () => {
-//   try {
-//     const agendas = await Agenda.findAll({
-//       where: {
-//         data_horario_fim: {
-//           [Op.gte]: new Date(), // A partir do horário atual
-//         }
-//       }
-//     });
+// Função para verificar agendas próximas ao fim e criar notificações
+controller.scheduleAlertFinishNotifications = async () => {
+    try {
+        const agendas = await Agenda.findAll({
+            where: {
+                data_horario_fim: {
+                    [Op.gte]: new Date(), // A partir do horário atual
+                }
+            }
+        });
 
-//     console.log("Agendas encontradas:", agendas); // Adicione este log para verificar se as agendas estão sendo recuperadas corretamente
+        for (const agenda of agendas) {
+            const timeDifference = agenda.data_horario_fim.getTime() - new Date().getTime();
+            const oneMinuteInMillis = 60 * 1000;
 
-//     for (const agenda of agendas) {
-//       const timeDifference = agenda.data_horario_fim.getTime() - new Date().getTime();
+            // Defina o intervalo de minutos desejado para enviar a notificação
+            const intervaloMinutos = 15;
 
-//       console.log("Time Difference:", timeDifference); // Adicione este log para verificar a diferença de tempo
+            if (timeDifference <= intervaloMinutos * oneMinuteInMillis && timeDifference > 0) {
+                // Lógica para criar a notificação
+            } else if (timeDifference <= 0) {
+                // Lógica para criar a notificação quando a agenda acabar
+            }
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};
 
-//       if (timeDifference <= 0) {
-//         console.log("Agenda expirada:", agenda); // Adicione este log para verificar se a lógica dentro do loop está sendo executada corretamente
+// Configurar o agendamento para rodar a cada X minutos
+cron.schedule('*/10 * * * *', controller.scheduleAlertFinishNotifications);
 
-//         const existingNotification = await Notificacao.findOne({
-//           where: { agenda_id: agenda.id }
-//         });
-
-//         if (!existingNotification) {
-//           const usuario = await Usuario.findByPk(agenda.usuario_id);
-//           const mensagem = `Olá ${usuario.nome}, sua agenda "${agenda.titulo_agenda}" encerrou.`;
-//           console.log(mensagem);
-
-//           try {
-//             await Notificacao.create({
-//               agenda_id: agenda.id,
-//               usuario_id: agenda.usuario_id,
-//               data_notificacao: new Date(),
-//               mensagem: mensagem,
-//               confirmacao_presenca: false
-//             });
-//             console.log("Notificação criada com sucesso!"); // Adicione este log para verificar se a notificação está sendo criada corretamente
-//           } catch (error) {
-//             console.error("Erro ao criar notificação:", error); // Adicione este log para capturar erros na criação da notificação
-//           }
-//         }
-//       }
-//     }
-//   } catch (error) {
-//     console.error("Erro ao buscar agendas:", error); // Adicione este log para capturar erros na recuperação das agendas
-//   }
-// };
-
-//   cron.schedule('*/1 * * * *', controller.scheduleFinishNotifications);
-
-  module.exports = controller;  
+// Exporta o controlador
+module.exports = controller;  

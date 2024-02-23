@@ -1,58 +1,42 @@
-const multer = require("multer")
-const path = require("path")
-const crypto = require('crypto')
-const multerS3 = require('multer-s3')
-const aws = require("aws-sdk")
+// Este código configura o multer para lidar com o upload de arquivos, especificamente imagens. Aqui está o que está acontecendo:
 
-const storageTypes = {
-    local: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.resolve(__dirname, "..", "tmp", "uploads"));
-    },
-    filename: (req, file, cb) => {
-      crypto.randomBytes(16, (err, hash) => {
-        if (err) cb(err);
+// O multer é configurado com opções para armazenar arquivos em disco (diskStorage) e filtrar os arquivos por extensão (fileFilter).
+// A configuração diskStorage define o diretório onde os arquivos serão armazenados e define o nome dos arquivos com um timestamp para torná-los únicos.
+// A função fileFilter filtra os arquivos aceitos para upload, verificando se a extensão do arquivo está entre os formatos de imagem aceitos.
+// Se a extensão do arquivo é válida, o middleware chama o callback com true, permitindo o upload. Caso contrário, chama o callback com false, recusando o upload.
+// O módulo multer configurado é exportado para ser utilizado em outras partes do aplicativo que precisem lidar com uploads de imagens.
 
-        file.key = `${hash.toString("hex")}-${file.originalname}`;
+const multer = require("multer"); // Importa o módulo multer para lidar com upload de arquivos
+const path = require("path"); // Importa o módulo path para lidar com caminhos de arquivos
 
-        cb(null, file.key);
-      });
-    }
+module.exports = (multer({
+
+  // Configuração de armazenamento do multer
+  storage: multer.diskStorage({
+      // Define o diretório onde os arquivos serão armazenados
+      destination: (req, file, cb) => {
+        cb(null, path.resolve(__dirname, "..", "tmp", "uploads")); // Caminho absoluto para a pasta de uploads
+      },
+
+      // Define o nome do arquivo
+      filename: (req, file, cb) => {
+          cb(null, Date.now().toString() + path.extname(file.originalname)); // Adiciona um timestamp ao nome do arquivo para torná-lo único
+      }
   }),
-  s3: multerS3({
-    s3: new aws.S3(),
-    bucket: process.env.BUCKET_NAME,
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-    acl: "public-read",
-    key: (req, file, cb) => {
-      crypto.randomBytes(16, (err, hash) => {
-        if (err) cb(err);
 
-        const fileName = `${hash.toString("hex")}-${file.originalname}`;
+  // Filtra os arquivos aceitos para upload
+  fileFilter: (req, file, cb) => {
 
-        cb(null, fileName);
-      });
-    }
-  })
-};
+      // Verifica se a extensão do arquivo está entre os formatos aceitos
+      const extesaoImg = ['image/png', 'image/jpg', 'image/jpeg'].find(formatoAceito => formatoAceito == file.mimetype);
 
-module.exports = {
-    dest: path.resolve(__dirname, '..', 'tmp', 'uploads'),
-    storage: storageTypes[process.env.STORAGE_TYPE],
-    limits:{
-        fileSize: 2 * 1024 * 1024
-    },
-    fileFilter:(req, file, cb) =>{
-        const allowedMimes = [
-            "image/jpeg",
-            "image/pjpeg",
-            "image/png",
-            "image/gif"
-        ];
-        if(allowedMimes.includes(file.mimetype)){
-            cb(null, true)  
-        }else{
-            cb(new Error("Invalid file type."));
-        }
-    },
-};
+      // Retorna TRUE se a extensão do arquivo é válida
+      if(extesaoImg){
+          return cb(null, true);
+      }
+
+      // Retorna FALSE se a extensão do arquivo não é válida
+      return cb(null, false);
+  }
+}));
+

@@ -1,40 +1,58 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+
+// Neste código, um modelo Sequelize chamado Agenda é definido. Ele descreve a estrutura da 
+// tabela agendas em um banco de dados relacional, incluindo os tipos de dados de cada coluna, 
+// restrições de chave estrangeira e associações com outros modelos (como Usuario, Jogo, Visualizacao e Notificacao). 
+// O método associate define essas associações entre os modelos. Cada agenda pertence a um usuário e a um jogo, e pode 
+// ter várias visualizações e notificações associadas a ela.
+
+const { Model } = require('sequelize');
+
+/**
+ * O arquivo define o modelo 'Agenda' usando o Sequelize.
+ */
+
 module.exports = (sequelize, DataTypes) => {
   class Agenda extends Model {
     /**
-     * Helper method for defining associations.
-     * This method is not a part of DataTypes lifecycle.
-     * The `models/index` file will call this method automatically.
+     * Método auxiliar para definir associações.
+     * Este método não faz parte do ciclo de vida do DataTypes.
+     * O arquivo `models/index` chamará este método automaticamente.
      */
     static associate(models) {
-      // define association here
-      this.belongsTo(models.Usuario,{
+      // Define as associações entre os modelos
+
+      // Cada agenda pertence a um usuário
+      this.belongsTo(models.Usuario, {
         foreignKey: 'usuario_id', // Nome do campo na tabela de ORIGEM
-        targetKey: 'id',       // Nome do campo na tabela de DESTINO
+        targetKey: 'id',          // Nome do campo na tabela de DESTINO
         as: 'usuario'             // Nome do atributo para exibição
-      })
-      this.belongsTo(models.Jogo,{
-        foreignKey: 'jogo_id', // Nome do campo na tabela de ORIGEM
-        targetKey: 'id',       // Nome do campo na tabela de DESTINO
-        as: 'jogo'             // Nome do atributo para exibição
-      })
+      });
+
+      // Cada agenda pertence a um jogo
+      this.belongsTo(models.Jogo, {
+        foreignKey: 'jogo_id',    // Nome do campo na tabela de ORIGEM
+        targetKey: 'id',           // Nome do campo na tabela de DESTINO
+        as: 'jogo'                 // Nome do atributo para exibição
+      });
+
+      // Cada agenda pode ter várias visualizações
       this.hasMany(models.Visualizacao, {
-        foreignKey: 'agenda_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'visualizacoes'  // Nome do campo de associação (plural)
-      })
+        foreignKey: 'agenda_id',   // Campo da tabela estrangeira
+        sourceKey: 'id',           // Campo da tabela local 
+        as: 'visualizacoes'        // Nome do campo de associação (plural)
+      });
+
+      // Cada agenda pode ter várias notificações
       this.hasMany(models.Notificacao, {
-        foreignKey: 'agenda_id',    // Campo da tabela estrangeira
-        sourceKey: 'id',          // Campo da tabela local 
-        as: 'notificacoes'  // Nome do campo de associação (plural)
-      })
+        foreignKey: 'agenda_id',   // Campo da tabela estrangeira
+        sourceKey: 'id',           // Campo da tabela local 
+        as: 'notificacoes'         // Nome do campo de associação (plural)
+      });
     }
   }
 
-
+  // Define a estrutura da tabela 'agendas' e suas propriedades
   Agenda.init({
     id: {
       allowNull: false,
@@ -74,8 +92,9 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'Agenda',
-    tableName: 'agendas'
+    modelName: 'Agenda',   // Nome do modelo
+    tableName: 'agendas'    // Nome da tabela no banco de dados
   });
+
   return Agenda;
 };

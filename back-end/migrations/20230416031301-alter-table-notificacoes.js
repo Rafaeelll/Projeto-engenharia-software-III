@@ -1,36 +1,54 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
+/**
+ * Migração para adicionar restrições de chave estrangeira à tabela 'notificacoes'.
+ * Este arquivo adiciona chaves estrangeiras para os campos 'usuario_id' e 'agenda_id'.
+ * Define as tabelas e campos de referência, bem como as ações de onDelete e onUpdate.
+ */
+
+/** Importa o objeto Migration do sequelize-cli */
+/** Este objeto é usado para criar as migrações */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  /**
+   * A função assíncrona 'up' é chamada quando a migração é executada para cima.
+   * Adiciona as restrições de chave estrangeira à tabela 'notificacoes'.
+   */
+  async up(queryInterface, Sequelize) {
+    // Adiciona a restrição de chave estrangeira para o campo 'usuario_id'
     await queryInterface.addConstraint('notificacoes', {
-      fields: ['usuario_id'], //campo(s) da tabela de origem
+      fields: ['usuario_id'], // Campo(s) da tabela de origem
       type: 'foreign key',
-      name: 'notificacao_usuarios_fk', // nome da chave estrangeira (deve ser único do BD)
+      name: 'notificacao_usuarios_fk', // Nome da chave estrangeira (deve ser único do BD)
       references:{
-        table: 'usuarios', //tabela estrangeira
+        table: 'usuarios', // Tabela estrangeira
         field: 'id'      // Campo da tabela estrangeira
-
       },
-      onDelete: 'RESTRICT', // Não deixa apagar um usuario em uso no agendamento
-      onUpdate: 'CASCADE'   // Atualiza usuario_id em agendamento se id em usuario mudar
-    })
+      onDelete: 'RESTRICT', // Não permite apagar um usuário em uso nas notificações
+      onUpdate: 'CASCADE'   // Atualiza usuario_id nas notificações se id do usuário mudar
+    });
+
+    // Adiciona a restrição de chave estrangeira para o campo 'agenda_id'
     await queryInterface.addConstraint('notificacoes', {
-      fields: ['agenda_id'], //campo(s) da tabela de origem
+      fields: ['agenda_id'], // Campo(s) da tabela de origem
       type: 'foreign key',
-      name: 'notificacao_agendas_fk', // nome da chave estrangeira (deve ser único do BD)
+      name: 'notificacao_agendas_fk', // Nome da chave estrangeira (deve ser único do BD)
       references:{
-        table: 'agendas', //tabela estrangeira
+        table: 'agendas', // Tabela estrangeira
         field: 'id'      // Campo da tabela estrangeira
-
       },
-      onDelete: 'RESTRICT', // Não deixa apagar um usuario em uso no agendamento
-      onUpdate: 'CASCADE'   // Atualiza usuario_id em agendamento se id em usuario mudar
-    })
+      onDelete: 'RESTRICT', // Não permite apagar uma agenda em uso nas notificações
+      onUpdate: 'CASCADE'   // Atualiza agenda_id nas notificações se id da agenda mudar
+    });
   },
 
-  async down (queryInterface, Sequelize) {
-    await queryInterface.removeConstraint('notificacoes', 'notificacao_agendas_fk')
-    await queryInterface.removeConstraint('notificacoes', 'notificacao_usuarios_fk')
+  /**
+   * A função assíncrona 'down' é chamada quando a migração é revertida.
+   * Remove as restrições de chave estrangeira da tabela 'notificacoes'.
+   */
+  async down(queryInterface, Sequelize) {
+    // Remove a restrição de chave estrangeira para o campo 'agenda_id'
+    await queryInterface.removeConstraint('notificacoes', 'notificacao_agendas_fk');
+    // Remove a restrição de chave estrangeira para o campo 'usuario_id'
+    await queryInterface.removeConstraint('notificacoes', 'notificacao_usuarios_fk');
   }
 };

@@ -1,6 +1,23 @@
 'use strict';
-/** @type {import('sequelize-cli').Migration} */
+
+/**
+ * Arquivo de migração para criar a tabela 'usuarios' no banco de dados.
+ * Esta migração cria a tabela 'usuarios' com os campos especificados.
+ * Também define as configurações de cada campo, como tipo, allowNull e unique.
+ * Define também as configurações para as colunas 'createdAt' e 'updatedAt'.
+ * 
+ * Este arquivo de migração realiza as seguintes ações:
+  Cria a tabela 'usuarios' com os campos especificados, como 'id', 'nome', 'sobrenome', 'email', etc.
+  Define as configurações para cada coluna, como tipo de dados, se é permitido valor nulo (allowNull) e se é único (unique).
+  Define as configurações para as colunas 'createdAt' e 'updatedAt'.
+  A função up é executada quando a migração é aplicada, criando a tabela.
+  A função down é executada quando a migração é revertida, eliminando a tabela 'usuarios'.
+ */
+
+/** Importa o objeto Migration do sequelize-cli */
+/** Este objeto é usado para criar as migrações */
 module.exports = {
+  /** Função assíncrona 'up' é chamada quando a migração é executada para cima */
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('usuarios', {
       id: {
@@ -39,17 +56,12 @@ module.exports = {
       jogo_fav: {
         type: Sequelize.STRING(50)
       },
-      name: {
-        type: Sequelize.STRING
+      image:{
+        type: Sequelize.STRING,
       },
-      size: {
-        type: Sequelize.FLOAT
-      },
-      key: {
-        type: Sequelize.STRING
-      },
-      url: {
-        type: Sequelize.STRING
+      primeiro_login:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
       },
       createdAt: {
         allowNull: false,
@@ -61,6 +73,7 @@ module.exports = {
       }
     });
   },
+  /** Função assíncrona 'down' é chamada quando a migração é revertida */
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('usuarios');
   }

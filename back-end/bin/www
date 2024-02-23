@@ -1,39 +1,58 @@
 #!/usr/bin/env node
 
+
+// Esse código é um script de servidor Node.js que configura um 
+// servidor HTTP usando o framework Express.
+
 /**
  * Module dependencies.
  */
 
-var app = require('../src/app');
+var app = require('../src/app'); // Essa linha importa a instância da aplicação Express 
+// do arquivo app.js localizado no diretório src.
+
 var debug = require('debug')('ps-mat-2023-1:server');
-var http = require('http');
+var http = require('http'); // Essa linha importa o módulo Node.js integrado http, 
+// que permite criar servidores HTTP e lidar com requisições HTTP.
 
 /**
  * Get port from environment and store in Express.
  */
-
 var port = normalizePort(process.env.PORT || '3333');
 app.set('port', port);
+// Essas linhas acima determinam o número da porta na qual o servidor irá escutar. 
+// Primeiro, tenta usar a porta especificada na variável de ambiente PORT. 
+// Se essa variável não estiver definida, a porta padrão é 3333. 
+// O número da porta é então definido na aplicação Express usando app.set().
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+var server = http.createServer(app); // Essa linha cria uma instância de servidor HTTP usando a aplicação Express app.
+
+
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(port); // Essa linha instrui o servidor a começar a escutar por conexões recebidas na porta especificada.
+
+
 server.on('error', onError);
 server.on('listening', onListening);
+// Essas linhas configuram ouvintes de eventos para o servidor. 
+// onError é chamada quando ocorre um erro, e onListening é chamada quando o servidor começa a escutar por conexões.
+
 
 /**
  * Normalize a port into a number, string, or false.
  */
 
-function normalizePort(val) {
+
+function normalizePort(val) {  
+// Função para normalizar um número de porta
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -54,6 +73,7 @@ function normalizePort(val) {
  */
 
 function onError(error) {
+    // Ouvinte de eventos para o evento "error" do servidor HTTP
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -82,9 +102,21 @@ function onError(error) {
  */
 
 function onListening() {
+    // Ouvinte de eventos para o evento "listening" do servidor HTTP
   var addr = server.address();
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+// Essas são declarações de funções.
+//  A função normalizePort normaliza a porta para um número,
+//  string ou false. onError e onListening são funções de tratamento de eventos para lidar com erros do servidor e eventos de escuta, respectivamente.
+
+// No geral, este código configura um servidor HTTP usando Node.js e Express,
+//  lida com a configuração de porta e fornece tratamento de erros para o servidor. É uma configuração básica para um servidor web em uma aplicação Node.js.
+
+
+
+
+

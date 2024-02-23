@@ -1,27 +1,32 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+// Este código define o modelo HistoricoJogo utilizando o Sequelize para lidar com a interação com o banco de dados. 
+// Ele inclui definições de associações com os modelos Usuario e Jogo, especificando as chaves estrangeiras e os 
+// atributos para exibição. Além disso, define os campos da tabela historico_jogos, como id, usuario_id, jogo_id, pontuacao e createdAt
+
+const { Model } = require('sequelize');
+
+// Definição do modelo HistoricoJogo usando o Sequelize
 module.exports = (sequelize, DataTypes) => {
   class HistoricoJogo extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of DataTypes lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+    // Método auxiliar para definir associações entre modelos
     static associate(models) {
-      this.belongsTo(models.Usuario,{
+      // Associação com o modelo Usuario
+      this.belongsTo(models.Usuario, {
         foreignKey: 'usuario_id', // Nome do campo na tabela de ORIGEM
-        targetKey: 'id',       // Nome do campo na tabela de DESTINO
+        targetKey: 'id',          // Nome do campo na tabela de DESTINO
         as: 'usuario'             // Nome do atributo para exibição
-      })
-      this.belongsTo(models.Jogo,{
-        foreignKey: 'jogo_id', // Nome do campo na tabela de ORIGEM
-        targetKey: 'id',       // Nome do campo na tabela de DESTINO
-        as: 'jogo'             // Nome do atributo para exibição
-      })
+      });
+
+      // Associação com o modelo Jogo
+      this.belongsTo(models.Jogo, {
+        foreignKey: 'jogo_id',    // Nome do campo na tabela de ORIGEM
+        targetKey: 'id',          // Nome do campo na tabela de DESTINO
+        as: 'jogo'                // Nome do atributo para exibição
+      });
     }
   }
+
+  // Inicialização do modelo HistoricoJogo
   HistoricoJogo.init({
     id: {
       allowNull: false,
@@ -47,8 +52,9 @@ module.exports = (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    modelName: 'HistoricoJogo',
-    tableName: 'historico_jogos'
+    modelName: 'HistoricoJogo', // Nome do modelo
+    tableName: 'historico_jogos' // Nome da tabela no banco de dados
   });
+
   return HistoricoJogo;
 };

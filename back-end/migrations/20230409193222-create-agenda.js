@@ -1,6 +1,19 @@
 'use strict';
-/** @type {import('sequelize-cli').Migration} */
+/**
+ * 
+ * Este arquivo de migração realiza as seguintes ações:
+
+  Cria a tabela 'agendas' com os campos especificados, como 'id', 'usuario_id', 'jogo_id', 'data_horario_inicio', etc.
+  Define as configurações para cada coluna, como tipo de dados, se é permitido valor nulo (allowNull), etc.
+  Define as configurações para as colunas 'createdAt' e 'updatedAt'.
+  A função up é executada quando a migração é aplicada, criando a tabela.
+  A função down é executada quando a migração é revertida, eliminando a tabela 'agendas'.
+ */
+
+/** Importa o objeto Migration do sequelize-cli */
+/** Este objeto é usado para criar as migrações */
 module.exports = {
+  /** Função assíncrona 'up' é chamada quando a migração é executada para cima */
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('agendas', {
       id: {
@@ -49,6 +62,7 @@ module.exports = {
       }
     });
   },
+  /** Função assíncrona 'down' é chamada quando a migração é revertida */
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('agendas');
   }
