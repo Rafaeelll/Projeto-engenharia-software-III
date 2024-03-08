@@ -8,24 +8,22 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/usuario');
-const authenticateToken = require('../lib/authMiddleware'); // Importa o middleware de autenticação
-const authorizationMiddleware = require('../lib/authorizationMiddleware'); // Importa o middleware de autorização
 const multerConfig = require('../config/multer');
 
 // Rota para criar um novo usuário
 router.post('/', multerConfig.single('image'), controller.create);
 
 // Rota para recuperar todos os usuários (requer autenticação)
-router.get('/', authenticateToken, controller.retrieve);
+router.get('/', controller.retrieve);
 
 // Rota para recuperar um usuário específico por ID (requer autenticação e autorização)
-router.get('/:id', authenticateToken, authorizationMiddleware, controller.retrieveOne);
+router.get('/:id', controller.retrieveOne);
 
 // Rota para atualizar um usuário específico por ID (requer autenticação e autorização)
-router.put('/:id', authenticateToken, authorizationMiddleware, controller.update);
+router.put('/:id', multerConfig.single('image'), controller.update);
 
 // Rota para excluir um usuário específico por ID (requer autenticação e autorização)
-router.delete('/:id', authenticateToken, authorizationMiddleware, controller.delete);
+router.delete('/:id', controller.delete);
 
 // Rota para fazer login
 router.post('/login', controller.login);

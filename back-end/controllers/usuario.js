@@ -62,7 +62,7 @@ controller.create = async (req, res) => {
 controller.retrieve = async (req, res) => {
   try {
     const data = await Usuario.findAll({
-      where: { id: req.user.id }  // Filtra pelos dados do usuário autenticado
+      where: { id: req.authUser.id }  // Filtra pelos dados do usuário autenticado
     });
     res.send(data);
   } catch (error) {
@@ -73,7 +73,7 @@ controller.retrieve = async (req, res) => {
 controller.retrieveOne = async (req, res) => {
   try {
     const data = await Usuario.findOne({
-      where: { id: req.params.id, id: req.user.id } // Filtra pelo ID e pelo usuário autenticado
+      where: { id: req.params.id, id: req.authUser.id } // Filtra pelo ID e pelo usuário autenticado
     });
 
     if (data) {
@@ -87,10 +87,32 @@ controller.retrieveOne = async (req, res) => {
 };
 
 controller.update = async (req, res) => {
+  const {nome, sobrenome, email, senha_acesso, telefone, data_nasc, plataforma_fav, jogo_fav } = req.body;
+  // const user = await Usuario.findOne({ where: { email } });
+
   try {
+    // if (user) {
+    //   // Se encontrou o usuário com o email, retorna um erro de conflito
+    //   return res.status(409).send('O e-mail informado já está em uso.');
+    // }
+    // Criptografar a senha
     const response = await Usuario.update(
-      req.body,
-      { where: { id: req.params.id, id: req.user.id } } // Filtra pelo ID e pelo usuário autenticado
+      {
+        // Dados a serem atualizados
+        nome,
+        sobrenome,
+        email,
+        senha_acesso,
+        telefone,    
+        data_nasc,
+        plataforma_fav,
+        jogo_fav,
+        image: req.file.filename
+      },
+      { 
+        // Condição para atualização
+        where: { id: req.params.id} 
+      }
     );
 
     if (response[0] > 0) {
@@ -106,7 +128,7 @@ controller.update = async (req, res) => {
 controller.delete = async (req, res) => {
   try {
     const response = await Usuario.destroy(
-      { where: { id: req.params.id, id: req.user.id } } // Filtra pelo ID e pelo usuário autenticado
+      { where: { id: req.params.id, id: req.authUser.id } } // Filtra pelo ID e pelo usuário autenticado
     );
 
     if (response) {

@@ -16,15 +16,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import GamesIcon from '@mui/icons-material/Games';
 import { Link } from 'react-router-dom';
 
-// function formatDate(dateString) {
-//   const date = new Date(dateString);
-//   const day = date.getDate().toString().padStart(2, '0');
-//   const month = (date.getMonth() + 1).toString().padStart(2, '0');
-//   const year = date.getFullYear();
-//   const hours = date.getHours().toString().padStart(2, '0');
-//   const minutes = date.getMinutes().toString().padStart(2, '0');
-//   return `${day}/${month}/${year} - ${hours}:${minutes}`;
-// }
+
 
   export default function HistoricoJogos() {
     const API_PATH = '/historico_jogos'
@@ -102,12 +94,6 @@ import { Link } from 'react-router-dom';
         headerName: 'Nível',
         width: 150
       },
-      // {
-      //   field: 'data_jogo',
-      //   headerName: 'Data de aquisição',
-      //   width: 150,
-      //   valueFormatter: (params) => formatDate(params.value),
-      // },
       {
         field: 'edit',
         headerName: 'Editar',

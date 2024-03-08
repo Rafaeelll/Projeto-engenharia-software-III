@@ -23,7 +23,6 @@ export default function CriarAgendas() {
   const [state, setState] = React.useState({
     criarAgendas: {
       titulo_agenda: '',
-      usuario_id: '',
       plt_transm: '',
       jogo_id: '',
       descricao: '',
@@ -267,19 +266,6 @@ export default function CriarAgendas() {
                 onChange={handleFormFieldChange}
                 error={errors?.titulo_agenda}
                 helperText={errors?.titulo_agenda}
-              />
-
-              <TextField sx={{marginTop: '12px'}}
-                label="Id usuario 
-                (Este campo é preenchido automaticamente)"
-                type="number"
-                variant='filled'
-                fullWidth
-                required
-                name="usuario_id"
-                value={criarAgendas.usuario_id}
-                onChange={handleFormFieldChange}
-                disabled
               />
 
               <TextField sx={{marginTop: '12px'}}

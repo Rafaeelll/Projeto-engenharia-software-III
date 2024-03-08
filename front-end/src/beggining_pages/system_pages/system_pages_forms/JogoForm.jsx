@@ -24,7 +24,6 @@ export default function jogos() {
   const [state, setState] = React.useState({
     jogos: {
       nome: '',
-      usuario_id: '',
       data_jogo: '',
     },
     errors: {},
@@ -172,7 +171,7 @@ export default function jogos() {
       <Paper
         className="Jogo-container"
         sx={{
-          width: '512px',
+          width: '500px',
           background: 'whitesmoke',
           maxWidth: '90%',
           margin: '25px auto 0 auto',
@@ -200,21 +199,6 @@ export default function jogos() {
               error={errors?.nome}
               helperText={errors?.nome}
             />
-            <TextField sx={{marginTop: '12px'}}
-                label="Id usuario (Este campo é preenchido automaticamente)"
-                type="number"
-                variant='filled'
-                fullWidth
-                required
-                name="usuario_id"
-                value={jogos.usuario_id}
-                onChange={handleFormFieldChange}
-                error={errors?.usuario_id}
-                helperText={errors?.usuario_id}
-                disabled
-
-              />
-
             <TextField sx={{marginTop: '12px'}}
               required
               variant='filled'

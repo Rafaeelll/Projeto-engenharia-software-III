@@ -23,19 +23,6 @@ controller.create = async (req, res) => {
     req.body.usuario_id = req.authUser.id;
 
     try {
-        const { data_horario_inicio, data_horario_fim } = req.body;
-
-        // Verifica o status da agenda com base nas datas
-        const dataAtual = new Date();
-        if (data_horario_inicio < dataAtual && data_horario_fim < dataAtual || 
-            data_horario_inicio < dataAtual && data_horario_fim <= dataAtual) {
-            req.body.status = 'Finalizada';
-        } else if (data_horario_inicio <= dataAtual && data_horario_fim >= dataAtual) {
-            req.body.status = 'Em andamento';
-        } else {
-            req.body.status = 'Agendado';
-        }
-
         // Cria a agenda no banco de dados
         await Agenda.create(req.body);
         // HTTP 201: Created

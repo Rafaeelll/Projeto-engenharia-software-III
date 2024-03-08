@@ -28,6 +28,9 @@ module.exports = {
       confirmacao_presenca: {
         type: Sequelize.BOOLEAN,
       },
+      confirmacao_finalizacao: {
+        type: Sequelize.BOOLEAN,
+      },
       configuracao: {
         type: Sequelize.JSON, // Ou outro tipo de dados apropriado
         allowNull: true // Ou false, dependendo se a configuração é obrigatória ou não

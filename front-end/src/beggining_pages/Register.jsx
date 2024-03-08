@@ -2,24 +2,26 @@ import React from 'react'
 import ImagemFundo from '../assets/back.jpg'
 import StreamAdvisor from '../assets/sa4.png'
 import '../styles/styles.css'
-import Upload from '../components/Upload'
-import FileList from '../components/FileList'
+// import Upload from '../components/Upload'
+// import FileList from '../components/FileList'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../components/ui/Notification'
 import {useNavigate} from 'react-router-dom'
-import myfetch from '../utils/myfetch'
+// import myfetch from '../utils/myfetch'
 import Usuario from  '../../models/Usuario'
 import getValidationMessages from '../utils/getValidationMessages'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import HowToRegIcon from '@mui/icons-material/HowToReg';
-import { Container, Content } from '../styles/styles-img-register'
-
+import api from '../../services/api'
+import { Container, Label} from '../styles/styles-img-register'
+// import {uniqueId} from 'lodash'
+// import {filesize} from 'filesize'
 
 function Register(){
-  const API_PATH = '/usuarios/cadastro'
 
+  const API_PATH = '/usuarios/cadastro'
   const navigate = useNavigate()
   const [state, setState] = React.useState({
     usuario: {
@@ -29,6 +31,7 @@ function Register(){
       senha_acesso: '',
       confirmar_senha: '',
       telefone: '',
+      image: ''
     },
     errors: {},
     showWaiting: false,
@@ -44,6 +47,11 @@ function Register(){
     showWaiting,
     notif
   } = state
+
+  function handleFileChange(event) {
+    const image = event.target.files[0]; // Pega o primeiro arquivo selecionado
+    setState({ ...state, usuario: { ...usuario, image: image } });
+  }
   
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
@@ -78,9 +86,23 @@ async function sendData() {
     console.log('Dados a serem enviados:', usuario); // Adicione este console.log
 
     await Usuario.validateAsync(usuario, { abortEarly: false });
-    await myfetch.post(API_PATH, usuario);
+
+
+    const formData = new FormData()
+    formData.append('nome', usuario.nome)
+    formData.append('sobrenome', usuario.sobrenome)
+    formData.append('email', usuario.email)
+    formData.append('senha_acesso', usuario.senha_acesso)
+    formData.append('telefone', usuario.telefone)
+    formData.append('image', usuario.image)
+
+    const headers = {
+      'headers':{
+        'Content-Type': 'mulitpart/form-data'
+      }
+    }
+    await api.post(API_PATH, formData, headers)
     // DAR FEEDBACK POSITIVO
-    
     setState({
       ...state,
       showWaiting: false,
@@ -132,6 +154,8 @@ async function sendData() {
 
     setState({ ...state, notif: { ...notif, show: false } })
   }
+
+
   return(  
       <div className="container">
           <Backdrop
@@ -263,14 +287,14 @@ async function sendData() {
                   }}
                 />
                 </div>
-                <Container>
-                  <Content>
-                    <Upload/>
-                    <FileList/>
-                  </Content>
-                </Container>
-
-                <div className="container-login-form-btn">
+                  <Container>
+                    <Label>
+                      <strong> Foto de perfil: *</strong>
+                    </Label>
+                      <input  className='input-file' type='file' name='image' onChange={handleFileChange} required /><br /><br/>
+                  </Container>
+               
+                <div className="container-login-form-btn">       
                   <Button 
                     sx={{fontFamily:'monospace',
                     fontWeight:'bold', fontSize: '20px'

@@ -14,7 +14,7 @@ import Typography  from '@mui/material/Typography';
 
 
 
-export default function NotificacaoForm() {
+export default function NotiConfirmFinish() {
     const API_PATH = '/notificacoes';
     const params = useParams();
     const navigate = useNavigate();
@@ -22,10 +22,8 @@ export default function NotificacaoForm() {
     const [state, setState] = useState({
         notificacoes: {
             agenda_id: '',
-            usuario_id: '',
-            data_notificacao: '',
             mensagem: '',
-            confirmacao_presenca: ''
+            confirmacao_finalizacao: ''
         },
         showWaiting: false,
         notif: {
@@ -45,7 +43,7 @@ export default function NotificacaoForm() {
         const { name, value } = event.target;
     
         // Se o campo for confirmacao_presenca, convertemos "Sim" para true e "Não" para false
-        notificacoesCopy[name] = name === 'confirmacao_presenca' ? (value === 'Sim') : value;
+        notificacoesCopy[name] = name === 'confirmacao_finalizacao' ? (value === 'Sim') : value;
     
         setState({ ...state, notificacoes: notificacoesCopy });
       }
@@ -145,15 +143,13 @@ export default function NotificacaoForm() {
       <Paper
         className="agenda-container"
         sx={{
-          width: '512px',
+          width: '500px',
           maxWidth: '90%',
           margin: '25px auto 0 auto',
           background: 'whitesmoke',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
           borderRadius: '5px',
           p: '12px',
-          height: '70%',
-          maxHeight: '100%'
         }}
       >
         <FormTitle
@@ -163,41 +159,14 @@ export default function NotificacaoForm() {
           <form onSubmit={handleFormSubmit}>
               <TextField sx={{marginTop: '10px'}}
                 id="standard-basic"
-                label="Título"
+                label="Id da agenda"
                 type="name"
                 variant='filled'
                 color='secondary'
                 required
                 fullWidth
-                name="titulo_agenda"
+                name="agenda_id"
                 value={notificacoes.agenda_id}
-                onChange={handleFormFieldChange}
-                disabled
-              />
-
-              <TextField sx={{marginTop: '12px'}}
-                label="Id usuario 
-                (Este campo é preenchido automaticamente)"
-                type="number"
-                variant='filled'
-                fullWidth
-                required
-                name="usuario_id"
-                value={notificacoes.usuario_id}
-                onChange={handleFormFieldChange}
-                disabled
-              />
-
-              <TextField sx={{marginTop: '12px'}}
-                id="standard-basic"
-                label="Data da notificação"
-                required
-                fullWidth
-                type="date"
-                color='secondary'
-                variant='filled'
-                name="data_notificacao"
-                value={notificacoes.data_notificacao}
                 onChange={handleFormFieldChange}
                 disabled
               />
@@ -222,12 +191,12 @@ export default function NotificacaoForm() {
                     {...params}
                       required
                       fullWidth
-                      name="confirmacao_presenca"
+                      name="confirmacao_finalizacao"
                       variant="filled"
                       type="text"
-                      label="Presença confirmada"
+                      label="Confirmar Finalização"
                       color="secondary"
-                      value={notificacoes.confirmacao_presenca ? 'Sim' : 'Não'}
+                      value={notificacoes.confirmacao_finalizacao ? 'Sim' : 'Não'}
                       onChange={handleFormFieldChange}
                     />
                 )}

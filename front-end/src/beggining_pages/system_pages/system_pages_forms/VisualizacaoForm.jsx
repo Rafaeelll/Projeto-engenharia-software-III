@@ -22,7 +22,6 @@ export default function VisualizacaoForm() {
 
   const [state, setState] = React.useState({
     visualizacoes: {
-      usuario_id: '',
       agenda_id: '',
       numero_visualizacao: ''
     },
@@ -190,20 +189,7 @@ export default function VisualizacaoForm() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-            <TextField sx={{marginTop: '12px'}}
-              label="Id usuario (Este campo é preenchido automaticamente)"
-              type="number"
-              variant='filled'
-              fullWidth
-              color='secondary'
-              required
-              name="usuario_id" // Nome do campo na tabela
-              value={visualizacoes.usuario_id} // Nome do campo na tabela
-              onChange={handleFormFieldChange}
-              error={errors?.usuario_id}
-              helperText={errors?.usuario_id}
-              disabled
-            />
+           
 
             <TextField sx={{marginTop: '12px'}}
               id="standard-basic"

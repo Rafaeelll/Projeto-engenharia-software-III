@@ -35,6 +35,5 @@ const Perfil = Joi.object({
         .max(50)
         .messages({'*': 'O jogo favorito é obrigatorio entre (2 e 50 caracteres).'}),
     
-})
-.options({allowUnknown: true})
+}).unknown(true); // Permite campos desconhecidos
 export default Perfil

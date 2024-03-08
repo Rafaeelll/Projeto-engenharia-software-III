@@ -88,13 +88,35 @@ module.exports = (sequelize, DataTypes) => {
     },
     status:{
       type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalizada'),
-      allowNull: false
+      allowNull: false,
+      defaultValue: 'Agendado' // Valor padrão para o campo status
+
     },
   }, {
     sequelize,
     modelName: 'Agenda',   // Nome do modelo
-    tableName: 'agendas'    // Nome da tabela no banco de dados
-  });
+    tableName: 'agendas',    // Nome da tabela no banco de dados
+    hooks: {
+      // Hook executado antes de criar um registro de agenda
+      beforeCreate: (agenda, options) => {
+        // Determinar o status da agenda com base na data e hora atual
+        const dataAtual = new Date();
+        const dataInicial = new Date(agenda.data_horario_inicio);
+        const dataFinal = new Date(agenda.data_horario_fim);
 
+        let statusAgenda = "Agendado";
+
+        if (dataAtual >= dataInicial && dataAtual <= dataFinal) {
+          statusAgenda = "Em andamento";
+        } else if (dataAtual > dataFinal) {
+          statusAgenda = "Finalizada";
+        }
+
+        // Definir o status da agenda
+        agenda.status = statusAgenda;
+      }
+    }
+  });
+  
   return Agenda;
 };

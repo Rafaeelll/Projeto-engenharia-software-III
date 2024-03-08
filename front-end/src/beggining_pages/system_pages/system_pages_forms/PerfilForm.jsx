@@ -12,8 +12,8 @@ import Paper  from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
-import format from 'date-fns/format';
-
+import api from '../../../../services/api';
+import { Container, Label } from '../../../styles/styles-img-register';
 
 export default function PerfilForm() {
   const API_PATH = '/usuarios'
@@ -21,7 +21,6 @@ export default function PerfilForm() {
 
   const navigate = useNavigate()
 
-  // const [selectedDate, setselectedDate] = React.useState(null);
   const [state, setState] = React.useState({
     perfils: {
       nome: '',
@@ -32,7 +31,7 @@ export default function PerfilForm() {
       plataforma_fav: '',
       data_nasc: '',
       jogo_fav: '',
-      foto_perfil: '',
+      image: '',
     },
     errors: {},
     showWaiting: false,
@@ -43,6 +42,11 @@ export default function PerfilForm() {
     }
   });
   const { perfils, errors, showWaiting, notif } = state;
+
+  function handleFileChange(event) {
+    const image = event.target.files[0]; // Pega o primeiro arquivo selecionado
+    setState({ ...state, perfils: { ...perfils, image: image } });
+  }
   
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
@@ -58,15 +62,12 @@ export default function PerfilForm() {
     )
     updatedValueTel = formattedValue
     }
-
-  
     // Atualiza o valor do campo correspondente no objeto perfils
     const perfilsCopy = { ...perfils, [name]: updatedValueTel };
   
     // Atualiza o estado com o novo objeto perfilsCopy
     setState({ ...state, perfils: perfilsCopy });
   }
-  
   
   function handleFormSubmit(event) {
     event.preventDefault(); // Evita que a página seja recarregada
@@ -83,12 +84,17 @@ export default function PerfilForm() {
   async function fetchData() {
     setState({...state, showWaiting: true, errors:{}})
     try {
-      const result = await myfetch.get(`${API_PATH}/${params.id}`)
-      setState({
-        ...state,
-        perfils: result,
-        showWaiting: false
-      })
+      // Verifica se params.id é definido antes de fazer a busca
+      if (params.id) {
+        const result = await myfetch.get(`${API_PATH}/${params.id}`);
+        setState({
+          ...state,
+          perfils: result,
+          showWaiting: false
+        });
+      } else {
+        console.error('ID do perfil não definido.');
+      }
     }
     catch(error) {
       console.error(error)
@@ -108,32 +114,40 @@ export default function PerfilForm() {
   async function sendData() {
     setState({ ...state, showWaiting: true, errors: {} });
     try {
-      // Remova a chamada para verifyEmailExists e a verificação subsequente do e-mail existente
+      console.log('Dados a serem enviados:', perfils); // Adicione este console.log
+
+      await Perfil.validateAsync(perfils, { abortEarly: false });
+      if (params.id) {
+        const formData = new FormData()
+        formData.append('nome', perfils.nome)
+        formData.append('sobrenome', perfils.sobrenome)
+        formData.append('email', perfils.email)
+        formData.append('senha_acesso', perfils.senha_acesso)
+        formData.append('telefone', perfils.telefone)
+        formData.append('plataforma_fav', perfils.plataforma_fav)
+        formData.append('data_nasc', perfils.data_nasc)
+        formData.append('jogo_fav', perfils.jogo_fav)
+        formData.append('image', perfils.image)
   
-      const formattedBirthDay = format(
-        new Date(perfils.data_nasc),
-        'yyyy-MM-dd HH:mm'
-      );
-  
-      const perfilsCopy = {
-        ...perfils,
-        data_nasc: formattedBirthDay,
-      };
-  
-      await Perfil.validateAsync(perfilsCopy, { abortEarly: false });
-  
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, perfilsCopy);
-      else await myfetch.post(API_PATH, perfilsCopy);
-  
-      setState({
-        ...state,
-        showWaiting: false,
-        notif: {
-          severity: 'success',
-          show: true,
-          message: 'Item salvo com sucesso'
+      const headers = {
+        'headers':{
+          'Content-Type': 'mulitpart/form-data'
         }
-      });
+      }
+      await api.put(`${API_PATH}/${params.id}`, formData, headers);
+
+    }else {
+      await myfetch.post(API_PATH, perfils);
+    }
+    setState({
+      ...state,
+      showWaiting: false,
+      notif: {
+        severity: 'success',
+        show: true,
+        message: 'Item salvo com sucesso'
+      }
+    });
     } catch (error) {
       const { validationError, errorMessages } = getValidationMessages(error);
 
@@ -235,6 +249,21 @@ export default function PerfilForm() {
 
           <div className='wrap-input3'>
             <TextField
+              label="email"
+              type="email"
+              variant='filled'
+              fullWidth
+              required
+              name="email" // Nome do campo na tabela
+              value={perfils.email} // Nome do campo na tabela
+              onChange={handleFormFieldChange}
+              error={errors?.email}
+              helperText={errors?.email}
+            />
+          </div>
+
+          <div className='wrap-input3'>
+            <TextField
               label="Senha"
               type="password"
               variant='filled'
@@ -309,16 +338,13 @@ export default function PerfilForm() {
             />
           </div>
 
-          <div className='wrap-input3'>
-            <TextField
-              label='Foto de perfil'
-              variant='filled'
-              type="file"
-              name="foto_perfil"
-              value={perfils.foto_perfil}
-              onChange={handleFormFieldChange}
-            />
-          </div>
+          <Container>
+            <Label>
+              <strong> Foto de perfil: *</strong>
+            </Label>
+                <input className='input-file' type='file' name='image' onChange={handleFileChange} required /><br /><br/>
+          </Container>
+
           <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
           <Button
               sx={{

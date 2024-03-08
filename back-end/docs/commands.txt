@@ -17,3 +17,18 @@ git push
 
 Relação (1,n) sempre sera HasMany para 1 e belongsTo para N
 Relação (N, N) sera belongsToMany e belongsToMany
+
+
+///////////// Comentarios de codigos ////////////
+   // const { data_horario_inicio, data_horario_fim } = req.body;
+
+        // // Verifica o status da agenda com base nas datas
+        // const dataAtual = new Date();
+        // if (data_horario_inicio < dataAtual && data_horario_fim < dataAtual || 
+        //     data_horario_inicio < dataAtual && data_horario_fim <= dataAtual) {
+        //     req.body.status = 'Finalizada';
+        // } else if (data_horario_inicio <= dataAtual && data_horario_fim >= dataAtual) {
+        //     req.body.status = 'Em andamento';
+        // } else {
+        //     req.body.status = 'Agendado';
+        // }

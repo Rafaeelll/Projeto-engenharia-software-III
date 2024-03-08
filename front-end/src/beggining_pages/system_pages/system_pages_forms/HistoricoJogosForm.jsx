@@ -22,7 +22,6 @@ export default function HistoricoJogosForm() {
 
   const [state, setState] = React.useState({
     historicoJogos: {
-      usuario_id: '',
       jogo_id: '',
       pontuacao: '',
     },
@@ -178,7 +177,7 @@ export default function HistoricoJogosForm() {
       <Paper
         className="HistoricoJogo-container"
         sx={{
-          width: '512px',
+          width: '500px',
           maxWidth: '90%',
           background: 'whitesmoke',
           margin: '25px auto 0 auto',
@@ -192,22 +191,6 @@ export default function HistoricoJogosForm() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-          <div className='wrap-input3'>
-            <TextField
-              label="Id usuario (Este campo é preenchido automaticamente)"
-              type="number"
-              fullWidth
-              variant='filled'
-              required
-              name="usuario_id" // Nome do campo na tabela
-              value={historicoJogos.usuario_id} // Nome do campo na tabela
-              onChange={handleFormFieldChange}
-              error={errors?.usuario_id}
-              helperText={errors?.usuario_id}
-              disabled
-            />
-          </div>
-
           <div className='wrap-input3'>
             <TextField
               id="standard-basic"

@@ -77,11 +77,18 @@ export default function Notificacoes() {
     {
       field: 'mensagem',
       headerName: 'Mensagem',
-      width: 300,
+      headerAlign: 'center',
+      width: 450,
     },
     {
       field: 'confirmacao_presenca',
       headerName: 'Presença confirmada',
+      width: 150,
+      valueGetter: (params) => params.value ? 'Sim' : 'Não'
+    },
+    {
+      field: 'confirmacao_finalizacao',
+      headerName: 'Finalização Confirmada',
       width: 150,
       valueGetter: (params) => params.value ? 'Sim' : 'Não'
     },
@@ -92,13 +99,25 @@ export default function Notificacoes() {
       headerAlign: 'center',
       align: 'center',
       width: 90,
-      renderCell: params => (
-        <Link to={'./' + params.id}>
-          <IconButton aria-label="Editar">
-            <EditIcon />
-          </IconButton>
-        </Link>
-      )
+      renderCell: params => {
+        const notificationMessage = params.row.mensagem;
+        let redirectPath = '';
+        if (notificationMessage.includes('prestes a começar')) {
+          redirectPath = `/notificacao/confirmar-presenca/${params.id}`;
+        } else if (notificationMessage.includes('já finalizou')) {
+          redirectPath = `/notificacao/confirmar-finalizacao/${params.id}`;
+        } else {
+          // Define um redirecionamento padrão caso a mensagem não corresponda a nenhum caso esperado
+          redirectPath = `/notificacao/confirmar-default/${params.id}`;
+        }
+        return (
+          <Link to={redirectPath}>
+            <IconButton aria-label="Editar">
+              <EditIcon />
+            </IconButton>
+          </Link>
+        );
+      }
     },
     {
       field: 'delete',

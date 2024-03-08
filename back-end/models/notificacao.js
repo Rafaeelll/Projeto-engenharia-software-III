@@ -1,5 +1,4 @@
 'use strict';
-
 /*
   Este código define o modelo Notificacao usando o Sequelize. Ele descreve a estrutura 
   da tabela de notificações e suas associações com outros modelos. O modelo Notificacao possui 
@@ -9,6 +8,8 @@
   O modelo Notificacao é exportado para ser usado em outras partes da aplicação.
 */
 
+//...
+
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
@@ -16,20 +17,19 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // Associações do modelo Notificacao com outros modelos
       this.belongsTo(models.Usuario, {
-        foreignKey: 'usuario_id', // Chave estrangeira na tabela de Notificacao
-        targetKey: 'id',          // Chave na tabela de Usuario
-        as: 'usuario'             // Alias para a associação
+        foreignKey: 'usuario_id',
+        targetKey: 'id',
+        as: 'usuario'
       });
 
       this.belongsTo(models.Agenda, {
-        foreignKey: 'agenda_id',  // Chave estrangeira na tabela de Notificacao
-        targetKey: 'id',          // Chave na tabela de Agenda
-        as: 'agenda'              // Alias para a associação
+        foreignKey: 'agenda_id',
+        targetKey: 'id',
+        as: 'agenda'
       });
     }
   }
 
-  // Definição dos campos e tipos na tabela Notificacao
   Notificacao.init({
     id: {
       allowNull: false,
@@ -56,14 +56,17 @@ module.exports = (sequelize, DataTypes) => {
     confirmacao_presenca: {
       type: DataTypes.BOOLEAN,
     },
+    confirmacao_finalizacao: {
+      type: DataTypes.BOOLEAN,
+    },
     configuracao: {
       type: DataTypes.JSON,
       allowNull: true
     },
   }, {
     sequelize,
-    modelName: 'Notificacao',   // Nome do modelo
-    tableName: 'notificacoes'    // Nome da tabela no banco de dados
+    modelName: 'Notificacao',
+    tableName: 'notificacoes',    
   });
 
   return Notificacao;

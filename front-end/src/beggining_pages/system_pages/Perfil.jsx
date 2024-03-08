@@ -126,9 +126,12 @@ import { format, parseISO, isValid } from 'date-fns';
         width: 150
       },
       {
-        field: 'foto_perfil',
+        field: 'image',
         headerName: 'Foto de perfil',
         width: 150,
+        renderCell: params => (
+          <img src={import.meta.env.VITE_BACKEND_URI_FILES + params.row.image} alt="Foto de Perfil" style={{ width: 65, height: 60, borderRadius: '50%' }} />
+        )
       },
 
       {

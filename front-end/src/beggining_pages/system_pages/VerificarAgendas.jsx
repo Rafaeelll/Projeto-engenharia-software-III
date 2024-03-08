@@ -82,7 +82,7 @@ export default function VerificarAgendas() {
       case 'Finalizada':
         return 'green';
       case 'Em andamento':
-        return 'green';
+        return 'lightblue';
       default:
         return 'black';
     }
