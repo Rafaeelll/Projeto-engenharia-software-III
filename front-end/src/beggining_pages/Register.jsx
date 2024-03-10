@@ -2,27 +2,25 @@ import React from 'react'
 import ImagemFundo from '../assets/back.jpg'
 import StreamAdvisor from '../assets/sa4.png'
 import '../styles/styles.css'
-// import Upload from '../components/Upload'
-// import FileList from '../components/FileList'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../components/ui/Notification'
 import {useNavigate} from 'react-router-dom'
-// import myfetch from '../utils/myfetch'
 import Usuario from  '../../models/Usuario'
 import getValidationMessages from '../utils/getValidationMessages'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import api from '../../services/api'
-import { Container, Label} from '../styles/styles-img-register'
-// import {uniqueId} from 'lodash'
-// import {filesize} from 'filesize'
+import { styled } from '@mui/material/styles';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+
 
 function Register(){
 
   const API_PATH = '/usuarios/cadastro'
   const navigate = useNavigate()
+  const [selectedFileName, setSelectedFileName] = React.useState('');
   const [state, setState] = React.useState({
     usuario: {
       nome: '',
@@ -48,10 +46,24 @@ function Register(){
     notif
   } = state
 
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
+
   function handleFileChange(event) {
-    const image = event.target.files[0]; // Pega o primeiro arquivo selecionado
-    setState({ ...state, usuario: { ...usuario, image: image } });
+    const file = event.target.files[0]; // Pega o primeiro arquivo selecionado
+    setState({ ...state, usuario: { ...usuario, image: file } });
+    setSelectedFileName(file.name)
   }
+
   
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
@@ -173,25 +185,29 @@ async function sendData() {
             {notif.message}
           </Notification>
 
-        <div className="container-login" style={{ 
-          backgroundImage: `url(${ImagemFundo})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          color: 'white',
-          fontFamily: 'monospace'
-        }}>
+        <div className="container-login" 
+          style={{ 
+            backgroundImage: `url(${ImagemFundo})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'white',
+            fontFamily: 'monospace'
+          }}>
           <div className="wrap-register">
             <form onSubmit={handleFormSubmit} className="login-form">
-                <span className="login-form-title" style={{fontFamily: 'monospace', color: 'black', fontWeight: 'bold', marginBottom: '10px'}}>Cadastrar-se</span>
-                <span className="login-form-title">
-                  <img src={StreamAdvisor} alt="Stream Advisor"/>
-                </span>
+              <span className="login-form-title" 
+              style={{fontFamily: 'monospace', color: 'black', fontWeight: 'bold', marginBottom: '10px'}}>
+                Cadastrar-se
+              </span>
+              <span className="login-form-title">
+                <img src={StreamAdvisor} alt="Stream Advisor"/>
+              </span>
 
-                <div className="wrap-input2">
+              <div className="wrap-input2">
                 <TextField 
                   className='input2'
                   label='Nome'
@@ -204,9 +220,9 @@ async function sendData() {
                   helperText={errors?.nome}
                   onChange={handleFormFieldChange}
                 />
-                </div>
+              </div>
 
-                <div className="wrap-input2">
+              <div className="wrap-input2">
                 <TextField 
                   label='Sobrenome'
                   color='secondary'
@@ -220,9 +236,9 @@ async function sendData() {
                   value={usuario.sobrenome}
                   onChange={handleFormFieldChange}
                 />
-                </div>
+              </div>
 
-                <div className="wrap-input2">
+              <div className="wrap-input2">
                 <TextField 
                   label='E-mail'
                   className='input2'
@@ -235,9 +251,9 @@ async function sendData() {
                   helperText={errors?.email}
                   onChange={handleFormFieldChange}
                 />
-                </div>
+              </div>
 
-                <div className="wrap-input2">
+              <div className="wrap-input2">
                 <TextField 
                   label='Senha'
                   color='secondary'
@@ -251,9 +267,9 @@ async function sendData() {
                   value={usuario.senha_acesso}
                   onChange={handleFormFieldChange}
                 />
-                </div>
+              </div>
 
-                <div className="wrap-input2">
+              <div className="wrap-input2">
                 <TextField 
                   label='Confirmar Senha'
                   color='secondary'
@@ -267,9 +283,9 @@ async function sendData() {
                   value={usuario.confirmar_senha}
                   onChange={handleFormFieldChange}
                 />
-                </div>
+              </div>
 
-                <div className="wrap-input2">
+              <div className="wrap-input2">
                 <TextField
                   className='input2'
                   variant='filled'
@@ -286,14 +302,25 @@ async function sendData() {
                     onChange: handleFormFieldChange,
                   }}
                 />
-                </div>
-                  <Container>
-                    <Label>
-                      <strong> Foto de perfil: *</strong>
-                    </Label>
-                      <input  className='input-file' type='file' name='image' onChange={handleFileChange} required /><br /><br/>
-                  </Container>
-               
+              </div>
+
+              <div className="wrap-input2">
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="contained"
+                  tabIndex={-1}
+                  startIcon={<CloudUploadIcon />}
+                >
+                  {selectedFileName ? selectedFileName : 'Adicione uma Foto de perfil'}
+                    <VisuallyHiddenInput 
+                      type="file" 
+                      onChange={handleFileChange}
+                      name='image'
+                    />
+                </Button>
+              </div>
+
                 <div className="container-login-form-btn">       
                   <Button 
                     sx={{fontFamily:'monospace',

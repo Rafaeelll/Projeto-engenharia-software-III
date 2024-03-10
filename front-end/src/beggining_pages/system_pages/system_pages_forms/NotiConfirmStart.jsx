@@ -8,8 +8,12 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Backdrop from '@mui/material/Backdrop'
 import TextField from '@mui/material/TextField';
 import '../../../styles/styles.css'
+import Select from '@mui/material/Select';
 import FormTitle from '../../../components/ui/FormTitle';
-import Autocomplete from '@mui/material/Autocomplete';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
 import Typography  from '@mui/material/Typography';
 
 
@@ -22,12 +26,8 @@ export default function NotiConfirmStart() {
     const [state, setState] = useState({
         notificacoes: {
             agenda_id: '',
-            data_notificacao: '',
             mensagem: '',
-            confirmacao_presenca: '',
-            confirmacao_finalizacao: ''
-
-
+            confirmacao_presenca: false,
         },
         showWaiting: false,
         notif: {
@@ -36,20 +36,15 @@ export default function NotiConfirmStart() {
           severity: 'success'
         }
       });
-      const statusOptions = [
-        { label: 'Sim', value: true },
-        { label: 'Não', value: false }
-      ];    
+
       const { notificacoes, showWaiting, notif } = state;
 
       function handleFormFieldChange(event) {
-        const notificacoesCopy = { ...notificacoes };
-        const { name, value } = event.target;
+        const NotificationsCopy = { ...notificacoes };
+        NotificationsCopy[event.target.name] = event.target.value;
     
-        // Se o campo for confirmacao_presenca, convertemos "Sim" para true e "Não" para false
-        notificacoesCopy[name] = name === 'confirmacao_presenca' || 'confirmacao_finalizacao' ? (value === 'Sim') : value;
     
-        setState({ ...state, notificacoes: notificacoesCopy });
+        setState({ ...state, notificacoes: NotificationsCopy });
       }
     
       async function handleFormSubmit(event) {
@@ -186,25 +181,24 @@ export default function NotiConfirmStart() {
                 disabled
               />
 
-              <Autocomplete sx={{marginTop: '12px'}}
-                id="status-autocomplete"
-                options={statusOptions}
-                getOptionLabel={(option) => option.label}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                      required
-                      fullWidth
-                      name="confirmacao_presenca"
-                      variant="filled"
-                      type="text"
-                      label="Presença confirmada"
-                      color="secondary"
-                      value={notificacoes.confirmacao_presenca ? 'Sim' : 'Não'}
-                      onChange={handleFormFieldChange}
-                    />
-                )}
-              />
+              <Box sx={{ minWidth: 120, marginTop: '12px'}}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Confirmar presença</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={notificacoes.confirmacao_presenca}
+                    label="Confirmar presença"
+                    name='confirmacao_presenca'
+                    required
+                    onChange={handleFormFieldChange}
+                  >
+                    <MenuItem value={true}>Sim</MenuItem>
+                    <MenuItem value={false}>Não</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+
             <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
               <Button
                 sx={{

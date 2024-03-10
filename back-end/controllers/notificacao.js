@@ -53,7 +53,6 @@ controller.createAutomaticStartNotifications = async () => {
                     usuario_id: agenda.usuario_id,
                     data_notificacao: umHoraAntesInicio,
                     mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora.
-                    \n
                     Confirme sua presença clicando no ícone "Editar".`,
                     confirmacao_presenca: false,              
                     confirmacao_finalizacao: false,
@@ -91,7 +90,6 @@ controller.createAutomaticFinishNotifications = async() =>{
                     usuario_id: agenda.usuario_id,
                     data_notificacao: agenda.data_horario_fim,
                     mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou.
-                    \n
                     Confirme a finalização clicando no ícone "Editar".`,
                     confirmacao_presenca: false,              
                     confirmacao_finalizacao: false,

@@ -86,20 +86,24 @@ export default function LoginForm({onLoginLogout}) {
       >
         {notif.message}
       </Notification>
-        <div className="container-login"style={{ 
-          backgroundImage: `url(${ImagemFundo})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          color: 'white',
-          fontFamily: 'monospace'
+        <div className="container-login"
+          style={{ 
+            backgroundImage: `url(${ImagemFundo})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'white',
+            fontFamily: 'monospace'
           }}>
           <div className="wrap-login">
             <form onSubmit={handleSubmit}className="login-form">
-                <span className="login-form-title" style={{fontFamily: 'monospace', fontWeight: 'bold', marginBottom: '15px'}}>Autentique-se</span>
+              <span className="login-form-title" 
+                style={{fontFamily: 'monospace', fontWeight: 'bold', marginBottom: '15px'}}>
+                  Autentique-se
+              </span>
                 <span className="login-form-title">
                   <img src={StreamAdvisor} alt="Stream Advisor"/>
                 </span>

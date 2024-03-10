@@ -135,21 +135,7 @@ export default function CriarAgendas() {
   async function sendData() {
     setState({ ...state, showWaiting: true, errors: {} });
     try {
-      const formattedInicio = format(
-        new Date(criarAgendas.data_horario_inicio),
-        'yyyy-MM-dd HH:mm'
-      );
-      const formattedFim = format(
-        new Date(criarAgendas.data_horario_fim),
-        'yyyy-MM-dd HH:mm'
-      );
-
-      const criarAgendasCopy = {
-        ...criarAgendas,
-        data_horario_inicio: formattedInicio,
-        data_horario_fim: formattedFim,
-      };
-
+ 
       const jogoExists = await verifyJogoExists(criarAgendas.jogo_id);
       if (!jogoExists) {
         setState({
@@ -164,10 +150,10 @@ export default function CriarAgendas() {
         return;
       }
 
-      await Agenda.validateAsync(criarAgendasCopy, { abortEarly: false })
+      await Agenda.validateAsync(criarAgendas, { abortEarly: false })
 
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendasCopy)
-      else await myfetch.post(API_PATH, criarAgendasCopy)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendas)
+      else await myfetch.post(API_PATH, criarAgendas)
 
       setState({
         ...state,
@@ -244,7 +230,6 @@ export default function CriarAgendas() {
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
           borderRadius: '5px',
           p: '12px',
-          height: '92%',
           maxHeight: '100%'
         }}
       >

@@ -3,6 +3,7 @@ import myfetch from '../../../utils/myfetch';
 import PageTitle from '../../../components/ui/PageTitle';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
+import { Grid } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import IconButton from '@mui/material/IconButton'
@@ -72,13 +73,6 @@ import parseISO from 'date-fns/parseISO';
         field: 'nome',
         headerName: 'Nome',
         width: 150
-      },
-      {
-        field: 'usuario_id',
-        headerName: 'Id usuário',
-        width: 150,
-        valueGetter: params => params.row?.usuario.id  + ': ' + params.row?.usuario.nome + ' ' + params.row?.usuario.sobrenome,
-
       },
       {
         field: 'data_jogo',
@@ -191,30 +185,56 @@ import parseISO from 'date-fns/parseISO';
         >
           {notif.message}
         </Notification>
-
-
-        <PageTitle title="Listagem de jogos"  />
   
-        <Box sx={{
+        <Box 
+          sx={{ width: '50%', margin: '0 auto', backgroundColor: 'black', 
+          color: 'white', font: 'arial', marginTop: '50px', 
+          borderRadius: '5px 5px 0px 0px', textAlign: 'center', padding: '10px' }}> 
+            <h1 style={{ margin: '0' }}>
+              <strong> 
+                Listagem De Jogos
+              </strong>
+            </h1>
+        </Box>
+
+          <Paper elevation={4} sx={{width: '50%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+            <DataGrid 
+              sx={{fontFamily: 'arial', fontWeight: 'medium', 
+              background: 'whitesmoke', color: '#470466', 
+              fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
+              rows={jogos}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    page: 0, pageSize: 5,
+                  },
+                },
+              }}
+              pageSizeOptions={[5, 10]}
+              disableRowSelectionOnClick
+            />
+          </Paper>
+          <Box sx={{
           display: "flex",
-          justifyContent: "right",
+          justifyContent: "center",
           marginBottom: "25px"
         }}>
           <Link to="new">
             <Button style={{marginRight: '20px'}}
               variant="contained" 
-              size="large" 
+              size="medium" 
               color="secondary"
               startIcon={<AddCircleIcon />}
             >
-              Cadastrar novo
+              Novo Jogo
             </Button>
           </Link>
 
           <Link to="/historico_jogo">
             <Button style={{marginRight: '20px'}}
               variant="contained" 
-              size="large" 
+              size="medium" 
               color="secondary"
               startIcon={<HistoryIcon/>}
             >
@@ -222,22 +242,6 @@ import parseISO from 'date-fns/parseISO';
             </Button>
           </Link>
         </Box>
-  
-        <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
-        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
-            rows={jogos}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
-            pageSizeOptions={[5]}
-            disableRowSelectionOnClick
-          />
-        </Paper>
       </>
     )
   }

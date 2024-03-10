@@ -9,8 +9,12 @@ import Backdrop from '@mui/material/Backdrop'
 import TextField from '@mui/material/TextField';
 import '../../../styles/styles.css'
 import FormTitle from '../../../components/ui/FormTitle';
-import Autocomplete from '@mui/material/Autocomplete';
 import Typography  from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
 
 
 
@@ -21,9 +25,9 @@ export default function NotiConfirmFinish() {
 
     const [state, setState] = useState({
         notificacoes: {
-            agenda_id: '',
-            mensagem: '',
-            confirmacao_finalizacao: ''
+          agenda_id: '',
+          mensagem: '',
+          confirmacao_finalizacao: false
         },
         showWaiting: false,
         notif: {
@@ -31,26 +35,19 @@ export default function NotiConfirmFinish() {
           message: '',
           severity: 'success'
         }
-      });
-      const statusOptions = [
-        { label: 'Sim', value: true },
-        { label: 'Não', value: false }
-      ];    
+      }); 
       const { notificacoes, showWaiting, notif } = state;
 
       function handleFormFieldChange(event) {
-        const notificacoesCopy = { ...notificacoes };
-        const { name, value } = event.target;
+        const NotificationsCopy = { ...notificacoes };
+        NotificationsCopy[event.target.name] = event.target.value;
     
-        // Se o campo for confirmacao_presenca, convertemos "Sim" para true e "Não" para false
-        notificacoesCopy[name] = name === 'confirmacao_finalizacao' ? (value === 'Sim') : value;
     
-        setState({ ...state, notificacoes: notificacoesCopy });
+        setState({ ...state, notificacoes: NotificationsCopy });
       }
     
       async function handleFormSubmit(event) {
         event.preventDefault();
-
         sendData();
     }
 
@@ -73,9 +70,9 @@ export default function NotiConfirmFinish() {
             ...state,
             showWaiting: false,
             notif:{
-                severity: 'error',
-                show: true,
-                message: 'ERRO: ' + error.message
+              severity: 'error',
+              show: true,
+              message: 'ERRO: ' + error.message
             }            
           });
         }
@@ -83,6 +80,32 @@ export default function NotiConfirmFinish() {
       async function sendData() {
         setState({ ...state, showWaiting: true, errors: {} });
         try {
+          // Verificar se confirmacao_presenca está como false e atualizá-lo para true se necessário
+          if (!notificacoes.confirmacao_presenca) {
+            notificacoes.confirmacao_presenca = true;
+          }
+      
+          // Verificar se data_horario_fim está expirada
+          const agenda = await myfetch.get(`/agenda/${notificacoes.agenda_id}`);
+          const dataHorarioFim = new Date(agenda.data_horario_fim);
+          const now = new Date();
+      
+          if (dataHorarioFim > now) {
+            // Exibir mensagem de erro e não prosseguir com a atualização
+            setState({
+              ...state,
+              showWaiting: false,
+              notif: {
+                severity: 'error',
+                show: true,
+                message: 'Esta agenda ainda está em andamento. Por favor, realize essa operação depois que o tempo da agenda expirar!',
+              },
+            });
+            return;
+          }
+      
+          // Atualizar confirmacao_finalizacao para true
+          notificacoes.confirmacao_finalizacao = true;
           if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, notificacoes)
           else await myfetch.post(API_PATH, notificacoes)
     
@@ -108,14 +131,13 @@ export default function NotiConfirmFinish() {
           });
         }
       }
-        function handleNotifClose(event, reason) {
-    if (reason === 'clickaway') {
-      return;
+    function handleNotifClose(event, reason) {
+      if (reason === 'clickaway') {
+        return;
+      }
+      if (notif.severity === 'success') navigate(-1);
+      setState({ ...state, notif: { ...notif, show: false } });
     }
-    if (notif.severity === 'success') navigate(-1);
-    setState({ ...state, notif: { ...notif, show: false } });
-  }
-
 
   return (
     <div
@@ -181,26 +203,23 @@ export default function NotiConfirmFinish() {
                 onChange={handleFormFieldChange}
                 disabled
               />
-
-              <Autocomplete sx={{marginTop: '12px'}}
-                id="status-autocomplete"
-                options={statusOptions}
-                getOptionLabel={(option) => option.label}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                      required
-                      fullWidth
-                      name="confirmacao_finalizacao"
-                      variant="filled"
-                      type="text"
-                      label="Confirmar Finalização"
-                      color="secondary"
-                      value={notificacoes.confirmacao_finalizacao ? 'Sim' : 'Não'}
+              <Box sx={{ minWidth: 120, marginTop: '12px'}}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Confirmar finalização</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={notificacoes.confirmacao_finalizacao}
+                      label="Confirmar finalização"
+                      name='confirmacao_finalizacao'
                       onChange={handleFormFieldChange}
-                    />
-                )}
-              />
+                      required
+                    >
+                    <MenuItem value={true}>Sim</MenuItem>
+                    <MenuItem value={false}>Não</MenuItem>
+                  </Select>
+              </FormControl>
+            </Box>
             <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
               <Button
                 sx={{
