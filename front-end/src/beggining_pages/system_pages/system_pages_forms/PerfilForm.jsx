@@ -13,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
 import api from '../../../../services/api';
-import { Container, Label } from '../../../styles/styles-img-register';
 
 export default function PerfilForm() {
   const API_PATH = '/usuarios'
@@ -337,13 +336,6 @@ export default function PerfilForm() {
               helperText={errors?.jogo_fav}
             />
           </div>
-
-          <Container>
-            <Label>
-              <strong> Foto de perfil: *</strong>
-            </Label>
-                <input className='input-file' type='file' name='image' onChange={handleFileChange} required /><br /><br/>
-          </Container>
 
           <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
           <Button

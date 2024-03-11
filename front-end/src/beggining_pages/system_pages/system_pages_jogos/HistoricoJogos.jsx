@@ -1,6 +1,6 @@
 import React from 'react'
 import myfetch from '../../../utils/myfetch';
-import PageTitle from '../../../components/ui/PageTitle';
+import DataGridTitle from '../../../components/ui/DataGridTitle';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
@@ -71,23 +71,11 @@ import { Link } from 'react-router-dom';
         field: 'usuario_id',
         headerName: 'Id usuário',
         width: 150,
-        valueGetter: params => {
-          if (params.row?.usuario) {
-            return params.row.usuario.id + ': ' + params.row.usuario.nome + ' ' + params.row.usuario.sobrenome;
-          }
-          return '';
-        }
       },
       {
         field: 'jogo_id',
         headerName: 'Id jogo',
         width: 150,
-        valueGetter: params => {
-          if (params.row?.jogo) {
-            return params.row.jogo.id + ': ' + params.row.jogo.nome;
-          }
-          return '';
-        }
       },
       {
         field: 'pontuacao',
@@ -200,51 +188,52 @@ import { Link } from 'react-router-dom';
           {notif.message}
         </Notification>
 
-        <PageTitle title="Listagem de histórico Jogos"  />
-  
-        <Box sx={{
-          display: "flex",
-          justifyContent: "right",
-          marginBottom: "25px"
-        }}>
-          <Link to="new">
-            <Button style={{marginRight: '20px'}}
-              variant="contained" 
-              size="large" 
-              color="secondary"
-              startIcon={<AddCircleIcon />}
-            >
-              Cadastrar novo
-            </Button>
-          </Link>
+        <DataGridTitle title="Listagem Histórico de Jogos"  />
+          <Paper elevation={4} sx={{width: '40%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+            <DataGrid sx={{
+              fontFamily: 'arial', fontWeight: 'medium', 
+              background: 'whitesmoke', color: '#470466', 
+              fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
+              rows={historicoJogos}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      page: 0, pageSize: 5,
+                    },
+                  },
+                }}
+                pageSizeOptions={[5, 10]}
+                disableRowSelectionOnClick
+              />
+            </Paper>
+              <Box sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "25px"
+              }}>
+                <Link to="new">
+                  <Button style={{marginRight: '15px'}}
+                    variant="contained" 
+                    size="medium" 
+                    color="secondary"
+                    startIcon={<AddCircleIcon />}
+                  >
+                    Novo Histórico
+                  </Button>
+                </Link>
 
-          <Link to="/jogo">
-            <Button style={{marginRight: '20px'}}
-              variant="contained" 
-              size="large" 
-              color="secondary"
-              startIcon={<GamesIcon/>}
-            >
-              Jogos
-            </Button>
-          </Link>
-        </Box>
-  
-        <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
-        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
-            rows={historicoJogos}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
-                },
-              },
-            }}
-            pageSizeOptions={[5]}
-            disableRowSelectionOnClick
-          />
-        </Paper>
+                <Link to="/jogo">
+                  <Button style={{marginRight: '15px'}}
+                    variant="contained" 
+                    size="medium" 
+                    color="secondary"
+                    startIcon={<GamesIcon/>}
+                  >
+                    Jogos
+                  </Button>
+                </Link>
+              </Box>
       </>
     )
   }

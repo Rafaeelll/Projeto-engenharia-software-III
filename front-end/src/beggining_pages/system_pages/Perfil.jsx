@@ -1,6 +1,5 @@
 import React from 'react'
 import myfetch from '../../utils/myfetch';
-import PageTitle from '../../components/ui/PageTitle'
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
@@ -130,7 +129,7 @@ import { format, parseISO, isValid } from 'date-fns';
         headerName: 'Foto de perfil',
         width: 150,
         renderCell: params => (
-          <img src={import.meta.env.VITE_BACKEND_URI_FILES + params.row.image} alt="Foto de Perfil" style={{ width: 65, height: 60, borderRadius: '50%' }} />
+          <img src={import.meta.env.VITE_BACKEND_URI_FILES + params.row.image} alt="Foto de Perfil" style={{ width: 65, borderRadius: '50%' }} />
         )
       },
 
@@ -239,42 +238,60 @@ import { format, parseISO, isValid } from 'date-fns';
         >
           {notif.message}
         </Notification>
-
-
-        <PageTitle title="Listagem de perfils"  />
-  
-        <Box sx={{
-          display: "flex",
-          justifyContent: "right",
-          marginBottom: "25px"
-        }}>
-          <Link to="/cadastro">
-            <Button style={{marginRight: '20px'}}
-              variant="contained" 
-              size="large" 
-              color="secondary"
-              startIcon={<AddCircleIcon />}
-            >
-              Cadastrar novo
-            </Button>
-          </Link>
-        </Box>
-  
-        <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
-        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
-            rows={perfils}
-            columns={columns}
-            initialState={{
-              pagination: {
-                paginationModel: {
-                  pageSize: 5,
+        
+        <Box 
+          sx={{ 
+            width: '70%', 
+            margin: '0 auto', 
+            backgroundColor: 'black', 
+            color: 'white', 
+            fontFamily: 'arial', 
+            marginTop: '50px', 
+            borderRadius: '5px 5px 0px 0px', 
+            textAlign: 'center', 
+            padding: '10px', 
+            borderStyle: 'groove' }}> 
+            <h1 style={{ margin: '0' }}>
+              <strong> 
+                Dados Cadastral
+              </strong>
+            </h1>
+      </Box> 
+        <Paper elevation={4} sx={{width: '70%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+          <DataGrid 
+            sx={{
+              fontFamily: 'arial', fontWeight: 'medium', 
+              background: 'whitesmoke', color: '#470466', 
+              fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
+              rows={perfils}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    page: 0, pageSize: 5,
+                  },
                 },
-              },
-            }}
-            pageSizeOptions={[5]}
+              }}
+            pageSizeOptions={[5, 10]}
             disableRowSelectionOnClick
           />
         </Paper>
+          <Box sx={{
+            display: "flex",
+            justifyContent: "Center",
+            marginTop: "25px"
+          }}>
+            <Link to="/cadastro">
+              <Button
+                variant="contained" 
+                size="medium" 
+                color="secondary"
+                startIcon={<AddCircleIcon />}
+              >
+                Novo Usúario
+              </Button>
+            </Link>
+        </Box>
       </>
     )
   }

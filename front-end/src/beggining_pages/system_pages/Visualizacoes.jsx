@@ -1,6 +1,6 @@
 import React from 'react'
 import myfetch from '../../utils/myfetch';
-import PageTitle from '../../components/ui/PageTitle';
+import DataGridTitle from '../../components/ui/DataGridTitle';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
@@ -188,7 +188,7 @@ import { Link } from 'react-router-dom';
           {notif.message}
         </Notification>
 
-        <PageTitle title="Listagem de visualizações"  />
+        <DataGridTitle title="Listagem de visualizações"  />
   
         <Box sx={{
           display: "flex",

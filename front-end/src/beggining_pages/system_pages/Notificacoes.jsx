@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import PageTitle from '../../components/ui/PageTitle';
-import Button from '@mui/material/Button';
+import DataGridTitle from '../../components/ui/DataGridTitle';
 import myfetch from '../../utils/myfetch';
 import { Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid'
@@ -208,7 +207,7 @@ export default function Notificacoes() {
         <CircularProgress color="secondary" />
       </Backdrop>
 
-      <PageTitle title="Suas Notificações" />
+      <DataGridTitle title="Suas Notificações" />
 
        <ConfirmDialog
         title="Confirmar operação"

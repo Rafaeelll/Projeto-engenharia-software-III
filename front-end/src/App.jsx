@@ -13,7 +13,6 @@ import Perfil from './beggining_pages/system_pages/Perfil';
 import PerfilForm from './beggining_pages/system_pages/system_pages_forms/PerfilForm';
 import Jogos from './beggining_pages/system_pages/system_pages_jogos/Jogos';
 import JogoForm from './beggining_pages/system_pages/system_pages_forms/JogoForm';
-import Configuracoes from './beggining_pages/system_pages/Configuracoes';
 import HistoricoJogos from './beggining_pages/system_pages/system_pages_jogos/HistoricoJogos';
 import HistoricoJogosForm from './beggining_pages/system_pages/system_pages_forms/HistoricoJogosForm'
 import Visualizacoes from './beggining_pages/system_pages/Visualizacoes';
@@ -59,7 +58,6 @@ function App() {
             <Route path= "/verificar_agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
             <Route path= "/perfil" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
             <Route path= "/perfil/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
-            <Route path= "/configuracao" element={<AuthGuard> <Configuracoes/> </AuthGuard>}/>
             <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
             <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
             <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>

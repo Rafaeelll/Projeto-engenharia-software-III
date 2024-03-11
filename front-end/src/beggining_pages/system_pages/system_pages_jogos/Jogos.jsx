@@ -1,9 +1,8 @@
 import React from 'react'
 import myfetch from '../../../utils/myfetch';
-import PageTitle from '../../../components/ui/PageTitle';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
-import { Grid } from '@mui/material';
+import DataGridTitle from '../../../components/ui/DataGridTitle';
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import IconButton from '@mui/material/IconButton'
@@ -186,22 +185,14 @@ import parseISO from 'date-fns/parseISO';
           {notif.message}
         </Notification>
   
-        <Box 
-          sx={{ width: '50%', margin: '0 auto', backgroundColor: 'black', 
-          color: 'white', font: 'arial', marginTop: '50px', 
-          borderRadius: '5px 5px 0px 0px', textAlign: 'center', padding: '10px' }}> 
-            <h1 style={{ margin: '0' }}>
-              <strong> 
-                Listagem De Jogos
-              </strong>
-            </h1>
-        </Box>
+        <DataGridTitle title="Listagem De Jogos"  />
 
-          <Paper elevation={4} sx={{width: '50%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+          <Paper elevation={4} sx={{width: '40%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
             <DataGrid 
-              sx={{fontFamily: 'arial', fontWeight: 'medium', 
-              background: 'whitesmoke', color: '#470466', 
-              fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
+              sx={{
+                fontFamily: 'arial', fontWeight: 'medium', 
+                background: 'whitesmoke', color: '#470466', 
+                fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
               rows={jogos}
               columns={columns}
               initialState={{
@@ -215,33 +206,29 @@ import parseISO from 'date-fns/parseISO';
               disableRowSelectionOnClick
             />
           </Paper>
-          <Box sx={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "25px"
-        }}>
-          <Link to="new">
-            <Button style={{marginRight: '20px'}}
-              variant="contained" 
-              size="medium" 
-              color="secondary"
-              startIcon={<AddCircleIcon />}
-            >
-              Novo Jogo
-            </Button>
-          </Link>
+            <Box sx={{display: "flex",justifyContent: "center", marginTop: "25px"}}>
+              <Link to="new">
+                <Button style={{marginRight: '15px'}}
+                  variant="contained" 
+                  size="medium" 
+                  color="secondary"
+                  startIcon={<AddCircleIcon />}
+                >
+                  Novo Jogo
+                </Button>
+              </Link>
 
-          <Link to="/historico_jogo">
-            <Button style={{marginRight: '20px'}}
-              variant="contained" 
-              size="medium" 
-              color="secondary"
-              startIcon={<HistoryIcon/>}
-            >
-              Históricos
-            </Button>
-          </Link>
-        </Box>
+              <Link to="/historico_jogo">
+                <Button style={{marginRight: '15px'}}
+                  variant="contained" 
+                  size="medium" 
+                  color="secondary"
+                  startIcon={<HistoryIcon/>}
+                >
+                  Históricos
+                </Button>
+              </Link>
+          </Box>
       </>
     )
   }

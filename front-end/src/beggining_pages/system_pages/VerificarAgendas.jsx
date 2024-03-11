@@ -1,6 +1,6 @@
 import React from 'react'
 import myfetch from '../../utils/myfetch'
-import PageTitle from '../../components/ui/PageTitle'
+import DataGridTitle from '../../components/ui/DataGridTitle'
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
@@ -251,7 +251,7 @@ export default function VerificarAgendas() {
         {notif.message}
       </Notification>
 
-      <PageTitle title="Relatório de agendas"/>
+      <DataGridTitle title="Relatório de agendas"/>
 
       <Box sx={{
         display: "flex",
