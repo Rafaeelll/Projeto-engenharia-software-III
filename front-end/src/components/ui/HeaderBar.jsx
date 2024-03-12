@@ -4,8 +4,8 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import MainMenu from './MainMenu'
-import sa3 from '../../assets/sa3.png'
-import  Backdrop  from '@mui/material/Backdrop';
+import sa3 from '../../../src/assets/sa3.png'
+import Backdrop  from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress'
 import ConfirmDialog from './ConfirmDialog'
 import myfetch from '../../utils/myfetch'

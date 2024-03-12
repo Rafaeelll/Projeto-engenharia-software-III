@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
-import gamerImage from '../assets/gamer.jpg';
-import LogoTipo from '../assets/sa2.png';
+import gamerImage from '../../assets/gamer.jpg';
+import LogoTipo from '../../assets/sa2.png';
 import Typography  from '@mui/material/Typography';
 
 export default function LandingPage() {

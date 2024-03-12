@@ -1,12 +1,12 @@
-import StreamAdvisor from '../assets/sa4.png'
+import StreamAdvisorLogo from '../../../assets/sa4.png'
 import React from 'react'
-import '../styles/styles.css'
-import ImagemFundo from '../assets/back.jpg'
+import '../../../styles/styles.css'
+import ImagemFundo from '../../../assets/back.jpg'
 import { Link, useNavigate } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
-import Notification from '../components/ui/Notification'
-import myfetch from '../utils/myfetch'
+import Notification from '../../../components/ui/Notification'
+import myfetch from '../../../utils/myfetch'
 import Button  from '@mui/material/Button'
 import LoginIcon from '@mui/icons-material/Login';
 import TextField from '@mui/material/TextField'
@@ -105,7 +105,7 @@ export default function LoginForm({onLoginLogout}) {
                   Autentique-se
               </span>
                 <span className="login-form-title">
-                  <img src={StreamAdvisor} alt="Stream Advisor"/>
+                  <img src={StreamAdvisorLogo} alt="Stream Advisor"/>
                 </span>
 
                 <div className="wrap-input2">

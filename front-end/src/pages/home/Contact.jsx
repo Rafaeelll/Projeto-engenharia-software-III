@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import StreamAdvisor from '../assets/sa2.png';
+import StreamAdvisor from '../../assets/sa2.png';
 
 function Contact(){
     return (

@@ -9,8 +9,6 @@ import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import Agenda from '../../../../models/Agenda'
 import FormTitle from '../../../components/ui/FormTitle';
-import Autocomplete from '@mui/material/Autocomplete';
-import { format } from 'date-fns';
 import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import Button  from '@mui/material/Button';

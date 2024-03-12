@@ -1,6 +1,6 @@
 import React from 'react'
-import myfetch from '../../../utils/myfetch';
-import DataGridTitle from '../../../components/ui/DataGridTitle';
+import myfetch from '../../utils/myfetch';
+import DataGridTitle from '../../components/ui/DataGridTitle';
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
@@ -8,8 +8,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import IconButton from '@mui/material/IconButton'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
-import ConfirmDialog from '../../../components/ui/ConfirmDialog'
-import Notification from '../../../components/ui/Notification';
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import Notification from '../../components/ui/Notification';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'

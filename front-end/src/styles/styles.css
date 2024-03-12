@@ -51,12 +51,6 @@
     width: 100px;
 }
 
-.wrap-input{
-    width: 100;
-    position: relative;
-    border-bottom: 2px solid #adadad;
-    margin-bottom: 37px;
-}
 .wrap-input2{
     width: 100;
     position: relative;
@@ -67,94 +61,13 @@
     position: relative;
     margin-bottom: 12px;
 }
-.input{
-    font-size: 15px;
-    color: #fff;
-    line-height: 1.2;
-    border: none;
-    display: block;
 
-    width: 100%;
-    height: 45px;
-
-    background-color: transparent;
-    padding: 0 5px;
-}
-
-.input-file{
-    margin-top: 15px;
-}
 .input2{
-    line-height: 1.2;
     display: block;
-
     width: 100%;
     height: 45px;
 }
-.focus-input{
-    position: absolute;
-    display: block;
-    width: 100%;
-    height: 100%;
 
-    top: 0;
-    left: 0;
-
-    pointer-events: none;
-    color:#adadad
-}
-.focus-input::before{
-    content: "";
-    display: block;
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-
-    -webkit-transition: all 0.4s;
-    -o-transition: all 0.4s;
-    -moz-transition: all 0.4s;
-    
-    background: -webkit-linear-gradient(to left, #21d4fd, #b721ff);
-    background: -o-linear-gradient(to left, #21d4fd, #b721ff);
-    background: -moz-linear-gradient(to left, #21d4fd, #b721ff);
-    background: linear-gradient(to left, #21d4fd, #b721ff);
-}
-.focus-input::after{
-    font-size: 15px;
-    color: #999;
-    line-height: 1.2;
-
-    content: attr(data-placeholder);
-
-    display: block;
-    width: 100%;
-    position: absolute;
-    top: 16px;
-    left: 0px;
-
-    padding-left: 5px;
-
-    -webkit-transition: all 0.4s;
-    -o-transition: all 0.4s;
-    -moz-transition: all 0.4s;
-}
-.input:focus{
-    outline: 0;
-}
-.input:focus + .focus-input::after{
-    top: -15px;
-}
-.input:focus + .focus-input::before{
-    width: 100%;
-}
-.has-val + .focus-input::after{
-    top: -15px
-}
-.has-val + .focus-input::before{
-    width: 100%;
-}
 .container-login-form-btn{
     display: flex;
     flex-wrap: wrap;
@@ -208,15 +121,14 @@
     text-decoration: none;
 }
 .container-landing-page{
+    width: 100%;
+    margin: 0 auto;
+    
     background: -webkit-linear-gradient(to left, #000, #b721ff);
     background: -o-linear-gradient(to left, #000, #b721ff);
     background: -moz-linear-gradient(to left, #000, #b721ff);
     background: linear-gradient(to left, #000, #b721ff);
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
+    
 }
 .container-landing-page img{
     margin-left: 150px;
