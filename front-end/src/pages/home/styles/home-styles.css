@@ -1,0 +1,44 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.container-landing-page{
+    width: 100%;
+    margin: 0 auto;
+}
+
+
+.logotipo{
+    height: 80px;
+    border-radius: 20px;
+    border: none;
+    left: 0;
+}
+
+.header-bar-links {
+    position: absolute;
+    right: 0;
+    margin-right: 100px;
+    align-self: flex-start;
+    margin-left: auto;
+    margin-top: 20px;
+}
+
+.login-btn, .home-btn, .sobre-btn, .contato-btn{
+    padding: 5px;
+    font-size: 15px;
+    
+}
+.footer{
+    width: 100%;
+    height: 95px;
+    position: static;
+    color:#f5deff;
+    text-align: center;
+
+    background: -webkit-linear-gradient(to left, #000, #b721ff);
+    background: -o-linear-gradient(to left, #000, #b721ff);
+    background: -moz-linear-gradient(to left, #000, #b721ff);
+    background: linear-gradient(to left, #000, #b721ff); 
+}

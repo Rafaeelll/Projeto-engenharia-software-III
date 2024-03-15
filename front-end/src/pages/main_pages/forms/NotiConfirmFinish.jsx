@@ -7,7 +7,6 @@ import { Paper } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress'
 import Backdrop from '@mui/material/Backdrop'
 import TextField from '@mui/material/TextField';
-import '../../../styles/styles.css'
 import FormTitle from '../../../components/ui/FormTitle';
 import Typography  from '@mui/material/Typography';
 import Select from '@mui/material/Select';
@@ -86,7 +85,7 @@ export default function NotiConfirmFinish() {
           }
       
           // Verificar se data_horario_fim está expirada
-          const agenda = await myfetch.get(`/agenda/${notificacoes.agenda_id}`);
+          const agenda = await myfetch.get(`/agendas/${notificacoes.agenda_id}`);
           const dataHorarioFim = new Date(agenda.data_horario_fim);
           const now = new Date();
       

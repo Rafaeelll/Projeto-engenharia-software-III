@@ -14,6 +14,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Link } from 'react-router-dom';
+import './styles/main-pages-styles.css'
+
 
   export default function Visualizacoes() {
     const API_PATH = '/visualizacoes'

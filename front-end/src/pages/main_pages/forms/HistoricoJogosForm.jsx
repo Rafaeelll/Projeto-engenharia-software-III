@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
-import '../../../styles/styles.css'
 import myfetch from '../../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -191,7 +190,6 @@ export default function HistoricoJogosForm() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-          <div className='wrap-input3'>
             <TextField
               id="standard-basic"
               label="Id jogo"
@@ -205,9 +203,7 @@ export default function HistoricoJogosForm() {
               error={errors?.jogo_id}
               helperText={errors?.jogo_id}
             />
-          </div>
 
-          <div className='wrap-input3'>
             <TextField
               fullWidth
               name="pontuacao"
@@ -220,7 +216,6 @@ export default function HistoricoJogosForm() {
               error={errors?.pontuacao}
               helperText={errors?.pontuacao}
             />
-          </div>
           <div className='historico-jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
           <Button
               sx={{

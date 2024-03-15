@@ -7,7 +7,6 @@ import { Paper } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress'
 import Backdrop from '@mui/material/Backdrop'
 import TextField from '@mui/material/TextField';
-import '../../../styles/styles.css'
 import Select from '@mui/material/Select';
 import FormTitle from '../../../components/ui/FormTitle';
 import InputLabel from '@mui/material/InputLabel';

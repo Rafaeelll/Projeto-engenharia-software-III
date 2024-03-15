@@ -17,6 +17,8 @@ import HistoryIcon from '@mui/icons-material/History';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
+import './styles/main-pages-styles.css'
+
 
   export default function Jogos() {
     const API_PATH = '/jogos'

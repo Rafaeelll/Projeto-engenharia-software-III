@@ -16,6 +16,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
+import './styles/main-pages-styles.css'
+
 
 export default function VerificarAgendas() {
 

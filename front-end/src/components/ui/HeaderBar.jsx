@@ -13,6 +13,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Button from '@mui/material/Button';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
+import '../../pages/main_pages/styles/main-pages-styles.css'
 
 export default function HeaderBar({isLoggedIn, onLoginLogout}) {
   const [state, setState] = React.useState({

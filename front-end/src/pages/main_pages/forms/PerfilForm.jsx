@@ -2,7 +2,6 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import myfetch from '../../../utils/myfetch';
-import '../../../styles/styles.css'
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
@@ -133,7 +132,7 @@ export default function PerfilForm() {
           'Content-Type': 'mulitpart/form-data'
         }
       }
-      await api.put(`${API_PATH}/${params.id}`, formData, headers);
+      await myfetch.put(`${API_PATH}/${params.id}`, formData, headers);
 
     }else {
       await myfetch.post(API_PATH, perfils);
@@ -214,7 +213,6 @@ export default function PerfilForm() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-          <div className='wrap-input3'>
             <TextField
               id="standard-basic"
               label="Nome"
@@ -229,9 +227,7 @@ export default function PerfilForm() {
               error={errors?.nome}
               helperText={errors?.nome}
             />
-          </div>
 
-          <div className='wrap-input3'>
             <TextField
               label="Sobrenome"
               type="name"
@@ -244,9 +240,7 @@ export default function PerfilForm() {
               error={errors?.sobrenome}
               helperText={errors?.sobrenome}
             />
-          </div>
 
-          <div className='wrap-input3'>
             <TextField
               label="email"
               type="email"
@@ -259,9 +253,7 @@ export default function PerfilForm() {
               error={errors?.email}
               helperText={errors?.email}
             />
-          </div>
 
-          <div className='wrap-input3'>
             <TextField
               label="Senha"
               type="password"
@@ -274,9 +266,7 @@ export default function PerfilForm() {
               error={errors?.senha_acesso}
               helperText={errors?.senha_acesso}
             />
-          </div>
 
-          <div className="wrap-input3">
             <TextField
               variant='filled'
               label='Telefone'
@@ -293,9 +283,7 @@ export default function PerfilForm() {
                 onChange: handleFormFieldChange,
               }}
             />
-          </div>
           
-          <div className='wrap-input3'>
             <TextField
               label='Data nascimento'
               color='secondary'
@@ -305,9 +293,7 @@ export default function PerfilForm() {
               value={perfils.data_nasc}
               onChange={handleFormFieldChange}
             />
-          </div>
 
-          <div className='wrap-input3'>
             <TextField
               fullWidth
               name="plataforma_fav"
@@ -320,9 +306,7 @@ export default function PerfilForm() {
               error={errors?.plataforma_fav}
               helperText={errors?.plataforma_fav}
             />
-          </div>
 
-          <div className='wrap-input3'>
             <TextField
               label='Jogo Favorito'
               type="name"
@@ -335,7 +319,6 @@ export default function PerfilForm() {
               error={errors?.jogo_fav}
               helperText={errors?.jogo_fav}
             />
-          </div>
 
           <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
           <Button

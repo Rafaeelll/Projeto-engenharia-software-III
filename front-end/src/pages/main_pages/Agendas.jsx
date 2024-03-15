@@ -5,6 +5,8 @@ import Button  from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import Box from '@mui/material/Box';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
+import './styles/main-pages-styles.css'
+
 
 
 export default function Agendas() {

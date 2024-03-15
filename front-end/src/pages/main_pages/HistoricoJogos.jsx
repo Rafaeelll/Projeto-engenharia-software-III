@@ -15,6 +15,7 @@ import Button from '@mui/material/Button';
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import GamesIcon from '@mui/icons-material/Games';
 import { Link } from 'react-router-dom';
+import './styles/main-pages-styles.css'
 
 
 
@@ -234,6 +235,6 @@ import { Link } from 'react-router-dom';
                   </Button>
                 </Link>
               </Box>
-      </>
+        </>
     )
   }

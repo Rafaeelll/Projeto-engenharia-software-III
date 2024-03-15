@@ -13,6 +13,8 @@ import parseISO from 'date-fns/parseISO';
 import EditIcon from '@mui/icons-material/Edit'
 import IconButton from '@mui/material/IconButton'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
+import './styles/main-pages-styles.css'
+
 
 export default function Notificacoes() {
   const API_PATH = '/notificacoes';

@@ -1,6 +1,6 @@
 import StreamAdvisorLogo from '../../../assets/sa4.png'
 import React from 'react'
-import '../../../styles/styles.css'
+import './styles/login-register-styles.css'
 import ImagemFundo from '../../../assets/back.jpg'
 import { Link, useNavigate } from 'react-router-dom'
 import Backdrop from '@mui/material/Backdrop'
