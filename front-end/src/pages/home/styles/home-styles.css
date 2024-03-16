@@ -18,11 +18,9 @@
 
 .header-bar-links {
     position: absolute;
+    display: flex;
+    align-self: center;
     right: 0;
-    margin-right: 100px;
-    align-self: flex-start;
-    margin-left: auto;
-    margin-top: 20px;
 }
 
 .login-btn, .home-btn, .sobre-btn, .contato-btn{
@@ -42,3 +40,5 @@
     background: -moz-linear-gradient(to left, #000, #b721ff);
     background: linear-gradient(to left, #000, #b721ff); 
 }
+
+

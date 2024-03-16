@@ -1,11 +1,11 @@
 'use strict';
-// Este código define o modelo HistoricoJogo utilizando o Sequelize para lidar com a interação com o banco de dados. 
+// Este código define o modelo HistoricoJogo utilizando o DataTypes para lidar com a interação com o banco de dados. 
 // Ele inclui definições de associações com os modelos Usuario e Jogo, especificando as chaves estrangeiras e os 
 // atributos para exibição. Além disso, define os campos da tabela historico_jogos, como id, usuario_id, jogo_id, pontuacao e createdAt
 
 const { Model } = require('sequelize');
 
-// Definição do modelo HistoricoJogo usando o Sequelize
+// Definição do modelo HistoricoJogo usando o DataTypes
 module.exports = (sequelize, DataTypes) => {
   class HistoricoJogo extends Model {
     // Método auxiliar para definir associações entre modelos
@@ -42,13 +42,30 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    pontuacao: {
+    nivel: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    createdAt: {
-      allowNull: false,
-      type: DataTypes.DATE
+    jogo_status:{
+      type: DataTypes.ENUM('Não iniciado', 'Em progresso', 'Concluído'),
+      defaultValue: 'Não iniciado',
+    },
+    jogo_iniciado:{
+      type: DataTypes.BOOLEAN,
+    },
+    jogo_zerado:{
+      type: DataTypes.BOOLEAN,
+    },
+    avaliacao: {
+      type: DataTypes.TINYINT.UNSIGNED,
+      allowNull: true,
+      validate: {
+        min: 1,
+        max: 5
+      }
+    },
+    comentario_usuario:{
+      type: DataTypes.TEXT
     },
   }, {
     sequelize,

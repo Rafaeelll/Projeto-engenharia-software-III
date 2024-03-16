@@ -23,7 +23,7 @@ export default function jogos() {
   const [state, setState] = React.useState({
     jogos: {
       nome: '',
-      data_jogo: '',
+      data_aquisicao: '',
     },
     errors: {},
     showWaiting: false,
@@ -203,9 +203,9 @@ export default function jogos() {
               variant='filled'
               label='Data de aquisição'
               type="date"
-              name="data_jogo"
+              name="data_aquisicao"
               fullWidth
-              value={jogos.data_jogo}
+              value={jogos.data_aquisicao}
               onChange={handleFormFieldChange}
             />
           

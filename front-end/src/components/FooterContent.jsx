@@ -7,7 +7,7 @@ const CenteredTypography = styled(Typography)({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '100%',
+  fontFamily: 'monospace'
 });
 
 export default function FooterContent() {

@@ -17,9 +17,30 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      pontuacao: {
+      nivel: {
         type: Sequelize.INTEGER,
         allowNull: false
+      },
+      jogo_status:{
+        type: Sequelize.ENUM('Não iniciado', 'Em progresso', 'Concluído'),
+        defaultValue: 'Não iniciado',
+      },
+      jogo_iniciado:{
+        type: Sequelize.BOOLEAN,
+      },
+      jogo_zerado:{
+        type: Sequelize.BOOLEAN,
+      },
+      avaliacao: {
+        type: Sequelize.TINYINT.UNSIGNED,
+        allowNull: true,
+        validate: {
+          min: 1,
+          max: 5
+        }
+      },
+      comentario_usuario:{
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,

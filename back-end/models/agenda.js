@@ -1,6 +1,6 @@
 'use strict';
 
-// Neste código, um modelo Sequelize chamado Agenda é definido. Ele descreve a estrutura da 
+// Neste código, um modelo DataTypes chamado Agenda é definido. Ele descreve a estrutura da 
 // tabela agendas em um banco de dados relacional, incluindo os tipos de dados de cada coluna, 
 // restrições de chave estrangeira e associações com outros modelos (como Usuario, Jogo, Visualizacao e Notificacao). 
 // O método associate define essas associações entre os modelos. Cada agenda pertence a um usuário e a um jogo, e pode 
@@ -9,7 +9,7 @@
 const { Model } = require('sequelize');
 
 /**
- * O arquivo define o modelo 'Agenda' usando o Sequelize.
+ * O arquivo define o modelo 'Agenda' usando o DataTypes.
  */
 
 module.exports = (sequelize, DataTypes) => {
@@ -68,13 +68,19 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    data_horario_inicio:{
+    data_horario_inicio:{ // Data e horario do inicio da agenda
       type: DataTypes.DATE,
       allowNull: false
     },
-    data_horario_fim:{
+    data_horario_fim:{ // Data e horario do fim da agenda
       type: DataTypes.DATE,
       allowNull: false,
+    },
+    p_data_horario_inicio:{ // data e horario do inicio da pausa (opcional para agendas com durações menor do que 3hrs)
+      type: DataTypes.DATE,
+    },
+    p_data_horario_fim:{ // data e horario do fim da pausa.
+      type: DataTypes.DATE,
     },
     titulo_agenda:{
       type: DataTypes.STRING(200),
@@ -88,9 +94,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     status:{
       type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalizada'),
-      allowNull: false,
-      defaultValue: 'Agendado' // Valor padrão para o campo status
-
+      allowNull: false
     },
   }, {
     sequelize,
@@ -114,9 +118,32 @@ module.exports = (sequelize, DataTypes) => {
 
         // Definir o status da agenda
         agenda.status = statusAgenda;
+
+
+      // Determinar a date e horario do inicio e fim da pausa caso a agenda tiver uma duração maior ou igual a 3 hrs
+      const inicio_agenda = new Date(agenda.data_horario_inicio).getTime(); // Obtém o tempo em milissegundos
+      const fim_agenda = new Date(agenda.data_horario_fim).getTime(); // Obtém o tempo em milissegundos
+
+      // Calcular a duração da agenda em milissegundos
+      const duracao = fim_agenda - inicio_agenda;
+
+      if (duracao >= 3 * 60 * 60 * 1000) { // Se a duração for maior ou igual a 3 horas
+        // Calcular a metade da duração da agenda em milissegundos
+        const metadeDuracao = duracao / 2;
+
+        // Calcular a data e hora de início da pausa (metade da duração da agenda)
+        const dataInicioPausa = new Date(inicio_agenda + metadeDuracao);
+
+        // Calcular a data e hora de término da pausa (10 minutos após o início da pausa)
+        const dataFimPausa = new Date(dataInicioPausa.getTime() + 10 * 60 * 1000); // Adiciona 10 minutos em milissegundos
+
+        // Definir os valores para os campos p_data_horario_inicio e p_data_horario_fim
+        agenda.p_data_horario_inicio = dataInicioPausa;
+        agenda.p_data_horario_fim = dataFimPausa;
       }
     }
-  });
+  }
+});
   
   return Agenda;
 };

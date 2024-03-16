@@ -18,9 +18,22 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      data_jogo: {
+      data_aquisicao: {
         type: Sequelize.DATEONLY,
         allowNull: false
+      },
+      plataforma_jogo:{
+        type: Sequelize.ENUM( 'PC', 'Console Xbox', 'PlayStation', 'Nintendo Switch', 'Dispositivo Móvel'),
+      },
+      preco_jogo:{
+        type: Sequelize.DECIMAL(10,2)
+      },
+      categoria: {
+        type: Sequelize.ENUM('Sobrevivência', 'Ação e aventura', 'Luta', 'Jogos Esportivos', 'Stealth (Furtividade)', 'RPG', 'FPS', 'MMORPG', 'MOBA',  'Battle Royale'),
+        allowNull: false,
+      },
+      modo_jogo_fav:{
+        type: Sequelize.ENUM('Campanha Solo', 'Multijogador Online', 'Cooperativo Local'),
       },
       createdAt: {
         allowNull: false,

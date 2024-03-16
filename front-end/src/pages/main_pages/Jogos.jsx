@@ -76,7 +76,7 @@ import './styles/main-pages-styles.css'
         width: 150
       },
       {
-        field: 'data_jogo',
+        field: 'data_aquisicao',
         headerName: 'Data de aquisição',
         width: 150,
         valueFormatter: (params) => format(parseISO(params.value), 'dd/MM/yyyy'),

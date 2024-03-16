@@ -1,7 +1,7 @@
 'use strict';
 
 /*
-  Este código define o modelo Jogo usando o Sequelize. Ele descreve a estrutura da tabela de 
+  Este código define o modelo Jogo usando o DataTypes. Ele descreve a estrutura da tabela de 
   jogos e suas associações com outros modelos. O modelo Jogo possui campos como id, nome, usuario_id e data_jogo.
   Além disso, o método associate define as associações do modelo Jogo com os modelos Agenda e HistoricoJogo, 
   indicando os relacionamentos entre eles por meio de chaves estrangeiras.
@@ -45,16 +45,29 @@ module.exports = (sequelize, DataTypes) => {
     },
     nome: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull:false,
       unique: true
     },
     usuario_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    data_jogo: {
+    data_aquisicao: {
       type: DataTypes.DATEONLY,
       allowNull: false
+    },
+    plataforma_jogo:{
+      type: DataTypes.ENUM( 'PC', 'Console Xbox', 'PlayStation', 'Nintendo Switch', 'Dispositivo Móvel'),
+    },
+    preco_jogo:{
+      type: DataTypes.DECIMAL(10,2)
+    },
+    categoria: {
+      type: DataTypes.ENUM('Sobrevivência', 'Ação e aventura', 'Luta', 'Jogos Esportivos', 'Stealth (Furtividade)', 'RPG', 'FPS', 'MMORPG', 'MOBA',  'Battle Royale'),
+      // allowNull: false,
+    },
+    modo_jogo_fav:{
+      type: DataTypes.ENUM('Campanha Solo', 'Multijogador Online', 'Cooperativo Local'),
     },
   }, {
     sequelize,

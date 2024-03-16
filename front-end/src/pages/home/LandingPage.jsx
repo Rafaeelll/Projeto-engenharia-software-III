@@ -7,9 +7,11 @@ export default function LandingPage() {
 
   return (
     <>
-      <HeaderBar2/>
-      <BodyContent/>
-      <FooterContent/>
+      <div className='container-landing-page'>
+        <HeaderBar2/>
+        <BodyContent/>
+        <FooterContent/>
+      </div>
     </>
   );
 }

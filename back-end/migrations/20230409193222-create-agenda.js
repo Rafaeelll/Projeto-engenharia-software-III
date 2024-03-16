@@ -30,13 +30,19 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      data_horario_inicio:{
+      data_horario_inicio:{ // Data e horario do inicio da agenda
         type: Sequelize.DATE,
         allowNull: false
       },
-      data_horario_fim:{
+      data_horario_fim:{ // Data e horario do fim da agenda
         type: Sequelize.DATE,
         allowNull: false,
+      },
+      p_data_horario_inicio:{ // data e horario do inicio da pausa (opcional para agendas com durações menor do que 3hrs)
+        type: Sequelize.DATE,
+      },
+      p_data_horario_fim:{ // data e horario do fim da pausa.
+        type: Sequelize.DATE,
       },
       titulo_agenda:{
         type: Sequelize.STRING(200),
