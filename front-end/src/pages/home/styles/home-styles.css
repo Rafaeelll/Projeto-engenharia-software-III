@@ -3,42 +3,94 @@
     padding: 0;
     box-sizing: border-box;
 }
-.container-landing-page{
+
+.container{
     width: 100%;
     margin: 0 auto;
 }
 
-
-.logotipo{
-    height: 80px;
-    border-radius: 20px;
-    border: none;
-    left: 0;
-}
-
-.header-bar-links {
-    position: absolute;
+.container-landing-page{
+    background-position: center;
+    height: 100vh;
     display: flex;
-    align-self: center;
-    right: 0;
+    justify-content: center;
+    align-items: center;
+}
+.wrap-body{
+    width: 50%;
+    background: -webkit-linear-gradient(to left, #060606, #b721ff);
+    background: -o-linear-gradient(to left, #060606, #b721ff);
+    background: -moz-linear-gradient(to left, #060606, #b721ff);
+    background: linear-gradient(to left, #060606, #b721ff);    
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 20px 20px 20px 20px;
+    box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.2);
+}
+.body-content{
+    width: 100%;
+}
+.body-text-center{
+    display: block;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+}
+.body-title{
+    display: block;
+    font-size: 45px;
+    color: #fff;
+    line-height: 1.2;
+    text-align: center;
+    top: auto;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
+.body-text{
+    font-size: 20px;
+    color:#e7fbff;
+    line-height: 1.5;
+    text-decoration: none;
+    padding: 5px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
 }
 
-.login-btn, .home-btn, .sobre-btn, .contato-btn{
-    padding: 5px;
-    font-size: 15px;
+.container-landing-page-btn{
+    display: block;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 15px;
+}
+.landing-page-btn{
+    border: none;
+    border-radius: 10px;
+    color:#fff;
+    line-height: 1.2;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
     
+    width: 100%;
+    
+    background: -webkit-linear-gradient(to left, #b721ff, #000000);
+    background: -o-linear-gradient(to left, #b721ff, #000000);
+    background: -moz-linear-gradient(to left, #b721ff, #000000);
+    background: linear-gradient(to left, #b721ff, #000000);
+}
+
+.landing-page-btn:hover{
+    cursor: pointer;
+    transition: box-shadow 0.5s ease;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.4);
 }
 .footer{
-    width: 100%;
-    height: 95px;
+    background: -webkit-linear-gradient(to left, #060606, #b721ff);
+    background: -o-linear-gradient(to left, #060606, #b721ff);
+    background: -moz-linear-gradient(to left, #060606, #b721ff);
+    background: linear-gradient(to left, #060606, #b721ff);
     position: static;
-    color:#f5deff;
-    text-align: center;
-
-    background: -webkit-linear-gradient(to left, #000, #b721ff);
-    background: -o-linear-gradient(to left, #000, #b721ff);
-    background: -moz-linear-gradient(to left, #000, #b721ff);
-    background: linear-gradient(to left, #000, #b721ff); 
+    height:fit-content
 }
-
-
+.footer-text{
+    color: #fff
+}

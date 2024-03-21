@@ -7,7 +7,6 @@ import About from './pages/home/About';
 import Contact from './pages/home/Contact';
 import PaginaInicial from './pages/main_pages/PaginaInicial';
 import CriarAgendas from './pages/main_pages/forms/AgendaForm';
-import Agendas from './pages/main_pages/Agendas'
 import VerificarAgendas from './pages/main_pages/VerificarAgendas';
 import Perfil from './pages/main_pages/Perfil';
 import PerfilForm from './pages/main_pages/forms/PerfilForm';
@@ -52,10 +51,9 @@ function App() {
             <Route path= "/sobre" element={<About/>}/>
             <Route path= "/contato" element={<Contact/>}/>
             <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
-            <Route path= "/agenda" element={<AuthGuard> <Agendas/> </AuthGuard>}/>
-            <Route path= "/criar_agenda" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-            <Route path= "/criar_agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-            <Route path= "/verificar_agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+            <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+            <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+            <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
             <Route path= "/perfil" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
             <Route path= "/perfil/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
             <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>

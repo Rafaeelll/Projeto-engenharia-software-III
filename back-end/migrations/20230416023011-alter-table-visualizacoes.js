@@ -36,7 +36,7 @@ module.exports = {
         table: 'agendas', // Tabela estrangeira
         field: 'id'      // Campo da tabela estrangeira
       },
-      onDelete: 'RESTRICT', // Não permite apagar uma agenda em uso nas visualizações
+      onDelete: 'CASCADE', // Não permite apagar uma agenda em uso nas visualizações
       onUpdate: 'CASCADE'   // Atualiza agenda_id nas visualizações se id da agenda mudar
     });
   },

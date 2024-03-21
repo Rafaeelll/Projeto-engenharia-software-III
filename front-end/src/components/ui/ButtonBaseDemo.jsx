@@ -12,26 +12,46 @@ const images = [
     url: '/src/assets/jogosbutton.jpg',
     title: 'Jogos',
     width: '20%',
-    instructions:  'Neste item o usúario poderá registrar, editar, visualizar e excluir seus jogos favoritos.', 
-    warning: 'Crie pelo menos um jogo antes de realizar outras funções do sistema.',
-    instructions2: 'Para criar clique no botão "Acessar" logo abaixo.',
-    route: '/jogo'
+    instruction1: 'Neste item o sistema permitirá o usúario à registrar, editar, listar e excluir seus jogos favoritos.',
+    warningTitle: 'Atenção:',
+    warning1: `Crie pelo menos um jogo antes de realizar outras funções do sistema.`,
+    warning2: `O sistema não permitirá criar jogos com o mesmo nome.`,
+    warning3: `Caso desejar excluir um jogo e o ID deste estiver registrado em outros itens como 
+    (Histórico de jogos e Agendas) os dados destes itens tambem serão excluídos.`,
+    acessarInstrucao: 'Para criar clique no botão "Acessar" logo abaixo.',
+    route: '/jogo/new'
   },
   {
     id: 2,
     url: '/src/assets/agendabutton.jpg',
     title: 'Agendas',
     width: '20%',
-    instructions: 'Conteúdo relacionado às agendas...',
-    route: '/agenda'
+    instruction1: `Neste item o sistema permitirá o usúario à registrar, editar, listar e excluir suas agendas.
+    A agenda é umas das principais funções do sistema, seu objetivo é armazenar dados referentes as
+    transmissões do usuário como data de início e término da agenda, horario de pausas etc.`,
+    warningTitle: 'Atenção:',
+    warning1: `Crie pelo menos um jogo antes de realizar esta função.`,
+    warning2: `O sistema não permitirá criar agendas no mesmo intervalo de tempo. Para agendas com duração de 3 horas ou mais 
+    o sistema exige que o usuário informe uma de pausa estratégica`,
+    warning3: `Caso desejar excluir uma agenda e o ID deste estiver registrado em outros itens como o de 
+    "Notificação e Visualização" os dados destes itens tambem serão excluídos.`,
+    acessarInstrucao: 'Para criar clique no botão "Acessar" logo abaixo.',
+    route: '/agenda/new'
   },
   {
     id: 3,
     url: '/src/assets/viewsbutton.jpg',
     title: 'Visualizações',
     width: '20%',
-    instructions: 'Conteúdo relacionado às visualizações...',
-    route: '/visualizacao'
+    instruction1: `Neste item o sistema permitirá o usúario à registrar, editar, listar e excluir suas visualizações. 
+    As visualizações estão associadas as agendas e tem o objetivo de armazenar a quantidade de visualização 
+    que a transmissão teve, depois que o usuário finalizar sua agenda.`,
+    warningTitle: 'Atenção:',
+    warning1: `Crie pelo menos uma agenda antes de realizar esta função.`,
+    warning2: `O sistema só permitirá o registro de uma visualização se a agenda em que estiver associada estar com status "Finalizada."`,
+    warning3: `O sistema orienta registrar a visualização toda vez em que o usuário for notificado sobre a finalização da agenda.`,
+    acessarInstrucao: 'Para criar clique no botão "Acessar" logo abaixo.',
+    route: '/visualizacao/new'
   },
 ];
 
@@ -104,18 +124,24 @@ export default function ButtonBaseDemo() {
   const [state, setState] = React.useState({
     showDialog: false,
     dialogTitle: '',
-    dialogContent: '',
-    dialogWarning: '',
-    dialogContent2: '',
+    dialogInstruction1: '',
+    dialogWarningTitle: '',
+    dialogWarning1: '',
+    dialogWarning2: '',
+    dialogWarning3: '',
+    dialogInstructionAcessar: '',
     targetRoute: '',
   });
 
   const { 
     showDialog, 
     dialogTitle,
-    dialogContent, 
-    dialogWarning, 
-    dialogContent2, 
+    dialogInstruction1, 
+    dialogWarningTitle,
+    dialogWarning1, 
+    dialogWarning2,
+    dialogWarning3,
+    dialogInstructionAcessar, 
     targetRoute } = state;
 
   function handleDialogClose(event, reason, answer) {
@@ -128,13 +154,16 @@ export default function ButtonBaseDemo() {
     }
   }
 
-  function handleImageClick(title, instructions, warning, instructions2, route) {
+  function handleImageClick(title, instruction1, warningTitle, warning1, warning2, warning3,acessarInstrucao, route) {
     setState({
       ...state,
       dialogTitle: title,
-      dialogContent: instructions,
-      dialogWarning: warning,
-      dialogContent2: instructions2,
+      dialogInstruction1: instruction1,
+      dialogWarningTitle: warningTitle,
+      dialogWarning1: warning1,
+      dialogWarning2: warning2,
+      dialogWarning3: warning3,
+      dialogInstructionAcessar: acessarInstrucao,
       targetRoute: route,
       showDialog: true,
     });
@@ -145,9 +174,12 @@ export default function ButtonBaseDemo() {
       <ConfirmDialogInitialPage
         open={showDialog}
         title={dialogTitle}
-        instructions={dialogContent}
-        warning={dialogWarning}
-        instructions2={dialogContent2}
+        instruction1={dialogInstruction1}
+        warningTitle={dialogWarningTitle}
+        warning1={dialogWarning1}
+        warning2={dialogWarning2}
+        warning3={dialogWarning3}
+        acessarInstrucao={dialogInstructionAcessar}
         onClose={handleDialogClose}
         onConfirm={() => {
           navigate(targetRoute);
@@ -161,7 +193,6 @@ export default function ButtonBaseDemo() {
           minWidth: 300,
           width: '100%',
           justifyContent: 'center',
-          paddingTop: '20px',
         }}
       >
         {images.map((image) => (
@@ -172,7 +203,14 @@ export default function ButtonBaseDemo() {
               width: image.width,
             }}
             onClick={() =>
-              handleImageClick(image.title, image.instructions, image.warning, image.instructions2, image.route)
+              handleImageClick(image.title, 
+                image.instruction1, 
+                image.warningTitle, 
+                image.warning1,
+                image.warning2, 
+                image.warning3, 
+                image.acessarInstrucao, 
+                image.route)
             }
           >
             <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />

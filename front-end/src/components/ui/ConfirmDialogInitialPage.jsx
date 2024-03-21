@@ -10,9 +10,12 @@ import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 
 export default function ConfirmDialogInitialPage({
   title, 
-  instructions, 
-  warning, 
-  instructions2, 
+  instruction1,
+  warningTitle,
+  warning1,
+  warning2, 
+  warning3, 
+  acessarInstrucao, 
   open = false, 
   onClose, onConfirm}) {
   const handleClose = (answer) => {
@@ -28,35 +31,42 @@ export default function ConfirmDialogInitialPage({
   };
 
   return (
-    <div>
-      <Dialog
-        open={open}
-        onClose={() => handleClose(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <Typography>{instructions}</Typography>
-            {warning && (
-              <div style={{ display: 'flex', alignItems: 'center', marginTop: '5px' }}>
-                <WarningRoundedIcon />
-                <Typography sx={{ marginLeft: '5px' }}>{warning}</Typography>
-              </div>
-            )}
-            <Typography style={{marginTop: '20px'}}>{instructions2}</Typography>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleConfirm} variant="outlined">
-            Acessar
-          </Button>
-          <Button onClick={() => handleClose(false)} autoFocus>
-            Voltar
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+    <Dialog
+      open={open}
+      onClose={() => handleClose(false)}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title"><strong><u>{title}</u></strong></DialogTitle>
+
+      <DialogContent>
+        <DialogContentText id="alert-dialog-description">
+          <Typography>{instruction1}</Typography>
+          {warningTitle && (
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+              <WarningRoundedIcon color='error'/>
+              <Typography sx={{ marginLeft: '3px' }}> <strong>{warningTitle}</strong></Typography>
+            </div>
+          )}
+            <ul style={{marginLeft: '40px', marginTop: '10px'}}>
+              <li>{warning1}</li>
+              <li>{warning2}</li>
+              <li>{warning3}</li>
+          </ul>
+          <Typography style={{marginTop: '40px'}}>{acessarInstrucao}</Typography>
+        </DialogContentText>
+      </DialogContent>
+
+
+      <DialogActions>
+        <Button onClick={handleConfirm} variant="outlined">
+          Acessar
+        </Button>
+        <Button onClick={() => handleClose(false)} autoFocus>
+          Voltar
+        </Button>
+      </DialogActions>
+      
+    </Dialog>
   );
 }

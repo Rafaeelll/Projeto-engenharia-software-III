@@ -2,9 +2,8 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import MainMenu from './MainMenu'
-import sa3 from '../../../src/assets/sa3.png'
+import sa2 from '../../../src/assets/sa2.png'
 import Backdrop  from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress'
 import ConfirmDialog from './ConfirmDialog'
@@ -14,6 +13,7 @@ import Button from '@mui/material/Button';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 import '../../pages/main_pages/styles/main-pages-styles.css'
+import SearchAppBar from './SearchAppBar';
 
 export default function HeaderBar({isLoggedIn, onLoginLogout}) {
   const [state, setState] = React.useState({
@@ -65,14 +65,14 @@ export default function HeaderBar({isLoggedIn, onLoginLogout}) {
         
         <Toolbar>
           <MainMenu/>
-          <Typography style={{fontFamily: 'monospace'}} variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Menu
-          </Typography>
+          <img style={{width: '90px', borderRadius: '5px'}} src={sa2} alt='Stream Advisor logo' />
+          <SearchAppBar/>
           {
             !isLoggedIn && 
-            <Button 
-              color="secondary" 
-              startIcon={<LoginIcon/>}
+            <Button sx={{fontFamily: 'monospace', margin: '20px', background: 'black', fontWeight: 'bold'}}
+              color="secondary"
+              variant='contained'              
+              startIcon={<LoginIcon style={{fontWeight: 'bold'}}/>}
               component={Link} to="/login">
               Entrar
             </Button>
@@ -88,7 +88,6 @@ export default function HeaderBar({isLoggedIn, onLoginLogout}) {
               Sair
             </Button>
           }
-            <img style={{height: '50px'}} src={sa3} alt='Stream Advisor logo' />
         </Toolbar>
       </AppBar>
     </Box>

@@ -11,7 +11,12 @@ import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
-
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import Input from '@mui/material/Input';
 
 
 export default function jogos() {
@@ -23,6 +28,9 @@ export default function jogos() {
   const [state, setState] = React.useState({
     jogos: {
       nome: '',
+      plataforma_jogo: '',
+      preco_jogo: '',
+      categoria: '',
       data_aquisicao: '',
     },
     errors: {},
@@ -184,30 +192,84 @@ export default function jogos() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-            <TextField sx={{marginTop: '12px'}}
-              id="standard-basic"
-              color='secondary'
-              label="Nome"
-              variant='filled'
-              type="name"
-              required
-              fullWidth
-              name="nome"
-              value={jogos.nome}
-              onChange={handleFormFieldChange}
-              error={errors?.nome}
-              helperText={errors?.nome}
-            />
-            <TextField sx={{marginTop: '12px'}}
-              required
-              variant='filled'
-              label='Data de aquisição'
-              type="date"
-              name="data_aquisicao"
-              fullWidth
-              value={jogos.data_aquisicao}
-              onChange={handleFormFieldChange}
-            />
+          <TextField sx={{marginTop: '12px'}}
+            id="standard-basic"
+            color='secondary'
+            label="Nome"
+            variant='filled'
+            type="name"
+            required
+            fullWidth
+            name="nome"
+            value={jogos.nome}
+            onChange={handleFormFieldChange}
+            error={errors?.nome}
+            helperText={errors?.nome}
+          />
+         <Box sx={{ minWidth: 120, marginTop: '12px'}}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Categoria do Jogo</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={jogos.categoria}
+                  label="Categoria Do Jogo"
+                  name='categoria'
+                  required
+                  onChange={handleFormFieldChange}
+              >
+                <MenuItem value={'Ação e aventura'}>Ação e aventura</MenuItem>
+                <MenuItem value={'Battle Royale'}>Battle Royale</MenuItem>
+                <MenuItem value={'FPS'}>FPS</MenuItem>
+                <MenuItem value={'Jogos Esportivos'}>Jogos Esportivos</MenuItem>
+                <MenuItem value={'MMORPG'}>MMORPG</MenuItem>
+                <MenuItem value={'MOBA'}>MOBA</MenuItem>
+                <MenuItem value={'RPG'}>RPG (Role Playing Game)</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          <Box sx={{ minWidth: 120, marginTop: '12px'}}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Plataforma De Jogo</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={jogos.plataforma_jogo}
+                  label="Plataforma De Jogo"
+                  name='plataforma_jogo'
+                  required
+                  onChange={handleFormFieldChange}
+              >
+                <MenuItem value={'PC'}>PC</MenuItem>
+                <MenuItem value={'Console Xbox'}>Console Xbox</MenuItem>
+                <MenuItem value={'PlayStation'}>PlayStation</MenuItem>
+                <MenuItem value={'Nintendo Switch'}>Nintendo Switch</MenuItem>
+                <MenuItem value={'Dispositivo Móvel'}>Dispositivo Móvel</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          <TextField sx={{marginTop: '12px'}}
+            value={jogos.preco_jogo}
+            label="Preço Do Jogo"
+            name='preco_jogo'
+            fullWidth
+            type='number'
+            required
+            onChange={handleFormFieldChange}
+          />
+
+          <TextField sx={{marginTop: '12px'}}
+            required
+            variant='filled'
+            label='Data de aquisição'
+            type="date"
+            name="data_aquisicao"
+            fullWidth
+            value={jogos.data_aquisicao}
+            onChange={handleFormFieldChange}
+          />
           
           <div className='jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
             <Button

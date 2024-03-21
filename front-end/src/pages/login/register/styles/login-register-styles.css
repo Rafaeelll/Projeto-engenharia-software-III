@@ -10,7 +10,7 @@
 }
 
 .wrap-login{
-    width: 390px;
+    width: 370px;
     background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
@@ -18,7 +18,7 @@
     box-shadow: 0 5px 10px 0px rgba(0, 0, 0, 0.2);
 }
 .wrap-register{
-    width: 390px;
+    width: 370px;
     height: 80%;
     background-color: #fff;
     border-radius: 5px;
@@ -81,7 +81,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
     margin-top: 50px;
 }
 

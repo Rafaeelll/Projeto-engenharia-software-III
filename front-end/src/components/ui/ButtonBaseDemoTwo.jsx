@@ -12,18 +12,32 @@ const images = [
     url: '/src/assets/historicobutton.jpg',
     title: 'Histórico De Jogos',
     width: '20%',
-    instructions:  'Neste item o usúario poderá registrar, editar, visualizar e excluir históricos de jogos salvos no sistema.' + 
-    'Os históricos estão associados aos jogos e tem o objetivo de registar o nível em que usuário está neste jogo.', 
-    warning: 'Crie pelo menos um jogo antes de realizar esta função do sistema.',
-    instructions2: 'Para criar um histórico clique no botão "Acessar" logo abaixo.',
-    route: '/historico_jogo'
+    instruction1: `Neste item o sistema permitirá o usúario à registrar, editar, visualizar e excluir históricos de jogos salvos no sistema.
+    Os históricos estão associados aos jogos e tem o objetivo de armazenar a progressão do usuário em um jogo, além disso 
+    poderá avaliar o jogo e fazer comentários sobre os jogos.`, 
+    warningTitle: 'Atenção:',
+    warning1: `Crie pelo menos um jogo antes de realizar esta função.`,
+    warning2: `O sistema não permitirá confirmar que zerou jogos de categorias: "MOBA", "MMORPG" e "Battle Royale".`,
+    warning3: `O sistema só permitirá informar o nível que esta no jogo se o usuário confirmar que já inícou a gameplay.`,
+    acessarInstrucao: 'Para criar um histórico clique no botão "Acessar" logo abaixo.',
+    route: '/historico_jogo/new'
   },
   {
     id: 5,
     url: 'https://c4.wallpaperflare.com/wallpaper/658/253/180/girl-headphones-computer-face-girl-hd-wallpaper-preview.jpg',
     title: 'Notificações',
     width: '20%',
-    instructions: 'Conteúdo relacionado às agendas...',
+    instruction1: `Neste item o sistema irá criar notificações automaticamente e permitirá o usuário à editar, listar e excluir suas notificações.
+    As notificações estão associadas às agendas e tem o objetivo de armazenar e notificar os usuários sobre a inicialização, finalização, pausa 
+    estratégica, confirmação de sua presença e confirmação da finalização da agenda. 
+    Além de ser notificado pela plataforma o usuário será notificado pelo navegador.`, 
+    warningTitle: 'Atenção:',
+    warning1: `Por padrão, o sistema notificará sobre o início da agenda com uma hora de antecedência.`,
+    warning2: `Após confirmar a finalização da agenda, orientamos registrar o número de visualização da agenda/transmissão.`,
+    warning3: `O sistema irá permitir que o usuário configure a notificação, incluindo opções como:
+    Configurar quando receberá a notificação de início ou fim da agenda, seja quando a agenda começar e finalizar, 30 minutos antes ou, por padrão, 1 hora antes.
+    Configurar a confirmação da presença da agenda automaticamente.`,
+    acessarInstrucao: 'Para verificar as notificações clique no botão "Acessar" logo abaixo.',
     route: '/notificacao'
   },
   {
@@ -31,7 +45,7 @@ const images = [
     url: '/src/assets/perfilbutton.jpg',
     title: 'Perfil',
     width: '20%',
-    instructions: 'Conteúdo relacionado às visualizações...',
+    instruction1: 'Conteúdo relacionado às visualizações...',
     route: '/perfil'
   },
 ];
@@ -102,21 +116,28 @@ const ImageMarked = styled('span')(({ theme }) => ({
 
 export default function ButtonBaseDemoTwo() {
   const navigate = useNavigate();
+
   const [state, setState] = React.useState({
     showDialog: false,
     dialogTitle: '',
-    dialogContent: '',
-    dialogWarning: '',
-    dialogContent2: '',
+    dialogInstruction1: '',
+    dialogWarningTitle: '',
+    dialogWarning1: '',
+    dialogWarning2: '',
+    dialogWarning3: '',
+    dialogInstructionAcessar: '',
     targetRoute: '',
   });
 
   const { 
     showDialog, 
     dialogTitle,
-    dialogContent, 
-    dialogWarning, 
-    dialogContent2, 
+    dialogInstruction1, 
+    dialogWarningTitle,
+    dialogWarning1, 
+    dialogWarning2,
+    dialogWarning3,
+    dialogInstructionAcessar, 
     targetRoute } = state;
 
   function handleDialogClose(event, reason, answer) {
@@ -129,13 +150,16 @@ export default function ButtonBaseDemoTwo() {
     }
   }
 
-  function handleImageClick(title, instructions, warning, instructions2, route) {
+  function handleImageClick(title, instruction1, warningTitle, warning1, warning2, warning3,acessarInstrucao, route) {
     setState({
       ...state,
       dialogTitle: title,
-      dialogContent: instructions,
-      dialogWarning: warning,
-      dialogContent2: instructions2,
+      dialogInstruction1: instruction1,
+      dialogWarningTitle: warningTitle,
+      dialogWarning1: warning1,
+      dialogWarning2: warning2,
+      dialogWarning3: warning3,
+      dialogInstructionAcessar: acessarInstrucao,
       targetRoute: route,
       showDialog: true,
     });
@@ -144,16 +168,19 @@ export default function ButtonBaseDemoTwo() {
   return (
     <>
       <ConfirmDialogInitialPage
-        open={showDialog}
-        title={dialogTitle}
-        instructions={dialogContent}
-        warning={dialogWarning}
-        instructions2={dialogContent2}
-        onClose={handleDialogClose}
-        onConfirm={() => {
-          navigate(targetRoute);
-          setState({ ...state, showDialog: false });
-        }}
+         open={showDialog}
+         title={dialogTitle}
+         instruction1={dialogInstruction1}
+         warningTitle={dialogWarningTitle}
+         warning1={dialogWarning1}
+         warning2={dialogWarning2}
+         warning3={dialogWarning3}
+         acessarInstrucao={dialogInstructionAcessar}
+         onClose={handleDialogClose}
+         onConfirm={() => {
+           navigate(targetRoute);
+           setState({ ...state, showDialog: false });
+         }}
       />
       <Box
         sx={{
@@ -172,7 +199,14 @@ export default function ButtonBaseDemoTwo() {
               width: image.width,
             }}
             onClick={() =>
-              handleImageClick(image.title, image.instructions, image.warning, image.instructions2, image.route)
+              handleImageClick(image.title, 
+                image.instruction1, 
+                image.warningTitle, 
+                image.warning1,
+                image.warning2, 
+                image.warning3, 
+                image.acessarInstrucao, 
+                image.route)
             }
           >
             <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />

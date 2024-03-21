@@ -59,6 +59,11 @@ module.exports = (sequelize, DataTypes) => {
     confirmacao_finalizacao: {
       type: DataTypes.BOOLEAN,
     },
+    contagem:{
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+
+    },
     configuracao: {
       type: DataTypes.JSON,
       allowNull: true
@@ -66,8 +71,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Notificacao',
-    tableName: 'notificacoes',    
+    tableName: 'notificacoes',
+    hooks: {
+      beforeCreate: (notificacao, options) => {
+        notificacao.contagem++; // Incrementa a contagem toda vez que uma notificação for criada
+      }
+    }
   });
+  
 
   return Notificacao;
 };

@@ -1,6 +1,5 @@
 import React from 'react'
 import myfetch from '../../utils/myfetch'
-import DataGridTitle from '../../components/ui/DataGridTitle'
 import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid'
 import EditIcon from '@mui/icons-material/Edit'
@@ -24,7 +23,7 @@ export default function VerificarAgendas() {
   const API_PATH = '/agendas'
 
   const [state, setState] = React.useState({
-    agendaPendentes: [],
+    agendas: [],
     showWaiting: false,
     showDialog: false,
     deleteId: null,
@@ -35,7 +34,7 @@ export default function VerificarAgendas() {
     }
   })
   const {
-    agendaPendentes,
+    agendas,
     showWaiting,
     showDialog,
     deleteId,
@@ -46,17 +45,18 @@ export default function VerificarAgendas() {
     setState({ ...state, showWaiting: true })
     try {
       const result = await myfetch.get(API_PATH);
-      const agendaPendentes = result.filter(agenda => agenda.status === 'Agendado' || agenda.status === 'Em andamento' 
+      const agendas = result.filter(agenda => agenda.status === 'Agendado' || agenda.status === 'Em andamento' 
       || agenda.status === 'Finalizada');
-      const formattedAgendaPendentes = agendaPendentes.map(agenda => ({
+      const formattedAgendas = agendas.map(agenda => ({
         ...agenda,
         data_horario_inicio: format(parseISO(agenda.data_horario_inicio), 'dd/MM/yyyy - HH:mm'),
-        data_horario_fim: format(parseISO(agenda.data_horario_fim), 'dd/MM/yyyy - HH:mm')
+        data_horario_fim: format(parseISO(agenda.data_horario_fim), 'dd/MM/yyyy - HH:mm'),
+
       }));
       
         setState({ 
         ...state, 
-        agendaPendentes: formattedAgendaPendentes,
+        agendas: formattedAgendas,
         showWaiting: false,
         showDialog: false
       });
@@ -93,13 +93,6 @@ export default function VerificarAgendas() {
   const columns = [
     { field: 'id', headerName: 'Id agenda', width: 90 },
     {
-      field: 'usuario_id',
-      headerName: 'Id usuário',
-      width: 150,
-      valueGetter: params => params.row?.usuario.id  + ': ' + params.row?.usuario.nome + ' ' + params.row?.usuario.sobrenome
-
-    },
-    {
       field: 'jogo_id',
       headerName: 'Id Jogo',
       width: 150,
@@ -125,6 +118,18 @@ export default function VerificarAgendas() {
       field: 'plt_transm',
       headerName: 'Plataforma',
       width: 150
+    },
+    {
+      field: 'p_data_horario_inicio',
+      headerName: "Início Pausa",
+      width: 150
+
+    },
+    {
+      field: 'p_data_horario_fim',
+      headerName: "Fim Pausa",
+      width: 150
+
     },
     {
       field: 'descricao',
@@ -252,40 +257,60 @@ export default function VerificarAgendas() {
         {notif.message}
       </Notification>
 
-      <DataGridTitle title="Relatório de agendas"/>
-
-      <Box sx={{
-        display: "flex",
-        justifyContent: "right",
-        marginBottom: "25px"
-      }}>
-        <Link to="/criar_agenda">
-          <Button style={{marginRight: '20px'}}
-          variant="contained"
-          size="large"
-          color="secondary"
-          startIcon={<AddCircleIcon/>}
-          >
-          Criar agenda
-          </Button>
-        </Link>
-      </Box>
-
-      <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
-        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
-          rows={agendaPendentes}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 5,
+      <Box 
+        sx={{ 
+          width: '70%', 
+          margin: '0 auto', 
+          backgroundColor: 'black', 
+          color: 'white', 
+          fontFamily: 'arial', 
+          marginTop: '50px', 
+          borderRadius: '5px 5px 0px 0px', 
+          textAlign: 'center', 
+          padding: '10px', 
+          borderStyle: 'groove' }}> 
+          <h1 style={{ margin: '0 auto', fontSize: '20px' }}>
+            <strong> 
+              Listagem de Agendas
+            </strong>
+          </h1>
+      </Box> 
+      <Paper elevation={4} sx={{width: '70%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+        <DataGrid 
+          sx={{
+            fontFamily: 'arial', fontWeight: 'medium', 
+            background: 'whitesmoke', color: '#470466', 
+            fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
+            rows={agendas}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  page: 0, pageSize: 5,
+                },
               },
-            },
-          }}
-          pageSizeOptions={[5]}
+            }}
+          pageSizeOptions={[5, 10]}
           disableRowSelectionOnClick
         />
       </Paper>
+
+      <Box sx={{
+        display: "flex",
+        justifyContent: "center",
+        marginTop: "25px"
+      }}>
+        <Link to="/agenda/new">
+          <Button style={{marginRight: '20px'}}
+          variant="contained"
+          size="medium"
+          color="secondary"
+          startIcon={<AddCircleIcon/>}
+          >
+          Nova agenda
+          </Button>
+        </Link>
+      </Box>
     </>
   )
 }

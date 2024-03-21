@@ -15,7 +15,7 @@ export default function DataGridTitle({title}) {
         textAlign: 'center', 
         padding: '10px', 
         borderStyle: 'groove' }}> 
-        <h1 style={{ margin: '0' }}>
+        <h1 style={{ margin: '0 auto', fontSize: '13px' }}>
           <strong> 
             {title}
           </strong>

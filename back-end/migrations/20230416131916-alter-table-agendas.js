@@ -36,7 +36,7 @@ module.exports = {
         table: 'jogos', // Tabela estrangeira
         field: 'id'      // Campo da tabela estrangeira
       },
-      onDelete: 'RESTRICT', // Não permite apagar um jogo em uso nas agendas
+      onDelete: 'CASCADE', // Não permite apagar um jogo em uso nas agendas
       onUpdate: 'CASCADE'   // Atualiza jogo_id nas agendas se id do jogo mudar
     });
   },

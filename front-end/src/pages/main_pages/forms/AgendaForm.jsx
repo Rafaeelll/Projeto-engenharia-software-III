@@ -340,7 +340,7 @@ export default function CriarAgendas() {
                 }}
                 color="error"
                 variant='contained'
-                onClick={() => navigate('/agenda')}
+                onClick={() => navigate(-1)}
               >
                 Cancelar
               </Button>

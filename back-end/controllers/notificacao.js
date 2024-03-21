@@ -52,11 +52,10 @@ controller.createAutomaticStartNotifications = async () => {
                     agenda_id: agenda.id,
                     usuario_id: agenda.usuario_id,
                     data_notificacao: umHoraAntesInicio,
-                    mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora.
-                    Confirme sua presença clicando no ícone "Editar".`,
+                    mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Confirme sua presença clicando no ícone "Editar".`,
                     confirmacao_presenca: false,              
                     confirmacao_finalizacao: false,
-                    configuracao: null
+                    configuracao: null,
                 });
             }
         }
@@ -89,12 +88,11 @@ controller.createAutomaticFinishNotifications = async() =>{
                     agenda_id: agenda.id,
                     usuario_id: agenda.usuario_id,
                     data_notificacao: agenda.data_horario_fim,
-                    mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou.
-                    Confirme a finalização clicando no ícone "Editar".`,
+                    mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. Confirme a finalização clicando no ícone "Editar".`,
                     confirmacao_presenca: false,              
                     confirmacao_finalizacao: false,
-                    configuracao: null
-                });                
+                    configuracao: null,
+                });
             }
         }
     } catch (error) {
@@ -102,6 +100,21 @@ controller.createAutomaticFinishNotifications = async() =>{
     }
 }
 cron.schedule('*/1 * * * *', controller.createAutomaticFinishNotifications);
+
+// Método para recuperar o número total de notificações do usuário autenticado
+controller.retrieveNotificationCount = async (req, res) => {
+    try {
+        const count = await Notificacao.count({
+            where: { usuario_id: req.authUser.id } // Filtra apenas as notificações do usuário autenticado
+        });
+        console.log("Quantidade de notificações:", count);
+
+        res.send({ count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+};
 
 
 // Método para recuperar todas as notificações do usuário autenticado

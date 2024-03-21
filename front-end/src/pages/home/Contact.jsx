@@ -1,14 +1,13 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import StreamAdvisor from '../../assets/sa2.png';
+
 import './styles/home-styles.css'
-import HeaderBar2 from "../../components/ui/HeaderBar2";
+import HeaderBarLP from "../../components/ui/HeaderBarLP";
 
 
 function Contact(){
   return (
     <>
-      <HeaderBar2/>
+      <HeaderBarLP/>
     </>
 );
 }

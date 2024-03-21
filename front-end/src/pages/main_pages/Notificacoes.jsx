@@ -14,6 +14,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import IconButton from '@mui/material/IconButton'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import './styles/main-pages-styles.css'
+import Box from '@mui/material/Box';
 
 
 export default function Notificacoes() {
@@ -209,7 +210,6 @@ export default function Notificacoes() {
         <CircularProgress color="secondary" />
       </Backdrop>
 
-      <DataGridTitle title="Suas Notificações" />
 
        <ConfirmDialog
         title="Confirmar operação"
@@ -227,21 +227,42 @@ export default function Notificacoes() {
         {notif.message}
       </Notification>
 
-      <Paper elevation={4} sx={{ height: 450, width: '60%', margin: '0 auto'}}>
-          <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
-                rows={notificacoes}
-                columns={columns}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 5,
-                    },
+      <Box 
+        sx={{ 
+          width: '70%', 
+          margin: '0 auto', 
+          backgroundColor: 'black', 
+          color: 'white', 
+          fontFamily: 'arial', 
+          marginTop: '50px', 
+          borderRadius: '5px 5px 0px 0px', 
+          textAlign: 'center', 
+          padding: '10px', 
+          borderStyle: 'groove' }}> 
+          <h1 style={{ margin: '0', fontSize: '20px' }}>
+            <strong> 
+              Suas Notificações
+            </strong>
+          </h1>
+      </Box>
+        <Paper elevation={4} sx={{width: '70%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+          <DataGrid 
+            sx={{
+              fontFamily: 'arial', fontWeight: 'medium', 
+              background: 'whitesmoke', color: '#470466', 
+              fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
+              rows={notificacoes}
+              columns={columns}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    page: 0, pageSize: 5,
                   },
-                }}
-                pageSizeOptions={[5]}
-                disableRowSelectionOnClick
-                
-            />
+                },
+              }}
+            pageSizeOptions={[5, 10]}
+            disableRowSelectionOnClick
+          />
         </Paper>
      </>
   );

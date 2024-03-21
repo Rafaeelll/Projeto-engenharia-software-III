@@ -94,7 +94,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     status:{
       type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalizada'),
-      allowNull: false
+      defaultValue: 'Agendado'
     },
   }, {
     sequelize,
@@ -117,31 +117,7 @@ module.exports = (sequelize, DataTypes) => {
         }
 
         // Definir o status da agenda
-        agenda.status = statusAgenda;
-
-
-      // Determinar a date e horario do inicio e fim da pausa caso a agenda tiver uma duração maior ou igual a 3 hrs
-      const inicio_agenda = new Date(agenda.data_horario_inicio).getTime(); // Obtém o tempo em milissegundos
-      const fim_agenda = new Date(agenda.data_horario_fim).getTime(); // Obtém o tempo em milissegundos
-
-      // Calcular a duração da agenda em milissegundos
-      const duracao = fim_agenda - inicio_agenda;
-
-      if (duracao >= 3 * 60 * 60 * 1000) { // Se a duração for maior ou igual a 3 horas
-        // Calcular a metade da duração da agenda em milissegundos
-        const metadeDuracao = duracao / 2;
-
-        // Calcular a data e hora de início da pausa (metade da duração da agenda)
-        const dataInicioPausa = new Date(inicio_agenda + metadeDuracao);
-
-        // Calcular a data e hora de término da pausa (10 minutos após o início da pausa)
-        const dataFimPausa = new Date(dataInicioPausa.getTime() + 10 * 60 * 1000); // Adiciona 10 minutos em milissegundos
-
-        // Definir os valores para os campos p_data_horario_inicio e p_data_horario_fim
-        agenda.p_data_horario_inicio = dataInicioPausa;
-        agenda.p_data_horario_fim = dataFimPausa;
-      }
-    }
+        agenda.status = statusAgenda;    }
   }
 });
   

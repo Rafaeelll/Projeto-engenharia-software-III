@@ -189,47 +189,47 @@ import './styles/main-pages-styles.css'
   
         <DataGridTitle title="Listagem De Jogos"  />
 
-          <Paper elevation={4} sx={{width: '40%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
-            <DataGrid 
-              sx={{
-                fontFamily: 'arial', fontWeight: 'medium', 
-                background: 'whitesmoke', color: '#470466', 
-                fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
-              rows={jogos}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    page: 0, pageSize: 5,
-                  },
+        <Paper elevation={4} sx={{width: '40%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+          <DataGrid 
+            sx={{
+              fontFamily: 'arial', fontWeight: 'medium', 
+              background: 'whitesmoke', color: '#470466', 
+              fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
+            rows={jogos}
+            columns={columns}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  page: 0, pageSize: 5,
                 },
-              }}
-              pageSizeOptions={[5, 10]}
-              disableRowSelectionOnClick
-            />
-          </Paper>
-            <Box sx={{display: "flex",justifyContent: "center", marginTop: "25px"}}>
-              <Link to="new">
-                <Button style={{marginRight: '15px'}}
-                  variant="contained" 
-                  size="medium" 
-                  color="secondary"
-                  startIcon={<AddCircleIcon />}
-                >
-                  Novo Jogo
-                </Button>
-              </Link>
+              },
+            }}
+            pageSizeOptions={[5, 10]}
+            disableRowSelectionOnClick
+          />
+        </Paper>
+          <Box sx={{display: "flex",justifyContent: "center", marginTop: "25px"}}>
+            <Link to="new">
+              <Button style={{marginRight: '15px'}}
+                variant="contained" 
+                size="medium" 
+                color="secondary"
+                startIcon={<AddCircleIcon />}
+              >
+                Novo Jogo
+              </Button>
+            </Link>
 
-              <Link to="/historico_jogo">
-                <Button style={{marginRight: '15px'}}
-                  variant="contained" 
-                  size="medium" 
-                  color="secondary"
-                  startIcon={<HistoryIcon/>}
-                >
-                  Históricos
-                </Button>
-              </Link>
+            <Link to="/historico_jogo">
+              <Button style={{marginRight: '15px'}}
+                variant="contained" 
+                size="medium" 
+                color="secondary"
+                startIcon={<HistoryIcon/>}
+              >
+                Históricos De Jogos
+              </Button>
+            </Link>
           </Box>
       </>
     )

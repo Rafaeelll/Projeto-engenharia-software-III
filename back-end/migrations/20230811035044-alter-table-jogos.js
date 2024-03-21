@@ -23,7 +23,7 @@ module.exports = {
         table: 'usuarios', // Tabela estrangeira
         field: 'id'      // Campo da tabela estrangeira
       },
-      onDelete: 'RESTRICT', // Não permite apagar um usuário em uso nos jogos
+      onDelete: 'CASCADE', // Não permite apagar um usuário em uso nos jogos
       onUpdate: 'CASCADE'   // Atualiza usuario_id nos jogos se id do usuário mudar
     });
   },

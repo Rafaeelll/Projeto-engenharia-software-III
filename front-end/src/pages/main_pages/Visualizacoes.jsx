@@ -66,12 +66,7 @@ import './styles/main-pages-styles.css'
   
     const columns = [
       { field: 'id', headerName: 'Cód.', width: 90 },
-      {
-        field: 'usuario_id',
-        headerName: 'Id usuário',
-        width: 150,
-        valueGetter: params => params.row?.usuario.id  + ': ' + params.row?.usuario.nome + ' ' + params.row?.usuario.sobrenome
-      },
+
       {
         field: 'agenda_id',
         headerName: 'Id agenda',
@@ -192,38 +187,43 @@ import './styles/main-pages-styles.css'
 
         <DataGridTitle title="Listagem de visualizações"  />
   
-        <Box sx={{
-          display: "flex",
-          justifyContent: "right",
-          marginBottom: "25px"
-        }}>
-          <Link to="new">
-            <Button style={{marginRight: '20px'}}
-              variant="contained" 
-              size="large" 
-              color="secondary"
-              startIcon={<AddCircleIcon />}
-            >
-              Cadastrar novo
-            </Button>
-          </Link>
-        </Box>
   
-        <Paper elevation={4} sx={{ height: 450, width: '70%', margin: '0 auto'}}>
-        <DataGrid sx={{fontFamily: 'arial', fontWeight: 'medium', background: 'whitesmoke', color: '#470466', fontSize: '13px'}}
+        <Paper elevation={4} sx={{width: '40%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
+          <DataGrid 
+            sx={{
+              fontFamily: 'arial', fontWeight: 'medium', 
+              background: 'whitesmoke', color: '#470466', 
+              fontSize: '13px', borderRadius: '0px 0px 5px 5px'}}
             rows={visualizacoes}
             columns={columns}
             initialState={{
               pagination: {
                 paginationModel: {
-                  pageSize: 5,
+                  page: 0, pageSize: 5,
                 },
               },
             }}
-            pageSizeOptions={[5]}
+            pageSizeOptions={[5, 10]}
             disableRowSelectionOnClick
           />
-        </Paper>
+          </Paper>
+          
+        <Box sx={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "25px"
+        }}>
+          <Link to="new">
+            <Button style={{marginTop: '20px'}}
+              variant="contained" 
+              size="medium" 
+              color="secondary"
+              startIcon={<AddCircleIcon />}
+            >
+              Nova Visualização
+            </Button>
+          </Link>
+        </Box>
       </>
     )
   }

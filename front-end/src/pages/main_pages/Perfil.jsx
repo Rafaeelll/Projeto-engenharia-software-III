@@ -241,24 +241,24 @@ import './styles/main-pages-styles.css'
           {notif.message}
         </Notification>
         
-        <Box 
-          sx={{ 
-            width: '70%', 
-            margin: '0 auto', 
-            backgroundColor: 'black', 
-            color: 'white', 
-            fontFamily: 'arial', 
-            marginTop: '50px', 
-            borderRadius: '5px 5px 0px 0px', 
-            textAlign: 'center', 
-            padding: '10px', 
-            borderStyle: 'groove' }}> 
-            <h1 style={{ margin: '0' }}>
-              <strong> 
-                Dados Cadastral
-              </strong>
-            </h1>
-      </Box> 
+      <Box 
+        sx={{ 
+          width: '70%', 
+          margin: '0 auto', 
+          backgroundColor: 'black', 
+          color: 'white', 
+          fontFamily: 'arial', 
+          marginTop: '50px', 
+          borderRadius: '5px 5px 0px 0px', 
+          textAlign: 'center', 
+          padding: '10px', 
+          borderStyle: 'groove' }}> 
+          <h1 style={{ margin: '0', fontSize: '20px' }}>
+            <strong> 
+              Dados Cadastral
+            </strong>
+          </h1>
+      </Box>
         <Paper elevation={4} sx={{width: '70%', margin: '0 auto', borderRadius: '0px 0px 5px 5px'}}>
           <DataGrid 
             sx={{
@@ -278,22 +278,22 @@ import './styles/main-pages-styles.css'
             disableRowSelectionOnClick
           />
         </Paper>
-          <Box sx={{
-            display: "flex",
-            justifyContent: "Center",
-            marginTop: "25px"
-          }}>
-            <Link to="/cadastro">
-              <Button
-                variant="contained" 
-                size="medium" 
-                color="secondary"
-                startIcon={<AddCircleIcon />}
-              >
-                Novo Usúario
-              </Button>
+        <Box sx={{
+          display: "flex",
+          justifyContent: "Center",
+          marginTop: "25px"
+        }}>
+          <Link to="/cadastro">
+            <Button
+              variant="contained" 
+              size="medium" 
+              color="secondary"
+              startIcon={<AddCircleIcon />}
+            >
+              Novo Usúario
+            </Button>
             </Link>
-        </Box>
+          </Box>
       </>
     )
   }

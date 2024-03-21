@@ -31,6 +31,10 @@ module.exports = {
       confirmacao_finalizacao: {
         type: Sequelize.BOOLEAN,
       },
+      contagem:{
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
       configuracao: {
         type: Sequelize.JSON, // Ou outro tipo de dados apropriado
         allowNull: true // Ou false, dependendo se a configuração é obrigatória ou não
@@ -45,6 +49,7 @@ module.exports = {
       }
     });
   },
+  
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('notificacoes');
   }
