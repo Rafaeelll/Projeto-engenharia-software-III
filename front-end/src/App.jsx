@@ -8,6 +8,7 @@ import Contact from './pages/home/Contact';
 import PaginaInicial from './pages/main_pages/PaginaInicial';
 import CriarAgendas from './pages/main_pages/forms/AgendaForm';
 import VerificarAgendas from './pages/main_pages/VerificarAgendas';
+import SearchResult from './pages/main_pages/SearchResult'
 import Perfil from './pages/main_pages/Perfil';
 import PerfilForm from './pages/main_pages/forms/PerfilForm';
 import Jogos from './pages/main_pages/Jogos'
@@ -52,6 +53,7 @@ function App() {
             <Route path= "/contato" element={<Contact/>}/>
             <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
             <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+            <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
             <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
             <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
             <Route path= "/perfil" element={<AuthGuard> <Perfil/> </AuthGuard>}/>

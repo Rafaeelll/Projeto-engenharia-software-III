@@ -3,7 +3,7 @@ const { Notificacao, Agenda, Usuario } = require('../models');
 // Importa o módulo cron para agendar tarefas
 const cron = require('node-cron');
 // Importa o operador de Sequelize
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 // Objeto controlador para os métodos CRUD e tarefas agendadas
 const controller = {};
@@ -113,6 +113,23 @@ controller.retrieveNotificationCount = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send({ error: 'Internal Server Error' });
+    }
+};
+
+controller.updateNotificationCountToZero = async (req, res) => {
+    try {
+        const notificacoes = await Notificacao.findAll({ where: { usuario_id: req.authUser.id } });
+        const ids = notificacoes.map(notificacao => notificacao.id);
+
+        if (ids.length > 0) {
+            await Notificacao.update({ count: 0 }, { where: { id: ids } });
+            res.send({ message: 'Contagem de notificações atualizada para zero.' });
+        } else {
+            res.send({ message: 'Não há notificações para atualizar.' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 

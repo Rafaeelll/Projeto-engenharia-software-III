@@ -35,13 +35,14 @@ export default function MainMenu() {
   };
 
   const API_PATH = '/notificacoes/contagem';
+  const API_PATH2 = '/notificacoes/atualizar_contagem_notificacoes';
   const [notificacoes, setNotificacoes] = React.useState(0);
 
   async function fetchData(){
     try{
       const response  = await myfetch.get(API_PATH);
-      const result = response.data;
-      setNotificacoes(result.contagem);
+      const result = response;
+      setNotificacoes(result);
     } catch (error) {
       console.error('Erro ao buscar contagem de notificações:', error);
     }
@@ -61,6 +62,20 @@ export default function MainMenu() {
       backgroundColor: theme.palette.common.black,
     },
   }));
+
+  async function handleBadgeNotifClick(event){
+    try{
+      const response = await myfetch.put(`${API_PATH2}`)
+      const result = response;
+      setNotificacoes(result)
+      fetchData();
+    }
+    catch (error){
+      console.error('Erro ao atualizar a contagem de notificações:', error);
+    }
+}
+
+  
   return (
     <div>
       <BootstrapTooltip title="Menu"> 
@@ -212,7 +227,10 @@ export default function MainMenu() {
         </MenuItem>
 
         <MenuItem
-          onClick={handleClose}
+          onClick={(event) => {
+            handleClose(); // Primeira função
+            handleBadgeNotifClick(event); // Segunda função
+          }}           
           component={Link} to="/notificacao"
           style={{
             backgroundColor: location.pathname === '/notificacao' ? '#21d4fd' : 'transparent',
@@ -221,8 +239,14 @@ export default function MainMenu() {
           <IconButton
             color='inherit'
             size='small'
+            onClick={handleBadgeNotifClick}
           >
-            <Badge badgeContent={notificacoes} color="error">
+            <Badge badgeContent={notificacoes.count} color="error" max={99}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+            >
               <NotificationsIcon/> 
             </Badge>
           </IconButton>

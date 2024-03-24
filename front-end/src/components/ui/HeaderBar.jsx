@@ -61,7 +61,7 @@ export default function HeaderBar({isLoggedIn, onLoginLogout}) {
         <CircularProgress color="secondary" />
       </Backdrop>
 
-      <AppBar position="static" className='app-bar'>
+      <AppBar position='static' className='app-bar'>
         
         <Toolbar>
           <MainMenu/>
@@ -82,7 +82,7 @@ export default function HeaderBar({isLoggedIn, onLoginLogout}) {
             <Button sx={{fontFamily: 'monospace', margin: '20px', background: 'black', fontWeight: 'bold'}}
               color="error"
               variant='contained'
-              startIcon={<LogoutIcon/>}
+              startIcon={<LogoutIcon style={{fontWeight: 'bold'}}/>}
               onClick={() => setState({...state, showDialog: true})}
             >
               Sair

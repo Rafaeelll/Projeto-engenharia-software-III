@@ -14,6 +14,8 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import api from '../../../../services/api'
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloseIcon from '@mui/icons-material/Close';
+
 
 
 function Register(){
@@ -21,6 +23,8 @@ function Register(){
   const API_PATH = '/usuarios/cadastro'
   const navigate = useNavigate()
   const [selectedFileName, setSelectedFileName] = React.useState('');
+  const [selectedFile, setSelectedFile] = React.useState(null);
+
   const [state, setState] = React.useState({
     usuario: {
       nome: '',
@@ -59,9 +63,15 @@ function Register(){
   });
 
   function handleFileChange(event) {
-    const file = event.target.files[0]; // Pega o primeiro arquivo selecionado
+    const file = event.target.files[0];
     setState({ ...state, usuario: { ...usuario, image: file } });
-    setSelectedFileName(file.name)
+    setSelectedFile(URL.createObjectURL(file)); // Atualiza o URL da imagem
+    setSelectedFileName(file.name); // Atualiza o nome do arquivo selecionado
+  }
+
+  function clearSelection() {
+    setSelectedFile(null);
+    setSelectedFileName('');
   }
 
   
@@ -194,8 +204,6 @@ async function sendData() {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        color: 'white',
-        fontFamily: 'monospace'
       }}>
       <div className="wrap-register">
         <form onSubmit={handleFormSubmit} className="login-form">
@@ -312,24 +320,25 @@ async function sendData() {
               tabIndex={-1}
               startIcon={<CloudUploadIcon />}
             >
+              {selectedFile && <img src={selectedFile} alt="Foto selecionada" style={{ marginRight: '8px', width: '24px'}} />}
               {selectedFileName ? selectedFileName : 'Adicione uma Foto de perfil'}
-                <VisuallyHiddenInput 
-                  type="file" 
-                  onChange={handleFileChange}
-                  name='image'
-                />
+              {selectedFile && <CloseIcon onClick={clearSelection} style={{ marginLeft: '8px', cursor: 'pointer' }} />}
+              <VisuallyHiddenInput
+                type="file"
+                onChange={handleFileChange}
+                name="image"
+              />
             </Button>
           </div>
 
             <div className="container-login-form-btn">       
               <Button 
                 sx={{fontFamily:'monospace',
-                fontWeight:'bold', fontSize: '20px'
+                fontWeight:'bold', fontSize: '20px', color: '#fff'
               }}
                 className="login-form-btn"
                 type='submit'
-                color='inherit'
-                >Cadastrar {<HowToRegIcon sx={{m: '8px'}}/>}
+                > Cadastrar {<HowToRegIcon sx={{m: '8px'}}/>}
               </Button>
           </div>
         </form>

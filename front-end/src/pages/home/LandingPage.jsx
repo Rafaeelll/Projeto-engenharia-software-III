@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './styles/home-styles.css'
 import HeaderBarLP from '../../components/ui/HeaderBarLP';
-import GamerBackground from '../../assets/gamer.jpg'
+import GamerBackground from '../../assets/back.jpg'
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import HowToRegIcon from '@mui/icons-material/HowToReg';

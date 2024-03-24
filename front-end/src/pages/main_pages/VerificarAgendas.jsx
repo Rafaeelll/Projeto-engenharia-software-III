@@ -117,12 +117,12 @@ export default function VerificarAgendas() {
     {
       field: 'plt_transm',
       headerName: 'Plataforma',
-      width: 150
+      width: 150,
     },
     {
       field: 'p_data_horario_inicio',
       headerName: "Início Pausa",
-      width: 150
+      width: 150,
 
     },
     {
@@ -158,7 +158,7 @@ export default function VerificarAgendas() {
       align: 'center',
       width: 90,
       renderCell: params => (
-        <Link to={'/criar_agenda/' + params.id}>
+        <Link to={'/agenda/' + params.id}>
           <IconButton aria-label="Editar">
             <EditIcon />
           </IconButton>

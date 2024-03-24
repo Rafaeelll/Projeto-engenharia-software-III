@@ -5,11 +5,12 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useLocation } from 'react-router-dom'
 import Divider from '@mui/material/Divider'
-import Button  from '@mui/material/Button';
 import HomeIcon from '@mui/icons-material/Home';
-import { MdContactMail } from "react-icons/md";
-import { FcAbout } from "react-icons/fc";
-
+import ContactsIcon from '@mui/icons-material/Contacts';
+import InfoIcon from '@mui/icons-material/Info';
+import Typography  from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
 
 export default function MainMenuLP() {
@@ -23,22 +24,36 @@ export default function MainMenuLP() {
     setAnchorEl(null);
   };
 
+  const BootstrapTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} arrow classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.arrow}`]: {
+      color: theme.palette.common.black,
+    },
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.black,
+    },
+  }));
+
   return (
     <div>
-      <IconButton
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-        size="large"
-        edge="start"
-        color="inherit"
-        aria-label="menu"
-        sx={{ mr: 2 }}
-      >
-        <MenuIcon/>
-      </IconButton>
+      <BootstrapTooltip title="Menu">
+        <IconButton
+          id="basic-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          size="large"
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2 }}
+        >
+          <MenuIcon/>
+        </IconButton>
+      </BootstrapTooltip>
+     
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -48,50 +63,57 @@ export default function MainMenuLP() {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={handleClose} component={Link} to="/">
-          <Button style={{
-            fontFamily: 'monospace', 
+        <MenuItem 
+          onClick={handleClose} 
+          component={Link} to="/"
+          style={{
             backgroundColor: location.pathname === '/' ? '#21d4fd' : 'transparent',
             color: location.pathname === '/' ? 'white' : 'purple',
           }}    
-            color='secondary'
-            startIcon={<HomeIcon/>}
           >
-            Home
-          </Button>
+          <IconButton 
+            size='small'
+            color='inherit'
+          >
+            <HomeIcon/>
+          </IconButton>
+          <Typography style={{marginLeft: '5px'}}> Home </Typography>
         </MenuItem>
         
         <Divider/>
 
-        <MenuItem onClick={handleClose} component={Link} to="/sobre">
-          <Button style={{fontFamily: 'monospace', 
-            display: 'flex', justifyContent:'left', textAlign: 'left',
+        <MenuItem 
+          onClick={handleClose} 
+          component={Link} to="/sobre"
+          style={{
             backgroundColor: location.pathname === '/sobre' ? '#21d4fd' : 'transparent',
             color: location.pathname === '/sobre' ? 'white' : 'black',
           }}
-            color='inherit'
-            fullWidth
-            startIcon={<FcAbout/>
-
-          }
           >
-            Sobre
-          </Button>
+          <IconButton 
+            color='inherit'
+            size='small'
+          >
+            <InfoIcon/>
+          </IconButton>
+          <Typography style={{marginLeft: '5px'}}> Sobre </Typography>
         </MenuItem>
         
-        <MenuItem onClick={handleClose} component={Link} to="/contato">
-          <Button style={{fontFamily: 'monospace', 
-            display: 'flex', justifyContent:'left', textAlign: 'left',
+        <MenuItem 
+          onClick={handleClose} 
+          component={Link} to="/contato"
+          style={{
             backgroundColor: location.pathname === '/contato' ? '#21d4fd' : 'transparent',
             color: location.pathname === '/contato' ? 'white' : 'black',
           }}
-            color='inherit'
-            fullWidth
-            startIcon={<MdContactMail/>
-          }
           >
-            Contato
-          </Button>
+          <IconButton
+            color='inherit'
+            size='small'          
+          >
+            <ContactsIcon/>
+          </IconButton>
+          <Typography style={{marginLeft: '5px'}}> Sobre </Typography>
         </MenuItem>
       </Menu>
     </div>

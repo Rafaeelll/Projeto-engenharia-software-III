@@ -8,7 +8,11 @@ import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import Joi from 'joi';
+import myfetch from '../../utils/myfetch';
+import Backdrop from '@mui/material/Backdrop'
+import CircularProgress from '@mui/material/CircularProgress'
+import Notification from '../ui/Notification'
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -52,25 +56,64 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const BootstrapTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.arrow}`]: {
+    color: theme.palette.common.black,
+  },
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.black,
+  },
+}));
+
 export default function SearchAppBar() {
   const navigate = useNavigate();
   const [selectedOption, setSelectedOption] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [isSelectVisible, setIsSelectVisible] = useState(false); // Estado para controlar a visibilidade do Select
-  const schema = Joi.number().integer().positive(); // Defina um esquema Joi para validar o ID
+  const [showWaiting, setShowWaiting] = React.useState(false)
+  const [notif, setNotif] = React.useState({
+    show: false,
+    message: '',
+    severity: 'success' // ou 'error'
+  })
 
-
-  const handleSearch = () => {
-    const { error } = schema.validate(searchInput); // Valide o ID usando Joi
-    if (error) {
-      setSearchInput('ID não encontrado');
-    } else {
-      navigate(`/rota/${searchInput}`);
-    }
-  };
+  const handleSearch = async () => {
+    if (selectedOption && searchInput) {
+      setShowWaiting(true) 
+      try {
+        const response = await myfetch.get(`/${selectedOption.toLowerCase()}/${searchInput}`);
+        if (response) {
+          setNotif({
+            show: true,
+            message: 'Pesquisa realizada com sucesso',
+            severity: 'success'
+          })
+          setTimeout(() => {
+            navigate(`/resultado/${selectedOption.toLowerCase()}/${searchInput}`);
+          }, 500);        
+        }
+      } 
+      catch (error) {
+        console.error('Erro ao buscar o ID:', error);
+        setNotif({
+          show: true,
+          message: error.message,
+          severity: 'error'
+        })
+      }
+      finally {
+        setShowWaiting(false)   // Esconde o spinner de espera
+      }
+    };
+  }
+  React.useEffect(() => {
+    handleSearch()
+  }, [])
 
   const handleSearchClick = () => {
-    setIsSelectVisible(true); // Ao clicar no componente de pesquisa, exibir o Select
+    setIsSelectVisible(true);
   };
 
   const handleKeyPress = (event) => {
@@ -78,57 +121,86 @@ export default function SearchAppBar() {
       handleSearch();
     }
   }
+  
+  function handleNotifClose(event, reason) {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotif({ show: false })
+  };
 
   return (
-    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-      <IconButton
-        size="small"
-        color="inherit"
-        aria-label="open drawer"
-        sx={{ mr: 2 }}
-        onClick={handleSearchClick} // Adicione um evento de clique para exibir o Select ao clicar no ícone de pesquisa
-      >        
-      </IconButton>
-      <Search>
-        <SearchIconWrapper>
-          <SearchIcon />
-        </SearchIconWrapper>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-        <StyledInputBase
-          placeholder="Informe o ID:"
-          inputProps={{ 'aria-label': 'search' }}
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyPress={handleKeyPress} // Adiciona o evento onKeyPress para detectar a tecla Enter
-          onClick={ handleSearchClick} // Adicione um evento de clique para exibir o Select ao clicar na barra de pesquisa
-        />
-        {isSelectVisible && ( // Exibir o Select somente se isSelectVisible for true
-          <Select
-            value={selectedOption}
-            onChange={(e) => setSelectedOption(e.target.value)}
-            displayEmpty
-            inputProps={{ 'aria-label': 'select option' }}
-            sx={{ ml: '8px', background: 'inherit', color: '#fff' }}
-          >
-            <MenuItem 
-              value="" disabled>
-              
-              Pesquisar por:
-            </MenuItem>
-            <MenuItem value="Agendas"> ID Agendas</MenuItem>
-            <MenuItem value="Jogos">ID Jogos</MenuItem>
-            <MenuItem value="Historico de Jogos"> ID Histórico de Jogos</MenuItem>
-            <MenuItem value="Visualizações">ID Visualizações</MenuItem>
-            <MenuItem value="Notificações">ID Notificações</MenuItem>
-          </Select>
-        )}
-        </Box>
-          {searchInput === 'ID não encontrado' && (
-          <div style={{ color: 'red', marginTop: '8px' }}>
-            {searchInput}
-          </div>
-        )}
-      </Search>
-    </Box>
+    <>
+      <Backdrop
+          sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={showWaiting}
+        >
+          <CircularProgress color="secondary" />
+        </Backdrop>
+
+        <Notification 
+          show={notif.show} 
+          onClose={handleNotifClose}
+          severity={notif.severity}
+        >
+          {notif.message}
+        </Notification>
+
+        <Tooltip 
+          title="Barra de Pesquisa: Pressione enter após selecionar o que deseja pesquisar e digitar o ID"
+          placement="bottom-start"
+          arrow>
+          <Box sx={{ flexGrow: 1, marginBottom: '10px', marginLeft: '10px'}}>
+            <IconButton
+              size="small"
+              color="inherit"
+              aria-label="open drawer"
+              sx={{ mr: 2}}
+              onClick={handleSearchClick} // Adicione um evento de clique para exibir o Select ao clicar no ícone de pesquisa
+            > 
+            </IconButton>
+      
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon sx={{cursor: 'pointer'}}/>
+              </SearchIconWrapper>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+              <StyledInputBase
+                placeholder="Digite o ID..."
+                inputProps={{ 'aria-label': 'search' }}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleKeyPress} // Adiciona o evento onKeyPress para detectar a tecla Enter
+                onClick={ handleSearchClick} // Adicione um evento de clique para exibir o Select ao clicar na barra de pesquisa
+              />
+              {isSelectVisible && ( // Exibir o Select somente se isSelectVisible for true
+                <Select
+                  value={selectedOption}
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                  displayEmpty
+                  color='primary'
+                  variant='outlined'
+                  inputProps={{ 'aria-label': 'select option' }}
+                  sx={{ ml: '8px', color: 'black', background: 'lightblue', borderRadius: '0px 5px 5px 0px', height: '40px'}}
+                >
+                  <MenuItem 
+                    value="" disabled>
+                    
+                    Pesquisar por:
+                  </MenuItem>
+                  <MenuItem value="agendas"> ID Agendas</MenuItem>
+                  <MenuItem value="jogos">ID Jogos</MenuItem>
+                  <MenuItem value="historico_jogos"> ID Histórico de Jogos</MenuItem>
+                  <MenuItem value="Visualizacoes">ID Visualizações</MenuItem>
+                  <MenuItem value="notificacoes">ID Notificações</MenuItem>
+                </Select>
+              )}
+              </Box>
+            </Search>
+          </Box>
+        </Tooltip>
+
+    </>
+
   );
 }

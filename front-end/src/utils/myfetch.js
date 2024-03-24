@@ -25,6 +25,9 @@ function getErrorDescription(response) {
   switch(response.status) {
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos'
+    
+    case 404:
+      return 'ERRO: ID não foi encontrado'
 
     default:
       return `ERRO: HTTP ${response.status}: ${response.statusText}`

@@ -12,6 +12,9 @@ import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
 import api from '../../../../services/api';
+import { styled } from '@mui/material/styles';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function PerfilForm() {
   const API_PATH = '/usuarios'
@@ -40,12 +43,32 @@ export default function PerfilForm() {
     }
   });
   const { perfils, errors, showWaiting, notif } = state;
+  const [selectedFileName, setSelectedFileName] = React.useState('');
+  const [selectedFile, setSelectedFile] = React.useState(null);
+
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
 
   function handleFileChange(event) {
-    const image = event.target.files[0]; // Pega o primeiro arquivo selecionado
-    setState({ ...state, perfils: { ...perfils, image: image } });
+    const file = event.target.files[0];
+    setState({ ...state, perfils: { ...perfils, image: file } });
+    setSelectedFile(URL.createObjectURL(file)); // Atualiza o URL da imagem
+    setSelectedFileName(file.name); // Atualiza o nome do arquivo selecionado
   }
-  
+
+  function clearSelection() {
+    setSelectedFile(null);
+    setSelectedFileName('');
+  }
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
 
@@ -132,10 +155,10 @@ export default function PerfilForm() {
           'Content-Type': 'mulitpart/form-data'
         }
       }
-      await myfetch.put(`${API_PATH}/${params.id}`, formData, headers);
+      await api.put(`${API_PATH}/${params.id}`, formData, headers);
 
     }else {
-      await myfetch.post(API_PATH, perfils);
+      await api.post(API_PATH, perfils);
     }
     setState({
       ...state,
@@ -213,22 +236,22 @@ export default function PerfilForm() {
         /> 
         <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-            <TextField
-              id="standard-basic"
-              label="Nome"
-              type="name"
-              variant='filled'
-              color='secondary'
-              required
-              fullWidth
-              name="nome"
-              value={perfils.nome}
-              onChange={handleFormFieldChange}
-              error={errors?.nome}
-              helperText={errors?.nome}
+          <TextField sx={{marginTop: '12px'}}
+            id="standard-basic"
+            label="Nome"
+            type="name"
+            variant='filled'
+            color='secondary'
+            required
+            fullWidth
+            name="nome"
+            value={perfils.nome}
+            onChange={handleFormFieldChange}
+            error={errors?.nome}
+            helperText={errors?.nome}
             />
 
-            <TextField
+            <TextField sx={{marginTop: '12px'}}
               label="Sobrenome"
               type="name"
               variant='filled'
@@ -241,7 +264,7 @@ export default function PerfilForm() {
               helperText={errors?.sobrenome}
             />
 
-            <TextField
+            <TextField sx={{marginTop: '12px'}}
               label="email"
               type="email"
               variant='filled'
@@ -254,7 +277,7 @@ export default function PerfilForm() {
               helperText={errors?.email}
             />
 
-            <TextField
+            <TextField sx={{marginTop: '12px'}}
               label="Senha"
               type="password"
               variant='filled'
@@ -267,7 +290,7 @@ export default function PerfilForm() {
               helperText={errors?.senha_acesso}
             />
 
-            <TextField
+          <TextField sx={{marginTop: '12px'}}
               variant='filled'
               label='Telefone'
               type="tel"
@@ -283,8 +306,8 @@ export default function PerfilForm() {
                 onChange: handleFormFieldChange,
               }}
             />
-          
-            <TextField
+
+            <TextField sx={{marginTop: '12px'}}
               label='Data nascimento'
               color='secondary'
               type="date"
@@ -294,7 +317,7 @@ export default function PerfilForm() {
               onChange={handleFormFieldChange}
             />
 
-            <TextField
+            <TextField sx={{marginTop: '12px'}}
               fullWidth
               name="plataforma_fav"
               variant='filled'
@@ -307,7 +330,7 @@ export default function PerfilForm() {
               helperText={errors?.plataforma_fav}
             />
 
-            <TextField
+          <TextField sx={{marginTop: '12px'}}
               label='Jogo Favorito'
               type="name"
               fullWidth
@@ -319,6 +342,26 @@ export default function PerfilForm() {
               error={errors?.jogo_fav}
               helperText={errors?.jogo_fav}
             />
+
+
+            <div className="wrap-input2">
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                tabIndex={-1}
+                startIcon={<CloudUploadIcon />}
+              >
+                {selectedFile && <img src={selectedFile} alt="Foto selecionada" style={{ marginRight: '8px', width: '24px'}} />}
+                {selectedFileName ? selectedFileName : 'Adicione uma Foto de perfil'}
+                {selectedFile && <CloseIcon onClick={clearSelection} style={{ marginLeft: '8px', cursor: 'pointer' }} />}
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={handleFileChange}
+                  name="image"
+                />
+              </Button>
+            </div>
 
           <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
           <Button
