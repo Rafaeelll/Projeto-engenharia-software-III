@@ -27,7 +27,8 @@ function About(){
             <u><strong>Stream Advisor</strong></u>
           </Typography>
           <Typography gutterBottom variant="h6" component="div" color="text.secondary">
-            <strong>Questão Problema:</strong> Excessividade no uso da tecnologia de vídeo games por gamers-streamers.          </Typography>
+            <strong>Questão Problema:</strong> Excessividade no uso da tecnologia de vídeo games por gamers-streamers.
+          </Typography>
           <Typography variant="body2" color="text.secondary">
               O projeto proposto para a solução tem como objetivo de prevenir ou minimizar que os gamers-streamers use com 
             excessividade o seu tempo em transmissões jogando, criando um sistema para controlar melhor seu tempo e ainda 

@@ -11,6 +11,14 @@ import Paper from '@mui/material/Paper'
 import Typography  from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
+import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+
 
 
 export default function HistoricoJogosForm() {
@@ -22,7 +30,10 @@ export default function HistoricoJogosForm() {
   const [state, setState] = React.useState({
     historicoJogos: {
       jogo_id: '',
-      pontuacao: '',
+      nivel: '',
+      jogo_status: '',
+      avaliacao: 1,
+      comentario_usuario: '',
     },
     errors: {},
     showWaiting: false,
@@ -82,7 +93,9 @@ export default function HistoricoJogosForm() {
   async function sendData() {
     setState({...state, showWaiting: true, errors: {}})
     try {
-      
+      // Chama a validação da biblioteca Joi
+      await HistoricoJogo.validateAsync(historicoJogos, { abortEarly: false })
+
       const jogoExists = await verifyJogoExists(historicoJogos.jogo_id);
         if (!jogoExists) {
           setState({
@@ -97,7 +110,6 @@ export default function HistoricoJogosForm() {
           return;
         }
       // Chama a validação da biblioteca Joi
-      await HistoricoJogo.validateAsync(historicoJogos, { abortEarly: false })
 
       // Registro já existe: chama PUT para atualizar
       if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, historicoJogos)
@@ -188,36 +200,75 @@ export default function HistoricoJogosForm() {
         <FormTitle
           title={params.id ? "Editar Historico de Jogos" : "Criar histórico de jogos"} 
         /> 
-        <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-            <TextField
-              id="standard-basic"
-              label="Id jogo"
-              fullWidth
-              type="number"
-              variant='filled'
-              required
-              name="jogo_id"
-              value={historicoJogos.jogo_id}
-              onChange={handleFormFieldChange}
-              error={errors?.jogo_id}
-              helperText={errors?.jogo_id}
-            />
+          <TextField
+            id="standard-basic"
+            label="Id jogo"
+            fullWidth
+            type="number"
+            variant='filled'
+            required
+            name="jogo_id"
+            value={historicoJogos.jogo_id}
+            onChange={handleFormFieldChange}
+            error={errors?.jogo_id}
+            helperText={errors?.jogo_id}
+          />
 
-            <TextField
-              fullWidth
-              name="pontuacao"
-              variant='filled'
-              type='number'
-              label='Nível'
-              color="secondary"
-              value={historicoJogos.pontuacao}
+          <TextField sx={{marginTop: '12px'}}
+            fullWidth
+            name="nivel"
+            variant='filled'
+            type='number'
+            required
+            label='Nível'
+            color="secondary"
+            value={historicoJogos.nivel}
+            onChange={handleFormFieldChange}
+            error={errors?.nivel}
+            helperText={errors?.nivel}
+          />
+          <FormControl color='secondary' sx={{marginTop: '12px'}}>
+            <FormLabel id="demo-radio-buttons-group-label" required>Status do Jogo:</FormLabel>
+            <RadioGroup
+              aria-labelledby="demo-radio-buttons-group-label"
+              row
+              name="jogo_status"
+              value={historicoJogos.jogo_status}
               onChange={handleFormFieldChange}
-              error={errors?.pontuacao}
-              helperText={errors?.pontuacao}
-            />
+            >
+              <FormControlLabel value="Não iniciado" control={<Radio />} label="Não iniciado" />
+              <FormControlLabel value="Em progresso"control={<Radio />} label="Em progresso" />
+              <FormControlLabel value="Concluído"control={<Radio />} label="Concluído" />
+
+            </RadioGroup>
+          </FormControl>
+
+          <Stack style={{marginTop: '12px'}}>
+            <Typography variant='h6'> Avalie o jogo de 1 a 5: </Typography>
+            <Rating 
+              name="avaliacao" 
+              defaultValue={1} 
+              precision={1}
+              value={historicoJogos.avaliacao}
+              onChange={handleFormFieldChange}
+              />
+          </Stack>
+
+          <TextField style={{marginTop: '25px'}}
+            fullWidth
+            name="comentario_usuario"
+            variant='outlined'
+            type='text'
+            label='Comentário'
+            color="primary"
+            value={historicoJogos.comentario_usuario}
+            onChange={handleFormFieldChange}
+            >
+          </TextField>
+
           <div className='historico-jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
-          <Button
+            <Button
               sx={{
                 margin: '10px',
                 padding: '5px 15px 5px 15px',
@@ -234,6 +285,7 @@ export default function HistoricoJogosForm() {
             > 
               Salvar
             </Button>
+
             <Button
               sx={{
                 margin: '10px',
@@ -247,13 +299,12 @@ export default function HistoricoJogosForm() {
               }}
               color="error"
               variant='contained'
-              onClick={() => navigate('/historico_jogo')}
+              onClick={() => navigate(-1)}
             >
               Cancelar
             </Button>
           </div>       
         </form>
-        </Typography>
       </Paper>
     </div>
   );

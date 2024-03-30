@@ -16,6 +16,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import GamesIcon from '@mui/icons-material/Games';
 import { Link } from 'react-router-dom';
 import './styles/main-pages-styles.css'
+import Rating from '@mui/material/Rating';
+
 
 
 
@@ -68,21 +70,39 @@ import './styles/main-pages-styles.css'
   
     const columns = [
       { field: 'id', headerName: 'Cód.', width: 90 },
-      {
-        field: 'usuario_id',
-        headerName: 'Id usuário',
-        width: 150,
-      },
+
       {
         field: 'jogo_id',
         headerName: 'Id jogo',
         width: 150,
+        valueGetter: params => params.row?.jogo.id  + ': ' + params.row?.jogo.nome
       },
       {
-        field: 'pontuacao',
+        field: 'nivel',
         headerName: 'Nível',
         width: 150
       },
+      {
+        field: 'jogo_status',
+        headerName: 'Status',
+        width: 150
+      },
+
+      {
+        field: 'avaliacao',
+        headerName: 'Avaliação',
+        width: 150,
+        renderCell: params =>(
+          <div>
+            <Rating
+              readOnly 
+              value={params.value}>
+            </Rating>
+          </div>
+        )
+        
+      },
+
       {
         field: 'edit',
         headerName: 'Editar',

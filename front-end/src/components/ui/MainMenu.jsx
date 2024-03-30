@@ -35,7 +35,6 @@ export default function MainMenu() {
   };
 
   const API_PATH = '/notificacoes/contagem';
-  const API_PATH2 = '/notificacoes/atualizar_contagem_notificacoes';
   const [notificacoes, setNotificacoes] = React.useState(0);
 
   async function fetchData(){
@@ -63,16 +62,8 @@ export default function MainMenu() {
     },
   }));
 
-  async function handleBadgeNotifClick(event){
-    try{
-      const response = await myfetch.put(`${API_PATH2}`)
-      const result = response;
-      setNotificacoes(result)
-      fetchData();
-    }
-    catch (error){
-      console.error('Erro ao atualizar a contagem de notificações:', error);
-    }
+  function handleBadgeNotifClick(event){
+    setNotificacoes(0)
 }
 
   

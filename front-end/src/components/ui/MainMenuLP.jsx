@@ -113,7 +113,7 @@ export default function MainMenuLP() {
           >
             <ContactsIcon/>
           </IconButton>
-          <Typography style={{marginLeft: '5px'}}> Sobre </Typography>
+          <Typography style={{marginLeft: '5px'}}> Contato </Typography>
         </MenuItem>
       </Menu>
     </div>

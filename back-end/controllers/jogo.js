@@ -61,7 +61,12 @@ controller.retrieve = async (req, res) => {
 controller.retrieveOne = async (req, res) => {
     try {
         const data = await Jogo.findOne({
-            where: { id: req.params.id, usuario_id: req.authUser.id } // Filtra pelo id do jogo e do usuário autenticado
+            where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pelo id do jogo e do usuário autenticado
+            include: [
+                { model: Agenda, as: 'agendas' },
+                { model: Usuario, as: 'usuario' },
+                { model: HistoricoJogo, as: 'historico_jogos' },
+            ],
         });
         // Retorna o registro se encontrado, caso contrário, retorna HTTP 404: Not Found
         if (data) res.send(data);

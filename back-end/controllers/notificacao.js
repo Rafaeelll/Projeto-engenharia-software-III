@@ -155,7 +155,11 @@ controller.retrieve = async (req, res) => {
 controller.retrieveOne = async (req, res) => {
     try {
         const data = await Notificacao.findOne({
-            where: { id: req.params.id, usuario_id: req.authUser.id } // Filtra pela notificação do usuário autenticado
+            where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela notificação do usuário autenticado
+            include: [
+                { model: Agenda, as: 'agenda' },
+                { model: Usuario, as: 'usuario' }
+            ]
         });
         if (data) res.send(data);
         else res.status(404).end();

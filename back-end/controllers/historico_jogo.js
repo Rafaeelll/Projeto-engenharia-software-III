@@ -33,7 +33,11 @@ controller.retrieve = async (req, res) => {
     try {
         // Busca todos os registros de histórico de jogo do usuário autenticado
         const data = await HistoricoJogo.findAll({
-            where: { usuario_id: req.authUser.id } // Filtra apenas os registros do usuário autenticado
+            where: { usuario_id: req.authUser.id }, // Filtra apenas os registros do usuário autenticado
+            include:[
+                {model: Usuario, as: 'usuario'},
+                {model: Jogo, as: 'jogo'},
+            ]
         });
         // Retorna os dados encontrados
         res.send(data);
@@ -47,7 +51,11 @@ controller.retrieveOne = async (req, res) => {
     try {
         // Busca um registro específico de histórico de jogo do usuário autenticado pelo id
         const data = await HistoricoJogo.findOne({
-            where: { id: req.params.id, usuario_id: req.authUser.id } // Filtra pelo id do jogo e do usuário autenticado
+            where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pelo id do jogo e do usuário autenticado
+            include:[
+                {model: Usuario, as: 'usuario'},
+                {model: Jogo, as: 'jogo'},
+            ]
         });
         // Se o registro for encontrado, retorna os dados, caso contrário, retorna HTTP 404: Not Found
         if (data) res.send(data);

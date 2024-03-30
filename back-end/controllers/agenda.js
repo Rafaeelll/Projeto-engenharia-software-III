@@ -56,6 +56,11 @@ controller.retrieveOne = async (req, res) => {
         // Busca uma agenda específica do usuário autenticado
         const data = await Agenda.findOne({
             where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela agenda do usuário autenticado
+            include: [
+                { model: Usuario, as: 'usuario' },
+                { model: Jogo, as: 'jogo' },
+                { model: Visualizacao, as: 'visualizacoes' }
+            ]
         });
         // Retorna a agenda se encontrada, caso contrário, retorna HTTP 404: Not Found
         if (data) res.send(data);

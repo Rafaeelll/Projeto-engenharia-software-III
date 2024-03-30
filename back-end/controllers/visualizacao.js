@@ -52,7 +52,11 @@ controller.retrieve = async (req, res) => {
 controller.retrieveOne = async (req, res) => {
     try {
         const data = await Visualizacao.findOne({
-            where: { id: req.params.id, usuario_id: req.authUser.id } // Filtra pela ID e pelo usuário autenticado
+            where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela ID e pelo usuário autenticado
+            include: [
+                {model: Usuario, as: 'usuario'}, // Inclui informações do usuário associado à visualização
+                {model: Agenda, as: 'agenda'},   // Inclui informações da agenda associada à visualização
+            ],
         });
         if (data) res.send(data); // Se a visualização existe, retorna os dados
         else res.status(404).end(); // Se não encontrou a visualização, retorna status 404: Not Found
