@@ -25,6 +25,9 @@ function getErrorDescription(response) {
   switch(response.status) {
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos'
+
+    case 403:   // Expired
+      return 'ERRO: Sessão expirada, por favor, logar novamente'
     
     case 404:
       return 'ERRO: ID não foi encontrado'

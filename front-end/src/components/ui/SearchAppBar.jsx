@@ -12,7 +12,7 @@ import myfetch from '../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../ui/Notification'
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import Tooltip from '@mui/material/Tooltip';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -56,16 +56,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const BootstrapTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} arrow classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.arrow}`]: {
-    color: theme.palette.common.black,
-  },
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.common.black,
-  },
-}));
 
 export default function SearchAppBar() {
   const navigate = useNavigate();

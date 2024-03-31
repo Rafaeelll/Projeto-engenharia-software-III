@@ -5,7 +5,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import HistoryIcon from '@mui/icons-material/History';
 import { Link } from 'react-router-dom';
 import './styles/main-pages-styles.css'
-import CollapsibleTable from '../../components/ui/CollapsibleTable';
+import CollapsibleTableJogo from '../../components/ui/CollapsibleTableJogo';
 
 
   export default function Jogos() {
@@ -13,7 +13,7 @@ import CollapsibleTable from '../../components/ui/CollapsibleTable';
     return(
       <>
       
-        <CollapsibleTable/>
+        <CollapsibleTableJogo/>
 
         <Box sx={{display: "flex",justifyContent: "center", marginTop: "25px"}}>
           <Link to="new">

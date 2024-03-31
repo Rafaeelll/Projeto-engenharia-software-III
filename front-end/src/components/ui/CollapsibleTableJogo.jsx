@@ -13,7 +13,7 @@ import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import ConfirmDialog from './ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link } from 'react-router-dom';
 import format from 'date-fns/format';
@@ -23,12 +23,47 @@ import Notification from './Notification';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import '../../pages/main_pages/styles/main-pages-styles.css';
+import { Rating } from '@mui/material';
 
 function Row({ jogo, onDelete }) {
+  const API_PATH2 = '/historico_jogos';
+
   const [open, setOpen] = React.useState(false);
+  const [historicoJogos, setHistoricoJogos] = React.useState([]);
 
   const handleDeleteClick = () => {
     onDelete(jogo.id);
+  };
+
+  const fetchHistorico = async () => {
+    try {
+      const result = await myfetch.get(`${API_PATH2}`);
+      const jogosResult = await myfetch.get('/jogos'); // Buscar informações de jogos
+
+      // Filtrar apenas o histórico relacionado ao jogo específico
+      const historicoRelacionado = result.filter(item => item.jogo_id === jogo.id);
+      // Incluir o nome do jogo correspondente nos itens de histórico
+      historicoRelacionado.forEach(item => {
+        const jogoCorrespondente = jogosResult.find(jogo => jogo.id === item.jogo_id);
+        if (jogoCorrespondente) {
+          item.nome_do_jogo = jogoCorrespondente.nome;
+        }
+      });
+      setHistoricoJogos(historicoRelacionado);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchHistorico();
+  }, []);
+
+  const handleCollapseToggle = () => {
+    setOpen(!open);
+    if (!open) {
+      fetchHistorico();
+    }
   };
 
   return (
@@ -38,22 +73,24 @@ function Row({ jogo, onDelete }) {
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen(!open)}
+            onClick={handleCollapseToggle}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
+        <TableCell  component="th" scope="row">
           {jogo.nome}
         </TableCell>
-        <TableCell align="right">{jogo.id}</TableCell>
-        <TableCell align="right">{jogo.plataforma_jogo}</TableCell>
-        <TableCell align="right">{jogo.categoria}</TableCell>
-        <TableCell align="right">{jogo.preco_jogo}</TableCell>
-        <TableCell align="right">
+        <TableCell size='small' align="center">{jogo.id}</TableCell>
+        <TableCell size='small' align="center">{jogo.plataforma_jogo}</TableCell>
+        <TableCell size='small' align="center">{jogo.categoria}</TableCell>
+        <TableCell size='small' align="center">
+          {Number(jogo.preco_jogo).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+        </TableCell>
+        <TableCell size='small' align="center">
           {format(parseISO(jogo.data_aquisicao), 'dd/MM/yyyy')}
         </TableCell>
-        <TableCell align="right">
+        <TableCell size='small' align="center">
           <Link to={'./' + jogo.id}>
             <IconButton aria-label="Editar">
               <EditIcon />
@@ -66,14 +103,50 @@ function Row({ jogo, onDelete }) {
           </IconButton>
         </TableCell>
       </TableRow>
+
+
       <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
-              {/* Insira a tabela de histórico aqui, se necessário */}
+            <Typography 
+              sx={{fontWeight: 'bolder'}} variant="h6" gutterBottom component="div" color='primary'> 
+              <u>Históricos Do Jogo</u> 
+            </Typography>
+              <Table size="small" aria-label="Historico De Jogos">
+                <TableHead>
+                  <TableRow>
+                    <TableCell size='small' align="center">Historíco ID</TableCell>
+                    <TableCell size='small' align="center">ID - Nome do Jogo</TableCell>
+                    <TableCell size='small' align="center">Nível</TableCell>
+                    <TableCell size='small' align="center">Status</TableCell>
+                    <TableCell size='small' align="center">Avaliação</TableCell>
+                    <TableCell size='small' align="center">Comentário</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {historicoJogos.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">
+                        <Typography style={{ color: 'GrayText' }}>Histórico vazio</Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                  historicoJogos.map((historicoItem) => (
+                    <TableRow key={historicoItem.id}>
+                      <TableCell size='small' align="center">{historicoItem.id}</TableCell>
+                      <TableCell size='small' align="center">{historicoItem.jogo_id} - {historicoItem.nome_do_jogo}</TableCell>
+                      <TableCell size='small' align="center">{historicoItem.nivel}</TableCell>
+                      <TableCell size='small' align="center">{historicoItem.jogo_status}</TableCell>
+                      <TableCell size='small' align="center">
+                        <Rating size='small' readOnly value={historicoItem.avaliacao} />
+                      </TableCell>
+                      <TableCell size='small' align="center">{historicoItem.comentario_usuario}</TableCell>
+                    </TableRow>
+                  ))
+                )}
+                </TableBody>
+              </Table>
             </Box>
           </Collapse>
         </TableCell>
@@ -84,6 +157,7 @@ function Row({ jogo, onDelete }) {
 
 export default function CollapsibleTable() {
   const API_PATH = '/jogos';
+
   const [jogos, setJogos] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
   const [showDialog, setShowDialog] = React.useState(false);
@@ -173,19 +247,19 @@ export default function CollapsibleTable() {
       </Notification>
 
       <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', background: 'whitesmoke' }} component={Paper}> 
-      <Typography sx={{marginLeft: '20px', fontWeight: 'bolder'}} variant="h6"> <u>Jogos</u> </Typography>
+        <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Jogos</u> </Typography>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
               <TableCell />
               <TableCell>Nome</TableCell>
-              <TableCell align="right">ID</TableCell>
-              <TableCell align="right">Plataforma</TableCell>
-              <TableCell align="right">Categoria</TableCell>
-              <TableCell align="right">Preço&nbsp;($)</TableCell>
-              <TableCell align="right">Data de Aquisição</TableCell>
-              <TableCell align="right">Editar</TableCell>
-              <TableCell align="right">Excluir</TableCell>
+              <TableCell size='small' align="center">Jogo ID</TableCell>
+              <TableCell size='small' align="center">Plataforma</TableCell>
+              <TableCell size='small' align="center">Categoria</TableCell>
+              <TableCell size='small' align="center">Preço</TableCell>
+              <TableCell size='small' align="center">Data de Aquisição</TableCell>
+              <TableCell size='small' align="center">Editar</TableCell>
+              <TableCell size='small' align="center">Excluir</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
