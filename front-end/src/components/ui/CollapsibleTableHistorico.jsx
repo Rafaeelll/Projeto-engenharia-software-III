@@ -246,7 +246,8 @@ export default function CollapsibleTable() {
         {notif.message}
       </Notification>
 
-      <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', background: 'whitesmoke' }} component={Paper}> 
+      <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', 
+        background: 'whitesmoke', overflow: 'auto', maxHeight: '70vh' }} component={Paper}> 
         <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Históricos de Jogo</u> </Typography>
         <Table aria-label="collapsible table">
           <TableHead>

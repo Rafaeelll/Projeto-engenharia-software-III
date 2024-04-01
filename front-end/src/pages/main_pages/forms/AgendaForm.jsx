@@ -5,18 +5,22 @@ import myfetch from '../../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
-import getValidationMessages from '../../../utils/getValidationMessages'
-import Agenda from '../../../../models/Agenda'
+import getValidationMessages from '../../../utils/getValidationMessages';
+import Agenda from '../../../../models/Agenda';
 import FormTitle from '../../../components/ui/FormTitle';
-import Paper from '@mui/material/Paper'
-import Typography  from '@mui/material/Typography';
-import Button  from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
 
 export default function CriarAgendas() {
   const API_PATH = '/agendas';
-  const params = useParams()
+  const params = useParams();
   const navigate = useNavigate();
-
+  const [showWaiting, setShowWaiting] = React.useState(false)
   const [state, setState] = React.useState({
     criarAgendas: {
       titulo_agenda: '',
@@ -24,24 +28,62 @@ export default function CriarAgendas() {
       jogo_id: '',
       descricao: '',
       data_horario_inicio: '',
-      data_horario_fim: ''
+      data_horario_fim: '',
     },
+    jogosList: [], // Estado para armazenar a lista de jogos
     errors: {},
-    showWaiting: false,
     notif: {
       show: false,
       message: '',
-      severity: 'success'
-    }
+      severity: 'success',
+    },
   });
-  const { criarAgendas, errors, showWaiting, notif } = state;
+
+  const { criarAgendas, jogosList, errors, notif } = state;
 
   function handleFormFieldChange(event) {
     const criarAgendasCopy = { ...criarAgendas };
     criarAgendasCopy[event.target.name] = event.target.value;
 
-
     setState({ ...state, criarAgendas: criarAgendasCopy });
+  }
+
+  async function handleGameIdClick() {
+    try {
+      // Verifica se a lista de jogos já está preenchida
+      if (jogosList.length === 0) {
+        setState({ ...state, errors: {} }); 
+        setShowWaiting(true)// Define o estado como true quando a busca começar
+
+        const response = await myfetch.get('/jogos');
+
+        if (response.length === 0) {
+          throw new Error('Nenhum jogo encontrado');
+        }
+
+        const formattedJogosList = response.map(jogo => ({
+          id: jogo.id,
+          nome: jogo.nome,
+        }));
+
+        setState({ ...state, jogosList: formattedJogosList }); // Atualiza apenas a lista de jogos
+      }
+    } catch (error) {
+      console.error(error);
+      setState({
+        ...state,
+        errors: errorMessages,
+        notif: {
+          severity: 'error',
+          show: true,
+          message: 'ERRO: ' + error.message,
+        },
+      });
+      setShowWaiting(false)
+
+    } finally {
+      setShowWaiting(false)
+    }
   }
 
   async function verifyAgendaExists(usuarioId, dataHorarioInicio, dataHorarioFim) {
@@ -85,7 +127,11 @@ export default function CriarAgendas() {
       return;
     }
 
-    const agendaExists = await verifyAgendaExists(criarAgendas.usuario_id, criarAgendas.data_horario_inicio, criarAgendas.data_horario_fim);
+    const agendaExists = await verifyAgendaExists(
+      criarAgendas.usuario_id,
+      criarAgendas.data_horario_inicio,
+      criarAgendas.data_horario_fim
+    );
     if (agendaExists) {
       setState({
         ...state,
@@ -106,74 +152,77 @@ export default function CriarAgendas() {
   }, []);
 
   async function fetchData() {
-    setState({ ...state, showWaiting: true, errors: {} });
+    setState({ ...state, errors: {} });
+    setShowWaiting(true)
     try {
       const result = await myfetch.get(`${API_PATH}/${params.id}`);
       setState({
         ...state,
         criarAgendas: result,
-        showWaiting: false
-      });
+      });        
+      setShowWaiting(false)
+
     } catch (error) {
       console.error(error);
       setState({
         ...state,
-        showWaiting: false,
         errors: errorMessages,
         notif: {
           severity: 'error',
           show: true,
-          message: 'ERRO: ' + error.message
-        }
+          message: 'ERRO: ' + error.message,
+        },
       });
     }
   }
 
   async function sendData() {
-    setState({ ...state, showWaiting: true, errors: {} });
+    setState({ ...state, errors: {} });
+    setShowWaiting(true)
     try {
- 
+      console.log(criarAgendas);
       const jogoExists = await verifyJogoExists(criarAgendas.jogo_id);
       if (!jogoExists) {
         setState({
           ...state,
-          showWaiting: false,
           notif: {
             severity: 'error',
             show: true,
             message: 'ID do jogo não encontrado! Crie um jogo ou informe um ID válido.',
           },
         });
+        setShowWaiting(false)
         return;
       }
 
-      await Agenda.validateAsync(criarAgendas, { abortEarly: false })
+      await Agenda.validateAsync(criarAgendas, { abortEarly: false });
 
-      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendas)
-      else await myfetch.post(API_PATH, criarAgendas)
+      if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, criarAgendas);
+      else await myfetch.post(API_PATH, criarAgendas);
 
       setState({
         ...state,
-        showWaiting: false,
         notif: {
           severity: 'success',
           show: true,
-          message: 'Item salvo com sucesso'
-        }
+          message: 'Item salvo com sucesso',
+        },
       });
+      setShowWaiting(false)
+
     } catch (error) {
-      const { validationError, errorMessages } = getValidationMessages(error)
-      console.error(error)
+      const { validationError, errorMessages } = getValidationMessages(error);
+      console.error(error);
       setState({
         ...state,
-        showWaiting: false,
         errors: errorMessages,
         notif: {
           severity: 'error',
           show: !validationError,
-          message: 'ERRO: ' + error.message
-        }
+          message: 'ERRO: ' + error.message,
+        },
       });
+      setShowWaiting(false)
     }
   }
 
@@ -194,6 +243,18 @@ export default function CriarAgendas() {
     setState({ ...state, notif: { ...notif, show: false } });
   }
 
+  // Função para lidar com a mudança de seleção de jogo
+  function handleJogoListChange(event) {
+    const selectedJogoId = event.target.value;
+    setState({
+      ...state,
+      criarAgendas: {
+        ...criarAgendas,
+        jogo_id: selectedJogoId,
+      },
+    });
+  }
+
   return (
     <div
       style={{
@@ -201,12 +262,12 @@ export default function CriarAgendas() {
         backgroundPosition: 'center',
         height: '100vh',
         justifyContent: 'center',
-        background: 'whitesmokesss'
+        background: 'whitesmokesss',
       }}
       className="pai"
     >
       <Backdrop
-        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >
         <CircularProgress sx={{ margin: '5px' }} color="secondary" />
@@ -227,89 +288,101 @@ export default function CriarAgendas() {
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
           borderRadius: '5px',
           p: '12px',
-          maxHeight: '100%'
+          maxHeight: '100%',
         }}
       >
-        <FormTitle
-          title={params.id ? "Editar agenda" : "Criar agendas"}
-        />
+        <FormTitle title={params.id ? 'Editar agenda' : 'Criar agendas'} />
         <Typography variant="h5" component="div">
           <form onSubmit={handleFormSubmit}>
-              <TextField sx={{marginTop: '10px'}}
-                id="standard-basic"
-                label="Título"
-                type="name"
-                variant='filled'
-                color='secondary'
-                required
-                fullWidth
-                name="titulo_agenda"
-                value={criarAgendas.titulo_agenda}
-                onChange={handleFormFieldChange}
-                error={errors?.titulo_agenda}
-                helperText={errors?.titulo_agenda}
-              />
+            <TextField
+              sx={{ marginTop: '10px' }}
+              id="standard-basic"
+              label="Título"
+              type="name"
+              variant="filled"
+              color="secondary"
+              required
+              fullWidth
+              name="titulo_agenda"
+              value={criarAgendas.titulo_agenda}
+              onChange={handleFormFieldChange}
+              error={errors?.titulo_agenda}
+              helperText={errors?.titulo_agenda}
+            />
 
-              <TextField sx={{marginTop: '12px'}}
-                id="standard-basic"
-                label="Id jogo"
-                required
-                fullWidth
-                type="number"
-                color='secondary'
-                variant='filled'
-                name="jogo_id"
-                value={criarAgendas.jogo_id}
-                onChange={handleFormFieldChange}
-                error={errors?.jogo_id}
-                helperText={errors?.jogo_id}
-              />
+            <Box sx={{ minWidth: 120, marginTop: '12px' }}>
+              <FormControl fullWidth>
+                <Select
+                  label="Jogo"
+                  variant='filled'
+                  required
+                  value={criarAgendas.jogo_id}
+                  onChange={handleJogoListChange}
+                  onClick={handleGameIdClick}
+                  name="jogo_id"
+                  displayEmpty
+                >
+                  <MenuItem value="" disabled>
+                    Selecione um jogo
+                  </MenuItem>
+                  {jogosList.map(jogo => (
+                    <MenuItem key={jogo.id} value={jogo.id}>
+                      {jogo.id} - {jogo.nome}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
 
-              <TextField sx={{marginTop: '12px'}}
-                required
-                type="datetime-local"
-                label='Início'
-                name="data_horario_inicio"
-                fullWidth
-                value={criarAgendas.data_horario_inicio}
-                onChange={handleFormFieldChange}
-              />
+            <TextField
+              sx={{ marginTop: '12px' }}
+              required
+              type="datetime-local"
+              label="Início"
+              name="data_horario_inicio"
+              fullWidth
+              value={criarAgendas.data_horario_inicio}
+              onChange={handleFormFieldChange}
+            />
 
-              <TextField sx={{marginTop: '12px'}}
-                required
-                label='Fim'
-                color='secondary'
-                type="datetime-local"
-                name="data_horario_fim"
-                fullWidth
-                value={criarAgendas.data_horario_fim}
-                onChange={handleFormFieldChange}
-              />
+            <TextField
+              sx={{ marginTop: '12px' }}
+              required
+              label="Fim"
+              color="secondary"
+              type="datetime-local"
+              name="data_horario_fim"
+              fullWidth
+              value={criarAgendas.data_horario_fim}
+              onChange={handleFormFieldChange}
+            />
 
-              <TextField sx={{marginTop: '12px'}}
-                label='Plataforma'
-                type="name"
-                fullWidth
-                name="plt_transm"
-                variant='filled'
-                color="secondary"
-                value={criarAgendas.plt_transm}
-                onChange={handleFormFieldChange}
-                error={errors?.plt_transm}
-                helperText={errors?.plt_transm}
-              />
+            <TextField
+              sx={{ marginTop: '12px' }}
+              label="Plataforma"
+              type="name"
+              fullWidth
+              name="plt_transm"
+              variant="filled"
+              color="secondary"
+              value={criarAgendas.plt_transm}
+              onChange={handleFormFieldChange}
+              error={errors?.plt_transm}
+              helperText={errors?.plt_transm}
+            />
 
-              <TextField sx={{marginTop: '12px'}}
-                label='Descrição'
-                fullWidth
-                type="text"
-                name="descricao"
-                value={criarAgendas.descricao}
-                onChange={handleFormFieldChange}
-                error={errors?.descricao}
-                helperText={errors?.descricao}
-              />
-            <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+            <TextField
+              sx={{ marginTop: '12px' }}
+              label="Descrição"
+              fullWidth
+              type="text"
+              name="descricao"
+              value={criarAgendas.descricao}
+              onChange={handleFormFieldChange}
+              error={errors?.descricao}
+              helperText={errors?.descricao}
+            />
+            <div className="agenda-form-btn" style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
               <Button
                 sx={{
                   margin: '10px',
@@ -322,7 +395,7 @@ export default function CriarAgendas() {
                   cursor: 'pointer',
                 }}
                 color="secondary"
-                variant='contained'
+                variant="contained"
                 type="submit"
               >
                 Salvar
@@ -339,7 +412,7 @@ export default function CriarAgendas() {
                   cursor: 'pointer',
                 }}
                 color="error"
-                variant='contained'
+                variant="contained"
                 onClick={() => navigate(-1)}
               >
                 Cancelar

@@ -24,6 +24,8 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import '../../pages/main_pages/styles/main-pages-styles.css';
 import { Rating } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
+
 
 function Row({ jogo, onDelete }) {
   const API_PATH2 = '/historico_jogos';
@@ -70,15 +72,17 @@ function Row({ jogo, onDelete }) {
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={handleCollapseToggle}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+          <Tooltip title="Detalhes" arrow>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={handleCollapseToggle}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </Tooltip>
         </TableCell>
-        <TableCell  component="th" scope="row">
+        <TableCell size='small' component="th" scope="row">
           {jogo.nome}
         </TableCell>
         <TableCell size='small' align="center">{jogo.id}</TableCell>
@@ -246,13 +250,14 @@ export default function CollapsibleTable() {
         {notif.message}
       </Notification>
 
-      <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', background: 'whitesmoke' }} component={Paper}> 
+      <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', 
+        background: 'whitesmoke', overflow: 'auto', maxHeight: '70vh'}} component={Paper}> 
         <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Jogos</u> </Typography>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell />
-              <TableCell>Nome</TableCell>
+              <TableCell/>
+              <TableCell size='small'>Nome</TableCell>
               <TableCell size='small' align="center">Jogo ID</TableCell>
               <TableCell size='small' align="center">Plataforma</TableCell>
               <TableCell size='small' align="center">Categoria</TableCell>

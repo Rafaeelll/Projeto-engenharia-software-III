@@ -15,7 +15,7 @@ import CollapsibleTableJogo from '../../components/ui/CollapsibleTableJogo';
       
         <CollapsibleTableJogo/>
 
-        <Box sx={{display: "flex",justifyContent: "center", marginTop: "25px"}}>
+        <Box sx={{display: "flex",justifyContent: "center", marginTop: "15px"}}>
           <Link to="new">
             <Button style={{marginRight: '15px'}}
               variant="contained" 
