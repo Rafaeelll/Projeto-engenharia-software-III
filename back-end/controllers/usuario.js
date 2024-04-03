@@ -88,21 +88,24 @@ controller.retrieveOne = async (req, res) => {
 
 controller.update = async (req, res) => {
   const {nome, sobrenome, email, senha_acesso, telefone, data_nasc, plataforma_fav, jogo_fav } = req.body;
-  // const user = await Usuario.findOne({ where: { email } });
+  const user = await Usuario.findOne({ where: { email } });
 
   try {
-    // if (user) {
-    //   // Se encontrou o usuário com o email, retorna um erro de conflito
-    //   return res.status(409).send('O e-mail informado já está em uso.');
-    // }
+    if (user) {
+      // Se encontrou o usuário com o email, retorna um erro de conflito
+      return res.status(409).send('O e-mail informado já está em uso.');
+    }
     // Criptografar a senha
+    const hashedPassword = await bcrypt.hash(senha_acesso, 12);
+
+
     const response = await Usuario.update(
       {
         // Dados a serem atualizados
         nome,
         sobrenome,
         email,
-        senha_acesso,
+        senha_acesso: hashedPassword,
         telefone,    
         data_nasc,
         plataforma_fav,
@@ -178,7 +181,7 @@ controller.login = async (req, res) => {
           secure: true,
           sameSite: 'None',
           path: '/',
-          maxAge: 120 * 3600 // 24 horas, em segundos
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas a partir de agora
         })
         res.json({auth: true, primeiro_acesso: true})
       }else{
@@ -187,7 +190,7 @@ controller.login = async (req, res) => {
           secure: true,
           sameSite: 'None',
           path: '/',
-          maxAge: 120 * 3600 // 24 horas, em segundos
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas a partir de agora
         })
         res.json({auth: true, primeiro_acesso: false})
       }  

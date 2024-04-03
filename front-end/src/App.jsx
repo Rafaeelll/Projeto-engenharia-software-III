@@ -53,6 +53,7 @@ function App() {
             <Route path= "/contato" element={<Contact/>}/>
             <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
             <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+            <Route path= "/agendas/status" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
             <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
             <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
             <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>

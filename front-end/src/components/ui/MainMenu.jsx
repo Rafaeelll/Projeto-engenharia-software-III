@@ -214,7 +214,7 @@ export default function MainMenu() {
           >
             <AccountCircleSharpIcon/> 
           </IconButton>
-          <Typography style={{marginLeft: '5px'}}> Perfil </Typography>
+          <Typography style={{marginLeft: '5px'}}> Perfil/Conta </Typography>
         </MenuItem>
 
         <MenuItem

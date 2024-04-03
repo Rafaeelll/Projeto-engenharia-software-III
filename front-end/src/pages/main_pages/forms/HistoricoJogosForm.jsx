@@ -18,15 +18,20 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select';
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+
 
 
 
 export default function HistoricoJogosForm() {
   const API_PATH = '/historico_jogos';
   const params = useParams()
-
   const navigate = useNavigate();
 
+  const [showWaiting, setShowWaiting] = React.useState(false)
   const [state, setState] = React.useState({
     historicoJogos: {
       jogo_id: '',
@@ -35,21 +40,60 @@ export default function HistoricoJogosForm() {
       avaliacao: 1,
       comentario_usuario: '',
     },
+    jogosList: [], // Estado para armazenar a lista de jogos
     errors: {},
-    showWaiting: false,
     notif: {
       show: false,
       message: '',
       severity: 'success' // ou 'error'
     }
   });
-  const { historicoJogos, errors, showWaiting, notif } = state;
+  const { historicoJogos, jogosList, errors, notif} = state;
   
   
   function handleFormFieldChange(event) {
     const historicoJogosCopy = {...historicoJogos}
     historicoJogosCopy[event.target.name] = event.target.value
     setState({...state, historicoJogos: historicoJogosCopy})
+  }
+
+  async function handleGameIdClick() {
+    try {
+      // Verifica se a lista de jogos já está preenchida
+      if (jogosList.length === 0) {
+        setState({ ...state, errors: {} }); 
+        setShowWaiting(true)// Define o estado como true quando a busca começar
+
+        const response = await myfetch.get('/jogos');
+
+        if (response.length === 0) {
+          throw new Error('Nenhum jogo encontrado');
+        }
+
+        const formattedJogosList = response.map(jogo => ({
+          id: jogo.id,
+          nome: jogo.nome,
+        }));
+
+        setState({ ...state, jogosList: formattedJogosList }); // Atualiza apenas a lista de jogos
+      }
+    } catch (error) {
+      console.error(error);
+      setState({
+        ...state,
+        errors: errorMessages,
+        notif: {
+          severity: 'error',
+          show: true,
+          message: 'ERRO: ' + error.message,
+        },
+      });
+      setShowWaiting(false)
+
+
+    } finally {
+      setShowWaiting(false)
+    }
   }
   
   
@@ -66,20 +110,21 @@ export default function HistoricoJogosForm() {
   }, [])
 
   async function fetchData() {
-    setState({...state, showWaiting: true, errors:{}})
+    setState({...state, errors:{}})
+    setShowWaiting(true)// Define o estado como true quando a busca começar
     try {
       const result = await myfetch.get(`${API_PATH}/${params.id}`)
       setState({
         ...state,
         historicoJogos: result,
-        showWaiting: false
       })
+      setShowWaiting(false)
+
     }
     catch(error) {
       console.error(error)
       setState({
         ...state, 
-        showWaiting: false,
         errors: errorMessages,
         notif: {
           severity: 'error',
@@ -87,11 +132,14 @@ export default function HistoricoJogosForm() {
           message: 'ERRO: ' + error.message
         }
       })
+      setShowWaiting(false)
     }
   }
 
   async function sendData() {
-    setState({...state, showWaiting: true, errors: {}})
+    setState({...state, errors: {}})
+    setShowWaiting(true)// Define o estado como true quando a busca começar
+
     try {
       // Chama a validação da biblioteca Joi
       await HistoricoJogo.validateAsync(historicoJogos, { abortEarly: false })
@@ -100,13 +148,13 @@ export default function HistoricoJogosForm() {
         if (!jogoExists) {
           setState({
             ...state,
-            showWaiting: false,
             notif: {
               severity: 'error',
               show: true,
               message: 'ID do jogo não encontrado! Crie um jogo ou informe um ID válido.',
             },
           });
+          setShowWaiting(false)
           return;
         }
       // Chama a validação da biblioteca Joi
@@ -119,13 +167,14 @@ export default function HistoricoJogosForm() {
 
       setState({
         ...state, 
-        showWaiting: false,
         notif: {
           severity: 'success',
           show: true,
           message: 'Item salvo com sucesso'
         }
       })
+      setShowWaiting(false)
+
     }
     catch(error) {
       const { validationError, errorMessages } = getValidationMessages(error)
@@ -134,7 +183,6 @@ export default function HistoricoJogosForm() {
       
       setState({
         ...state, 
-        showWaiting: false,
         errors: errorMessages,
         notif: {
           severity: 'error',
@@ -142,6 +190,7 @@ export default function HistoricoJogosForm() {
           message: 'ERRO: ' + error.message
         }
       })
+      setShowWaiting(false)
     }
     async function verifyJogoExists(jogoId) {
       try {
@@ -160,6 +209,18 @@ export default function HistoricoJogosForm() {
     // Se o item foi salvo com sucesso, retorna à página de listagem
     if (notif.severity === 'success') navigate(-1);
     setState({ ...state, notif: { ...notif, show: false } });
+  }
+
+  // Função para lidar com a mudança de seleção de jogo
+  function handleJogoListChange(event) {
+    const selectedJogoId = event.target.value;
+    setState({
+      ...state,
+      historicoJogos: {
+        ...historicoJogos,
+        jogo_id: selectedJogoId,
+      },
+    });
   }
 
   return (
@@ -201,19 +262,35 @@ export default function HistoricoJogosForm() {
           title={params.id ? "Editar Historico de Jogos" : "Criar histórico de jogos"} 
         /> 
         <form onSubmit={handleFormSubmit}>
-          <TextField
-            id="standard-basic"
-            label="Id jogo"
-            fullWidth
-            type="number"
-            variant='filled'
-            required
-            name="jogo_id"
-            value={historicoJogos.jogo_id}
-            onChange={handleFormFieldChange}
-            error={errors?.jogo_id}
-            helperText={errors?.jogo_id}
-          />
+          <Box sx={{ minWidth: 120, marginTop: '12px' }}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Selecione um jogo</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  label="Selecione um jogo"
+                  variant='outlined'
+                  required
+                  value={historicoJogos.jogo_id}
+                  onChange={handleJogoListChange}
+                  onClick={handleGameIdClick}
+                  name="jogo_id"
+                  displayEmpty
+                >
+                    {jogosList.length === 0 ? (
+                      <MenuItem disabled>
+                        Nenhum jogo encontrado!
+                      </MenuItem>
+                    ) : (
+                    jogosList.map(jogo => (
+                      <MenuItem key={jogo.id} value={jogo.id}>
+                        {jogo.id} - {jogo.nome}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+            </FormControl>
+          </Box>
 
           <TextField sx={{marginTop: '12px'}}
             fullWidth

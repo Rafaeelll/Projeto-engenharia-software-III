@@ -70,6 +70,25 @@ controller.retrieveOne = async (req, res) => {
     }
 };
 
+// Método para recuperar agendas filtradas por status
+controller.retrieveByStatus = async (req, res) => {
+    const { status } = req.query; // Obtenha o status do parâmetro de consulta
+    try {
+        // Busca todas as agendas do usuário autenticado filtradas pelo status fornecido
+        const data = await Agenda.findAll({
+            where: { usuario_id: req.authUser.id, status }, // Filtra agendas pelo usuário autenticado e pelo status
+            include: [
+                { model: Usuario, as: 'usuario' },
+                { model: Jogo, as: 'jogo' },
+                { model: Visualizacao, as: 'visualizacoes' }
+            ]
+        });
+        res.send(data);
+    } catch (error) {
+        console.error(error);
+    }
+};
+
 // Método para atualizar uma agenda específica de um usuário
 controller.update = async (req, res) => {
     try {

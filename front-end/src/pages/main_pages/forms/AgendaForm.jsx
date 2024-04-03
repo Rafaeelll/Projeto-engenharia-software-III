@@ -312,27 +312,34 @@ export default function CriarAgendas() {
 
             <Box sx={{ minWidth: 120, marginTop: '12px' }}>
               <FormControl fullWidth>
-                <Select
-                  label="Jogo"
-                  variant='filled'
-                  required
-                  value={criarAgendas.jogo_id}
-                  onChange={handleJogoListChange}
-                  onClick={handleGameIdClick}
-                  name="jogo_id"
-                  displayEmpty
-                >
-                  <MenuItem value="" disabled>
-                    Selecione um jogo
-                  </MenuItem>
-                  {jogosList.map(jogo => (
-                    <MenuItem key={jogo.id} value={jogo.id}>
-                      {jogo.id} - {jogo.nome}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <InputLabel id="demo-simple-select-label">Selecione um jogo</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Selecione um jogo"
+                    variant='outlined'
+                    required
+                    value={criarAgendas.jogo_id}
+                    onChange={handleJogoListChange}
+                    onClick={handleGameIdClick}
+                    name="jogo_id"
+                    displayEmpty
+                  >
+                    {jogosList.length === 0 ? (
+                      <MenuItem disabled>
+                        Nenhum jogo encontrado!
+                      </MenuItem>
+                    ) : (
+                    jogosList.map(jogo => (
+                      <MenuItem key={jogo.id} value={jogo.id}>
+                        {jogo.id} - {jogo.nome}
+                      </MenuItem>
+                    ))
+                  )}
+                  </Select>
               </FormControl>
             </Box>
+
 
             <TextField
               sx={{ marginTop: '12px' }}

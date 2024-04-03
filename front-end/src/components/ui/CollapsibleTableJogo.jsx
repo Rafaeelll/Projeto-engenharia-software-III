@@ -28,7 +28,7 @@ import Tooltip from '@mui/material/Tooltip';
 
 
 function Row({ jogo, onDelete }) {
-  const API_PATH2 = '/historico_jogos';
+  const API_PATH_HT = '/historico_jogos';
 
   const [open, setOpen] = React.useState(false);
   const [historicoJogos, setHistoricoJogos] = React.useState([]);
@@ -39,7 +39,7 @@ function Row({ jogo, onDelete }) {
 
   const fetchHistorico = async () => {
     try {
-      const result = await myfetch.get(`${API_PATH2}`);
+      const result = await myfetch.get(`${API_PATH_HT}`);
       const jogosResult = await myfetch.get('/jogos'); // Buscar informações de jogos
 
       // Filtrar apenas o histórico relacionado ao jogo específico
@@ -160,7 +160,7 @@ function Row({ jogo, onDelete }) {
 }
 
 export default function CollapsibleTable() {
-  const API_PATH = '/jogos';
+  const API_PATH_JG = '/jogos';
 
   const [jogos, setJogos] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
@@ -175,7 +175,7 @@ export default function CollapsibleTable() {
   const fetchData = async () => {
     setShowWaiting(true);
     try {
-      const result = await myfetch.get(API_PATH);
+      const result = await myfetch.get(API_PATH_JG);
       setJogos(result);
     } catch (error) {
       console.error(error);
@@ -198,7 +198,7 @@ export default function CollapsibleTable() {
     if (answer) {
       try {
         setShowWaiting(true);
-        await myfetch.delete(`${API_PATH}/${deleteId}`);
+        await myfetch.delete(`${API_PATH_JG}/${deleteId}`);
         setNotif({
           show: true,
           message: 'Item excluído com sucesso',
