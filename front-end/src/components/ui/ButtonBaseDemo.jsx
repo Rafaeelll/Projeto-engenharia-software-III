@@ -154,7 +154,7 @@ export default function ButtonBaseDemo() {
     }
   }
 
-  function handleImageClick(title, instruction1, warningTitle, warning1, warning2, warning3,acessarInstrucao, route) {
+  function handleImageClick(title, instruction1, warningTitle, warning1, warning2, warning3, acessarInstrucao, route) {
     setState({
       ...state,
       dialogTitle: title,

@@ -20,6 +20,8 @@ import VisualizacaoForm from './pages/main_pages/forms/VisualizacaoForm';
 import Notificacoes from './pages/main_pages/Notificacoes'
 import NotiConfirmStart from './pages/main_pages/forms/NotiConfirmStart'
 import NotiConfirmFinish from './pages/main_pages/forms//NotiConfirmFinish';
+import MyAccountForm from './pages/main_pages/forms/MyAccountForm';
+import PerfilImgForm from './pages/main_pages/forms/PerfilImgForm';
 import HeaderBar from './components/ui/HeaderBar';
 
 
@@ -59,6 +61,8 @@ function App() {
             <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
             <Route path= "/perfil" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
             <Route path= "/perfil/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
+            <Route path= "/perfil/image/:id" element={<AuthGuard> <PerfilImgForm/> </AuthGuard>}/>
+            <Route path= "perfil/minha_conta/:id" element={<AuthGuard> <MyAccountForm/> </AuthGuard>}/>
             <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
             <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
             <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>

@@ -12,10 +12,9 @@ import TableHead from '@mui/material/TableHead';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmImgDialog from './ConfirmImgDialog';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import myfetch from '../../utils/myfetch';
@@ -27,14 +26,22 @@ import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
 
 
-function Row({ usuario, onDelete }) {
+function Row({ usuario}) {
   const API_PATH_US = '/usuarios';
+  const nav = useNavigate();
 
   const [open, setOpen] = React.useState(false);
   const [userAcounts, setUserAcounts] = React.useState([]);
+  const [targetRoute, setTargetRoute] = React.useState('')
+  const [showDialog, setShowDialog] = React.useState(false);
 
-  const handleDeleteClick = () => {
-    onDelete(usuario.id);
+  const handleImageClick = () => {
+    setShowDialog(true);
+    setTargetRoute('./image/' + usuario.id)
+  };
+
+  const handleCloseDialog = () => {
+    setShowDialog(false);
   };
 
   const fetchUserAcount = async () => {
@@ -44,7 +51,9 @@ function Row({ usuario, onDelete }) {
         const formattedUserAcount = result.map(usuario =>({
           id: usuario.id,
           email: usuario.email,
-          senha_acesso: usuario.senha_acesso
+          senha_acesso: usuario.senha_acesso,
+          createdAt: usuario.createdAt,
+          ativo: usuario.ativo
         }))
         setUserAcounts(formattedUserAcount);
       }
@@ -64,8 +73,31 @@ function Row({ usuario, onDelete }) {
     }
   };
 
+  function getAccountStatus(ativo){
+    switch (ativo){
+      case false:
+        return 'red';
+      case true:
+        return 'green';
+      default:
+        return 'black';
+    }
+  }
+
   return (
     <>
+      <ConfirmImgDialog
+      title="Foto de perfil"
+      open={showDialog}
+      onClose={handleCloseDialog}
+      onConfirm={() =>{
+        nav(targetRoute);
+      }}
+      >
+      <img src={import.meta.env.VITE_BACKEND_URI_FILES + usuario.image} alt="Foto de perfil" style={{ width: '100%' }} />
+      </ConfirmImgDialog>
+
+
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>
           <Tooltip title="Detalhes" arrow>
@@ -95,10 +127,12 @@ function Row({ usuario, onDelete }) {
           {usuario.jogo_fav ? usuario.jogo_fav: 'Nulo'}
         </TableCell>     
         <TableCell size='small' align="center">
-          <Avatar sx={{width: '60px', height: '45px'}}
-            alt='Foto De Perfil' 
-            src={import.meta.env.VITE_BACKEND_URI_FILES + usuario.image}>
-          </Avatar>
+          <IconButton onClick={handleImageClick}>
+            <Avatar sx={{width: '60px', height: '45px'}}
+              alt='Foto De Perfil' 
+              src={import.meta.env.VITE_BACKEND_URI_FILES + usuario.image}>
+            </Avatar>
+          </IconButton>
         </TableCell>        
         <TableCell size='small' align="center">
           <Link to={'./' + usuario.id}>
@@ -106,11 +140,6 @@ function Row({ usuario, onDelete }) {
               <EditIcon />
             </IconButton>
           </Link>
-        </TableCell>
-        <TableCell align="right">
-          <IconButton aria-label="Excluir" onClick={handleDeleteClick}>
-            <DeleteForeverIcon color="error" />
-          </IconButton>
         </TableCell>
       </TableRow>
 
@@ -126,8 +155,11 @@ function Row({ usuario, onDelete }) {
               <Table size="small" aria-label="Visualizações">
                 <TableHead>
                   <TableRow>
+                    <TableCell size='small' align="center">Data De Criação</TableCell>
                     <TableCell size='small' align="center">Email</TableCell>
                     <TableCell size='small' align="center">Senha</TableCell>
+                    <TableCell size='small' align="center">Conta</TableCell>
+                    <TableCell size='small' align="center">Editar</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -140,8 +172,22 @@ function Row({ usuario, onDelete }) {
                   ) : (
                     userAcounts.map((userAcountItem) => (
                     <TableRow key={userAcountItem.id}>
+                      <TableCell size='small' align="center">
+                        {userAcountItem.createdAt ? 
+                          format(parseISO(userAcountItem.createdAt), 'dd/MM/yyyy') :
+                          'Nulo'
+                        }
+                      </TableCell>                      
                       <TableCell size='small' align="center">{userAcountItem.email}</TableCell>
                       <TableCell size='small' align="center">{userAcountItem.senha_acesso}</TableCell>
+                      <TableCell size='small' align="center" style={{color: getAccountStatus(userAcountItem.ativo), fontWeight: 'bolder'}}>{userAcountItem.ativo ? 'Ativa': 'Inativa'}</TableCell>
+                      <TableCell size='small' align="center">
+                        <Link to={'./minha_conta/' + usuario.id}>
+                          <IconButton aria-label="Editar">
+                            <EditIcon />
+                          </IconButton>
+                        </Link>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -160,8 +206,6 @@ export default function CollapsibleTable() {
 
   const [userPerfil, setUserPerfil] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
-  const [showDialog, setShowDialog] = React.useState(false);
-  const [deleteId, setDeleteId] = React.useState(null);
   const [notif, setNotif] = React.useState({
     show: false,
     message: '',
@@ -185,35 +229,6 @@ export default function CollapsibleTable() {
     fetchData();
   }, []);
 
-  const handleDelete = async (id) => {
-    setShowDialog(true);
-    setDeleteId(id);
-  };
-
-  const handleDialogClose = async (answer) => {
-    setShowDialog(false);
-    if (answer) {
-      try {
-        setShowWaiting(true);
-        await myfetch.delete(`${API_PATH_US}/${deleteId}`);
-        setNotif({
-          show: true,
-          message: 'Item excluído com sucesso',
-          severity: 'success'
-        });
-        fetchData();
-      } catch (error) {
-        console.error(error);
-        setNotif({
-          show: true,
-          message: 'ERRO: ' + error.message,
-          severity: 'error'
-        });
-      } finally {
-        setShowWaiting(false);
-      }
-    }
-  };
 
   const handleNotifClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -230,14 +245,6 @@ export default function CollapsibleTable() {
       >
         <CircularProgress color="secondary" />
       </Backdrop>
-
-      <ConfirmDialog
-        title="Confirmar operação"
-        open={showDialog}
-        onClose={handleDialogClose}
-      >
-        Deseja realmente excluir este item?
-      </ConfirmDialog>
 
       <Notification
         show={notif.show}
@@ -261,7 +268,6 @@ export default function CollapsibleTable() {
               <TableCell size='small' align="center">Jogo Favorito</TableCell>
               <TableCell size='small' align="center">Imagem de Perfil</TableCell>
               <TableCell size='small' align="center">Editar</TableCell>
-              <TableCell size='small' align="center">Excluir</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -274,7 +280,7 @@ export default function CollapsibleTable() {
             ) : (
               // Renderiza as linhas da tabela
               userPerfil.map((usuario) => (
-                <Row key={usuario.id} usuario={usuario} onDelete={handleDelete} />
+                <Row key={usuario.id} usuario={usuario}/> //onDelete={handleDelete}
               ))
             )}
           </TableBody>
