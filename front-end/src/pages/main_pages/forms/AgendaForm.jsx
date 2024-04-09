@@ -15,6 +15,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel'
 
 export default function CriarAgendas() {
   const API_PATH = '/agendas';
@@ -256,16 +257,8 @@ export default function CriarAgendas() {
   }
 
   return (
-    <div
-      style={{
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        height: '100vh',
-        justifyContent: 'center',
-        background: 'whitesmokesss',
-      }}
-      className="pai"
-    >
+    <>
+    
       <Backdrop
         sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
         open={showWaiting}
@@ -364,19 +357,26 @@ export default function CriarAgendas() {
               onChange={handleFormFieldChange}
             />
 
-            <TextField
-              sx={{ marginTop: '12px' }}
-              label="Plataforma"
-              type="name"
-              fullWidth
-              name="plt_transm"
-              variant="filled"
-              color="secondary"
-              value={criarAgendas.plt_transm}
-              onChange={handleFormFieldChange}
-              error={errors?.plt_transm}
-              helperText={errors?.plt_transm}
-            />
+            <Box sx={{ minWidth: 120, marginTop: '12px'}}>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Plataforma de Transmissão</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={criarAgendas.plt_transm}
+                    label="Plataforma de Transmissão"
+                    name='plt_transm'
+                    required
+                    onChange={handleFormFieldChange}
+                >
+                  <MenuItem value={'Facebook'}>Facebook</MenuItem>
+                  <MenuItem value={'Kick'}>Kick</MenuItem>
+                  <MenuItem value={'Twitch'}>Twitch</MenuItem>
+                  <MenuItem value={'Youtube'}>Youtube</MenuItem>
+                  <MenuItem value={'Outros'}>Outros</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
 
             <TextField
               sx={{ marginTop: '12px' }}
@@ -428,6 +428,6 @@ export default function CriarAgendas() {
           </form>
         </Typography>
       </Paper>
-    </div>
+    </>  
   );
 }

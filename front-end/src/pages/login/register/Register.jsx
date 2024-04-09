@@ -15,6 +15,10 @@ import api from '../../../../services/api'
 import { styled } from '@mui/material/styles';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloseIcon from '@mui/icons-material/Close';
+import InputAdornment from '@mui/material/InputAdornment'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import IconButton from '@mui/material/IconButton'
 
 
 
@@ -37,6 +41,7 @@ function Register(){
     },
     errors: {},
     showWaiting: false,
+    mostrarSenha: false,
     notif: {
       show: false,
       message: '',
@@ -45,6 +50,7 @@ function Register(){
   })
   const {
     usuario,
+    mostrarSenha,
     errors,
     showWaiting,
     notif
@@ -74,6 +80,11 @@ function Register(){
     setSelectedFileName('');
   }
 
+  const handleClickShowPassword = () => setState({...state, mostrarSenha: !mostrarSenha})
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault()
+  }
   
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
@@ -267,13 +278,26 @@ async function sendData() {
               color='secondary'
               className='input2'
               variant='filled'
-              type="password"
+              type={mostrarSenha ? 'text' : 'password'}
               name='senha_acesso'
               required
               error={errors?.senha_acesso}
               helperText={errors?.senha_acesso}
               value={usuario.senha_acesso}
               onChange={handleFormFieldChange}
+              InputProps={{
+                endAdornment: 
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {mostrarSenha ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }}
             />
           </div>
 
@@ -290,6 +314,19 @@ async function sendData() {
               helperText={errors?.confirmar_senha}
               value={usuario.confirmar_senha}
               onChange={handleFormFieldChange}
+              InputProps={{
+                endAdornment: 
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                      edge="end"
+                    >
+                      {mostrarSenha ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                }}
             />
           </div>
 
@@ -317,6 +354,7 @@ async function sendData() {
               component="label"
               role={undefined}
               variant="contained"
+              fullWidth
               tabIndex={-1}
               startIcon={<CloudUploadIcon />}
             >

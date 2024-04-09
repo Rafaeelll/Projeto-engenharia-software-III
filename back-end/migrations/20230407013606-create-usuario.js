@@ -51,7 +51,7 @@ module.exports = {
         type: Sequelize.DATEONLY,
       },
       plataforma_fav: {
-        type: Sequelize.STRING(50)
+        type: Sequelize.ENUM('Twitch', 'Kick', 'Youtube', 'Facebook', 'Outros'),
       },
       jogo_fav: {
         type: Sequelize.STRING(50)

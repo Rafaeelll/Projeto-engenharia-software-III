@@ -86,47 +86,59 @@ controller.retrieveOne = async (req, res) => {
   }
 };
 
-controller.update = async (req, res) => {
-  const {nome, sobrenome, email, senha_acesso, telefone, data_nasc, plataforma_fav, jogo_fav } = req.body;
-  const user = await Usuario.findOne({ where: { email } });
-
+controller.updateUserProfile = async (req, res) => {
   try {
-    if (user) {
-      // Se encontrou o usuário com o email, retorna um erro de conflito
-      return res.status(409).send('O e-mail informado já está em uso.');
-    }
-    // Criptografar a senha
-    const hashedPassword = await bcrypt.hash(senha_acesso, 12);
+    const response = await Usuario.update({
+      id: req.authUser.id,
+      nome: req.body.nome,
+      sobrenome: req.body.sobrenome,
+      telefone: req.body.telefone,
+      data_nasc: req.body.data_nasc,
+      plataforma_fav: req.body.plataforma_fav,
+      jogo_fav: req.body.jogo_fav
 
-
-    const response = await Usuario.update(
-      {
-        // Dados a serem atualizados
-        nome,
-        sobrenome,
-        email,
-        senha_acesso: hashedPassword,
-        telefone,    
-        data_nasc,
-        plataforma_fav,
-        jogo_fav,
-        image: req.file.filename
-      },
-      { 
+    },
         // Condição para atualização
-        where: { id: req.params.id} 
-      }
+        { 
+          where: { id: req.params.id, id: req.authUser.id }
+        }
     );
-
+    // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
     if (response[0] > 0) {
-      res.status(204).end();
+        // HTTP 204: No Content
+        res.status(204).end();
     } else {
-      res.status(404).end();
+        // HTTP 404: Not Found
+        res.status(404).end();
     }
-  } catch (error) {
-    console.error(error);
-  }
+    } catch (error) {
+      console.error(error);
+    }
 };
+
+controller.updateUserImg = async (req, res) => {
+  try {
+    const response = await Usuario.update({
+      image: req.file.filename,
+    },
+
+    {
+      // Condição para atualização
+      where:{ id: req.params.id, id: req.authUser.id }
+    });
+    
+    // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
+    if (response[0] > 0) {
+        // HTTP 204: No Content
+        res.status(204).end();
+    } else {
+        // HTTP 404: Not Found
+        res.status(404).end();
+    }
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 controller.delete = async (req, res) => {
   try {

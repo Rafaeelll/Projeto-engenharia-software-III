@@ -10,7 +10,10 @@ import myfetch from '../../../utils/myfetch'
 import Button  from '@mui/material/Button'
 import LoginIcon from '@mui/icons-material/Login';
 import TextField from '@mui/material/TextField'
-
+import InputAdornment from '@mui/material/InputAdornment'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import IconButton from '@mui/material/IconButton'
 
 
 
@@ -18,12 +21,21 @@ export default function LoginForm({onLoginLogout}) {
   const [email, setEmail] = React.useState("")
   const [senha_acesso, setSenhaAcesso] = React.useState("")
   const [showWaiting, setShowWaiting] = React.useState(false)
+  const [mostrarSenha, setMostrarSenha] = React.useState(false)
   const [notif, setNotif] = React.useState({
     show: false,
     message: '',
     severity: 'success' // ou 'error'
   })
   const navigate = useNavigate()
+
+  const handleClickShowPassword = () => {
+    setMostrarSenha(!mostrarSenha)
+  }
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault()
+  }
 
   async function handleSubmit(event) {
     event.preventDefault()      // Impede o recarregamento da página
@@ -41,8 +53,10 @@ export default function LoginForm({onLoginLogout}) {
         severity: 'success'
       })
       onLoginLogout(true)
-      navigate('/pagina_inicial')
 
+      setTimeout(()=>{
+        navigate('/pagina_inicial')
+      }, 1500)
     }
     catch(error) {
       console.error(error)
@@ -128,10 +142,23 @@ export default function LoginForm({onLoginLogout}) {
                   color='secondary'
                   label="Senha"
                   variant='filled'
-                  type="password"
+                  type={mostrarSenha ? 'text' : 'password'}
                   required
                   value={senha_acesso}
                   onChange={e => setSenhaAcesso(e.target.value)}
+                  InputProps={{
+                    endAdornment: 
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end"
+                        >
+                          {mostrarSenha ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }}
                 />
               </div>
 

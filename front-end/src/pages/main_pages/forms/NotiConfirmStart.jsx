@@ -116,16 +116,7 @@ export default function NotiConfirmStart() {
 
 
   return (
-    <div
-      style={{
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        height: '100vh',
-        justifyContent: 'center',
-        background: 'whitesmokesss'
-      }}
-      className="pai"
-    >
+    <>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
@@ -254,6 +245,6 @@ export default function NotiConfirmStart() {
           </form>
         </Typography>
       </Paper>
-    </div>
+    </>
   );
 }

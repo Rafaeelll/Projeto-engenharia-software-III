@@ -9,7 +9,6 @@ const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/usuario');
 const multerConfig = require('../config/multer');
-const authorizationMiddleware = require('../lib/authorizationMiddleware');
 
 // Rota para criar um novo usuário
 router.post('/', multerConfig.single('image'), controller.create);
@@ -21,7 +20,9 @@ router.get('/', controller.retrieve);
 router.get('/:id', controller.retrieveOne);
 
 // Rota para atualizar um usuário específico por ID (requer autenticação e autorização)
-router.put('/:id',authorizationMiddleware, multerConfig.single('image'), controller.update);
+router.put('/profile/:id', controller.updateUserProfile);
+
+router.put('/image/:id', multerConfig.single('image'), controller.updateUserImg);
 
 // Rota para excluir um usuário específico por ID (requer autenticação e autorização)
 router.delete('/:id', controller.delete);

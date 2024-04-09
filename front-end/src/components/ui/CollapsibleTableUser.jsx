@@ -24,6 +24,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import '../../pages/main_pages/styles/main-pages-styles.css';
 import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import FacebookIcon from '@mui/icons-material/Facebook';
 
 
 function Row({ usuario}) {
@@ -32,17 +34,16 @@ function Row({ usuario}) {
 
   const [open, setOpen] = React.useState(false);
   const [userAcounts, setUserAcounts] = React.useState([]);
-  const [targetRoute, setTargetRoute] = React.useState('')
   const [showDialog, setShowDialog] = React.useState(false);
 
   const handleImageClick = () => {
     setShowDialog(true);
-    setTargetRoute('./image/' + usuario.id)
   };
 
   const handleCloseDialog = () => {
     setShowDialog(false);
   };
+
 
   const fetchUserAcount = async () => {
     try {
@@ -84,19 +85,31 @@ function Row({ usuario}) {
     }
   }
 
+  function getPlatformIcon(plataforma_fav){
+    switch (plataforma_fav){
+      case 'Facebook':
+        return <FacebookIcon color='primary'/>
+      case 'Youtube':
+        return <YouTubeIcon color='error'/>
+    }
+  }
+
   return (
     <>
       <ConfirmImgDialog
-      title="Foto de perfil"
-      open={showDialog}
-      onClose={handleCloseDialog}
-      onConfirm={() =>{
-        nav(targetRoute);
-      }}
+        open={showDialog}
+        onClose={handleCloseDialog}
+        title="Imagem De Perfil"
+        userName={<Typography> {usuario.nome + ' ' + usuario.sobrenome} </Typography>}
+        profileImg = { <Avatar 
+          src={import.meta.env.VITE_BACKEND_URI_FILES + usuario.image} 
+          alt="Foto de perfil" 
+          style={{ width: '200px', height: '200px', boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.2)'}}/>}
+        onConfirm={() => {
+          nav('./image/' + usuario.id);
+        }}
       >
-      <img src={import.meta.env.VITE_BACKEND_URI_FILES + usuario.image} alt="Foto de perfil" style={{ width: '100%' }} />
       </ConfirmImgDialog>
-
 
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>
@@ -121,21 +134,26 @@ function Row({ usuario}) {
           }
         </TableCell>
         <TableCell size='small' align="center">
-          {usuario.plataforma_fav ? usuario.plataforma_fav: 'Nulo'}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {getPlatformIcon(usuario.plataforma_fav)}
+            <Typography variant="body1" sx={{ml: '2px'}}>
+              {usuario.plataforma_fav ? usuario.plataforma_fav : 'Nulo'}
+            </Typography>
+          </div>
         </TableCell>
         <TableCell size='small' align="center">
           {usuario.jogo_fav ? usuario.jogo_fav: 'Nulo'}
         </TableCell>     
         <TableCell size='small' align="center">
           <IconButton onClick={handleImageClick}>
-            <Avatar sx={{width: '60px', height: '45px'}}
+            <Avatar sx={{width: '50px', height: '50px'}}
               alt='Foto De Perfil' 
               src={import.meta.env.VITE_BACKEND_URI_FILES + usuario.image}>
             </Avatar>
           </IconButton>
         </TableCell>        
         <TableCell size='small' align="center">
-          <Link to={'./' + usuario.id}>
+          <Link to={'./profile/' + usuario.id}>
             <IconButton aria-label="Editar">
               <EditIcon />
             </IconButton>

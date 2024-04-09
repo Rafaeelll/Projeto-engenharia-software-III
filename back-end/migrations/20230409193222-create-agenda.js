@@ -49,7 +49,8 @@ module.exports = {
         allowNull: false,
       },
       plt_transm:{
-        type: Sequelize.STRING(100)
+        type: Sequelize.ENUM('Twitch', 'Kick', 'Youtube', 'Facebook', 'Outros'),
+        allowNull: false
       },
       descricao:{
         type: Sequelize.TEXT,

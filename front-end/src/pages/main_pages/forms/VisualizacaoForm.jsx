@@ -208,16 +208,7 @@ export default function VisualizacaoForm() {
   }
 
   return (
-    <div
-      style={{
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        height: '100vh',
-        justifyContent: 'center',
-        background: 'whitesmokesss'
-      }}
-      className="pai"
-    >
+    <>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
@@ -317,13 +308,13 @@ export default function VisualizacaoForm() {
               }}
               color="error"
               variant='contained'
-              onClick={() => navigate('/visualizacao')}
+              onClick={() => navigate(-1)}
             >
               Cancelar
             </Button>
           </div>
         </form>
       </Paper>
-    </div>
+    </>
   );
 }

@@ -11,16 +11,6 @@ const Perfil = Joi.object({
         .max(100)
         .required()
         .messages({'*': 'O sobrenome é obrigatorio entre (2 e 100 caracteres).'}),
-    email: Joi.string()
-        .min(10)
-        .max(200)
-        .required()
-        .messages({'*': 'O email é obrigatorio entre (10 e 200 caracteres).'}),
-    senha_acesso: Joi.string()
-        .min(5)
-        .max(200)
-        .required()
-        .messages({'*': 'A senha é obrigatorio entre (5 e 200 caracteres).'}),
     telefone: Joi.string()
         .min(14)
         .max(20)

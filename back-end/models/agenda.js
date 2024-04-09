@@ -87,7 +87,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     plt_transm:{
-      type: DataTypes.STRING(100)
+      type: DataTypes.ENUM('Twitch', 'Kick', 'Youtube', 'Facebook', 'Outros'),
+      allowNull: false
     },
     descricao:{
       type: DataTypes.TEXT,

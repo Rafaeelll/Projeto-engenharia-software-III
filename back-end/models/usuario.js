@@ -85,7 +85,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATEONLY,
     },
     plataforma_fav: {
-      type: DataTypes.STRING(50)
+      type: DataTypes.ENUM('Twitch', 'Kick', 'Youtube', 'Facebook', 'Outros'),
     },
     jogo_fav: {
       type: DataTypes.STRING(50)

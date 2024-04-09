@@ -16,7 +16,6 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
-import Input from '@mui/material/Input';
 
 
 export default function jogos() {
@@ -153,16 +152,7 @@ export default function jogos() {
   }
 
   return (
-    <div
-      style={{
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        height: '100vh',
-        justifyContent: 'center',
-        background: 'whitesmokesss'
-      }}
-      className="pai"
-    >
+    <>
         <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
@@ -302,7 +292,7 @@ export default function jogos() {
               }}
               color="error"
               variant='contained'
-              onClick={() => navigate('/jogo')}
+              onClick={() => navigate(-1)}
             >
               Cancelar
             </Button>
@@ -310,6 +300,6 @@ export default function jogos() {
         </form>
         </Typography>
       </Paper>
-    </div>
+    </>
   );
 }

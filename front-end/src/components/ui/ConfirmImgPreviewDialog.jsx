@@ -5,22 +5,13 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import EditIcon from '@mui/icons-material/Edit';
-import IconButton from '@mui/material/IconButton';
 
-export default function ConfirmImgDialog({title, profileImg, userName, open = false, onClose, onConfirm}) {
+export default function ConfirmImgPreviewDialog({title, profileImgPreview, userName, open = false, onClose}) {
 
   const handleClose = answer => {
     // answer === true: resposta positiva à pergunta
     // answer === false: resposta negativa à pergunta 
     onClose(answer);
-  };
-  const handleConfirm = () => {
-    if (onConfirm) {
-      onConfirm();
-    } else {
-      handleClose(true);
-    }
   };
 
   return (
@@ -39,18 +30,14 @@ export default function ConfirmImgDialog({title, profileImg, userName, open = fa
             {userName}
           </DialogContentText>
           <DialogContent sx={{display: 'flex', justifyContent: 'center', pl: '50px', pr: '50px'}}>
-              {profileImg}
+              {profileImgPreview}
           </DialogContent>
 
           <br/>
 
         <DialogActions>
-          <Button onClick={handleConfirm} variant="outlined" size='small' color='secondary'>
-            <IconButton size='small'><EditIcon color='secondary'/></IconButton>
-            Alterar
-          </Button>
           <Button onClick={() => handleClose(false)} autoFocus size='small' color='secondary'>
-            Voltar
+            OK
           </Button>
         </DialogActions>
       </Dialog>

@@ -8,31 +8,31 @@ import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import Perfil from '../../../../models/Perfil';
 import Paper  from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
-import api from '../../../../services/api';
-import { styled } from '@mui/material/styles';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import CloseIcon from '@mui/icons-material/Close';
+import api from '../../../../services/api'
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+
+
 
 export default function PerfilForm() {
-  const API_PATH = '/usuarios'
-  const params = useParams()
-
+  const API_PATH_US = '/usuarios'
+  const API_PATH_PF =  '/usuarios/profile'
+  const { id } = useParams(); // Capturando o ID da URL
   const navigate = useNavigate()
 
   const [state, setState] = React.useState({
     perfils: {
       nome: '',
       sobrenome: '',
-      email: '',
-      senha_acesso: '',
       telefone: '',
       plataforma_fav: '',
       data_nasc: '',
       jogo_fav: '',
-      image: '',
     },
     errors: {},
     showWaiting: false,
@@ -43,32 +43,7 @@ export default function PerfilForm() {
     }
   });
   const { perfils, errors, showWaiting, notif } = state;
-  const [selectedFileName, setSelectedFileName] = React.useState('');
-  const [selectedFile, setSelectedFile] = React.useState(null);
 
-  const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-  });
-
-  function handleFileChange(event) {
-    const file = event.target.files[0];
-    setState({ ...state, perfils: { ...perfils, image: file } });
-    setSelectedFile(URL.createObjectURL(file)); // Atualiza o URL da imagem
-    setSelectedFileName(file.name); // Atualiza o nome do arquivo selecionado
-  }
-
-  function clearSelection() {
-    setSelectedFile(null);
-    setSelectedFileName('');
-  }
   function handleFormFieldChange(event) {
     const { name, value } = event.target;
 
@@ -99,15 +74,15 @@ export default function PerfilForm() {
     React.useEffect(() => {
     // Se houver parâmetro id na rota, devemos carregar um registro
     // existente para edição
-    if(params.id) fetchData()
+    if(id) fetchData()
   }, [])
 
   async function fetchData() {
     setState({...state, showWaiting: true, errors:{}})
     try {
       // Verifica se params.id é definido antes de fazer a busca
-      if (params.id) {
-        const result = await myfetch.get(`${API_PATH}/${params.id}`);
+      if (id) {
+        const result = await api.get(`${API_PATH_US}/${id}`);
         setState({
           ...state,
           perfils: result,
@@ -138,54 +113,38 @@ export default function PerfilForm() {
       console.log('Dados a serem enviados:', perfils); // Adicione este console.log
 
       await Perfil.validateAsync(perfils, { abortEarly: false });
-      if (params.id) {
-        const formData = new FormData()
-        formData.append('nome', perfils.nome)
-        formData.append('sobrenome', perfils.sobrenome)
-        formData.append('email', perfils.email)
-        formData.append('senha_acesso', perfils.senha_acesso)
-        formData.append('telefone', perfils.telefone)
-        formData.append('plataforma_fav', perfils.plataforma_fav)
-        formData.append('data_nasc', perfils.data_nasc)
-        formData.append('jogo_fav', perfils.jogo_fav)
-        formData.append('image', perfils.image)
+      if (id) {
+        await myfetch.put(`${API_PATH_PF}/${id}`, perfils);
   
-      const headers = {
-        'headers':{
-          'Content-Type': 'mulitpart/form-data'
-        }
+      } else {
+        await myfetch.post(API_PATH_PF, perfils);
       }
-      await api.put(`${API_PATH}/${params.id}`, formData, headers);
-
-    }else {
-      await api.post(API_PATH, perfils);
-    }
-    setState({
-      ...state,
-      showWaiting: false,
-      notif: {
-        severity: 'success',
-        show: true,
-        message: 'Item salvo com sucesso'
-      }
-    });
-    } catch (error) {
-      const { validationError, errorMessages } = getValidationMessages(error);
-
-      console.error(error);
-
       setState({
         ...state,
         showWaiting: false,
-        errors: errorMessages,
         notif: {
-          severity: 'error',
-          show: !validationError,
-          message: 'ERRO: ' + error.message
+          severity: 'success',
+          show: true,
+          message: 'Item salvo com sucesso'
         }
       });
+      } catch (error) {
+        const { validationError, errorMessages } = getValidationMessages(error);
+
+        console.error(error);
+
+        setState({
+          ...state,
+          showWaiting: false,
+          errors: errorMessages,
+          notif: {
+            severity: 'error',
+            show: !validationError,
+            message: 'ERRO: ' + error.message
+          }
+        });
+      }
     }
-  }
 
   function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {
@@ -197,16 +156,7 @@ export default function PerfilForm() {
   }
 
   return (
-    <div
-      style={{
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        height: '100vh',
-        justifyContent: 'center',
-        background: 'whitesmokesss'
-      }}
-      className="pai"
-    >
+    <>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
@@ -234,9 +184,8 @@ export default function PerfilForm() {
         <FormTitle
           title="Editar perfil"
         /> 
-        <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
-          <TextField sx={{marginTop: '12px'}}
+          <TextField
             id="standard-basic"
             label="Nome"
             type="name"
@@ -251,7 +200,7 @@ export default function PerfilForm() {
             helperText={errors?.nome}
             />
 
-            <TextField sx={{marginTop: '12px'}}
+            <TextField sx={{marginTop: '15px'}}
               label="Sobrenome"
               type="name"
               variant='filled'
@@ -264,33 +213,7 @@ export default function PerfilForm() {
               helperText={errors?.sobrenome}
             />
 
-            <TextField sx={{marginTop: '12px'}}
-              label="email"
-              type="email"
-              variant='filled'
-              fullWidth
-              required
-              name="email" // Nome do campo na tabela
-              value={perfils.email} // Nome do campo na tabela
-              onChange={handleFormFieldChange}
-              error={errors?.email}
-              helperText={errors?.email}
-            />
-
-            <TextField sx={{marginTop: '12px'}}
-              label="Senha"
-              type="password"
-              variant='filled'
-              fullWidth
-              required
-              name="senha_acesso" // Nome do campo na tabela
-              value={perfils.senha_acesso} // Nome do campo na tabela
-              onChange={handleFormFieldChange}
-              error={errors?.senha_acesso}
-              helperText={errors?.senha_acesso}
-            />
-
-          <TextField sx={{marginTop: '12px'}}
+            <TextField sx={{marginTop: '15px'}}
               variant='filled'
               label='Telefone'
               type="tel"
@@ -307,7 +230,7 @@ export default function PerfilForm() {
               }}
             />
 
-            <TextField sx={{marginTop: '12px'}}
+            <TextField sx={{marginTop: '15px'}}
               label='Data nascimento'
               color='secondary'
               type="date"
@@ -317,20 +240,28 @@ export default function PerfilForm() {
               onChange={handleFormFieldChange}
             />
 
-            <TextField sx={{marginTop: '12px'}}
-              fullWidth
-              name="plataforma_fav"
-              variant='filled'
-              type='name'
-              label='Plataforma favorita'
-              color="secondary"
-              value={perfils.plataforma_fav}
-              onChange={handleFormFieldChange}
-              error={errors?.plataforma_fav}
-              helperText={errors?.plataforma_fav}
-            />
+            <Box sx={{ minWidth: 120, marginTop: '15px'}}>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Plataforma Favorita</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={perfils.plataforma_fav}
+                    label="Plataforma Favorita"
+                    name='plataforma_fav'
+                    required
+                    onChange={handleFormFieldChange}
+                >
+                  <MenuItem value={'Facebook'}>Facebook</MenuItem>
+                  <MenuItem value={'Kick'}>Kick</MenuItem>
+                  <MenuItem value={'Twitch'}>Twitch</MenuItem>
+                  <MenuItem value={'Youtube'}>Youtube</MenuItem>
+                  <MenuItem value={'Outros'}>Outros</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
 
-          <TextField sx={{marginTop: '12px'}}
+            <TextField sx={{marginTop: '15px'}}
               label='Jogo Favorito'
               type="name"
               fullWidth
@@ -344,64 +275,27 @@ export default function PerfilForm() {
             />
 
 
-            <div className="wrap-input2">
-              <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUploadIcon />}
-              >
-                {selectedFile && <img src={selectedFile} alt="Foto selecionada" style={{ marginRight: '8px', width: '24px'}} />}
-                {selectedFileName ? selectedFileName : 'Adicione uma Foto de perfil'}
-                {selectedFile && <CloseIcon onClick={clearSelection} style={{ marginLeft: '8px', cursor: 'pointer' }} />}
-                <VisuallyHiddenInput
-                  type="file"
-                  onChange={handleFileChange}
-                  name="image"
-                />
-              </Button>
-            </div>
-
-          <div className='agenda-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
-          <Button
-              sx={{
-                margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
-                background: 'black',
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
+          <div style={{display: 'flex', justifyContent: 'center'}}>
+            <Button
+              sx={{m: '10px', mt: '20px', background: 'black'}}
               color="secondary"
               variant='contained'
               type="submit"
             > 
               Salvar
             </Button>
+
             <Button
-              sx={{
-                margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
-                background: 'black',
-                fontFamily: 'monospace',
-                fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
-              }}
+              sx={{m: '10px', mt: '20px', background: 'black'}}
               color="error"
               variant='contained'
-              onClick={() => navigate('/perfil')}
+              onClick={() => navigate(-1)}
             >
               Cancelar
             </Button>
           </div>       
         </form>
-        </Typography>
       </Paper>
-    </div>
+    </>
   );
 }

@@ -141,7 +141,12 @@ function Row({ agenda, onDelete }) {
           {agenda.descricao ? agenda.descricao : 'Nulo'}
         </TableCell>        
         <TableCell size='small' align="center" style={{ color: getStatusColor(agenda.status)}}>
-          {getStatusIcon(agenda.status)} {agenda.status}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {getStatusIcon(agenda.status)}
+            <Typography variant="body1">
+              {agenda.status}
+            </Typography>
+          </div>
         </TableCell>
         <TableCell size='small' align="center">
           <Link to={'./' + agenda.id}>

@@ -70,7 +70,23 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'HistoricoJogo', // Nome do modelo
-    tableName: 'historico_jogos' // Nome da tabela no banco de dados
+    tableName: 'historico_jogos', // Nome da tabela no banco de dados
+    hooks:{
+      beforeCreate: (historicoJogo, options) => {
+        const status = historicoJogo.jogo_status;
+    
+        if (status === 'Não iniciado') {
+          historicoJogo.jogo_iniciado = false;
+          historicoJogo.jogo_zerado = false;
+        } else if (status === 'Em progresso') {
+          historicoJogo.jogo_iniciado = true;
+          historicoJogo.jogo_zerado = false;
+        } else {
+          historicoJogo.jogo_iniciado = true;
+          historicoJogo.jogo_zerado = true;
+        }
+      }
+    }
   });
 
   return HistoricoJogo;

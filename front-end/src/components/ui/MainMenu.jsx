@@ -203,10 +203,10 @@ export default function MainMenu() {
         
         <MenuItem 
           onClick={handleClose}
-          component={Link} to="/perfil"
+          component={Link} to="/usuario"
           style={{
-            backgroundColor: location.pathname === '/perfil' ? '#21d4fd' : 'transparent',
-            color: location.pathname === '/perfil' ? 'white' : 'black',
+            backgroundColor: location.pathname === '/usuario' ? '#21d4fd' : 'transparent',
+            color: location.pathname === '/usuario' ? 'white' : 'black',
           }}>
           <IconButton
             color='inherit'
