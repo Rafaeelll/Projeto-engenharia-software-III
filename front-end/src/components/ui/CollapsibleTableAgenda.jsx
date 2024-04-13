@@ -32,6 +32,11 @@ import ConfirmFilterDialog from '../ui/ConfirmFilterDialog'
 import { MenuItem, Select } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import { FaTwitch } from "react-icons/fa";
+import { RiKickFill } from "react-icons/ri";
+
 
 function Row({ agenda, onDelete }) {
   const API_PATH_VS = '/visualizacoes';
@@ -86,14 +91,43 @@ function Row({ agenda, onDelete }) {
         return 'black';
     }
   }
+
   function getStatusIcon(status){
     switch (status){
       case 'Agendado':
-        return <EventIcon/>;
+        return <EventIcon />;
       case 'Finalizada':
         return <EventAvailableIcon/>;
       case 'Em andamento':
         return <PendingActionsIcon/>;
+      default:
+        return 'black';
+    }
+  }
+
+  function getPlatformIcon(plt_transm){
+    switch (plt_transm){
+      case 'Facebook':
+        return <FacebookIcon color='primary'/>
+      case 'Youtube':
+        return <YouTubeIcon color='error'/>
+      case 'Kick':
+        return <RiKickFill color='green' size={18}/> 
+      case 'Twitch':
+        return <FaTwitch color='purple' size={16}/>
+    }
+  }
+
+  function getPlataformColor(plt_transm){
+    switch (plt_transm){
+      case 'Facebook':
+        return 'blue';
+      case 'Youtube':
+        return 'red';
+      case 'Kick':
+        return 'green';
+      case 'Twitch':
+        return 'purple'
       default:
         return 'black';
     }
@@ -136,14 +170,22 @@ function Row({ agenda, onDelete }) {
             'Nulo'
           }
         </TableCell>
-        <TableCell size='small' align="center">{agenda.plt_transm}</TableCell>
+        <TableCell size='small' align="center">
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {getPlatformIcon(agenda.plt_transm)}
+            <Typography variant="body1" sx={{ml: '4px', color: getPlataformColor(agenda.plt_transm), fontWeight: 'bold'}}>
+              {agenda.plt_transm ? agenda.plt_transm : 'Nulo'}
+            </Typography>
+          </div>
+        </TableCell>
+
         <TableCell size='small' align="center">
           {agenda.descricao ? agenda.descricao : 'Nulo'}
-        </TableCell>        
+        </TableCell>      
         <TableCell size='small' align="center" style={{ color: getStatusColor(agenda.status)}}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {getStatusIcon(agenda.status)}
-            <Typography variant="body1">
+            <Typography variant="body2" sx={{ml:'2px', fontWeight: 'bold'}}>
               {agenda.status}
             </Typography>
           </div>

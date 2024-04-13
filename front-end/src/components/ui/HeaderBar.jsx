@@ -61,7 +61,7 @@ export default function HeaderBar({isLoggedIn, onLoginLogout}) {
         <CircularProgress color="secondary" />
       </Backdrop>
 
-      <AppBar position='static' className='app-bar'>
+      <AppBar position='static' className='app-bar' enableColorOnDark>
         
         <Toolbar>
           <MainMenu/>

@@ -26,7 +26,8 @@ import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import FacebookIcon from '@mui/icons-material/Facebook';
-
+import { FaTwitch } from "react-icons/fa";
+import { RiKickFill } from "react-icons/ri";
 
 function Row({ usuario}) {
   const API_PATH_US = '/usuarios';
@@ -91,6 +92,24 @@ function Row({ usuario}) {
         return <FacebookIcon color='primary'/>
       case 'Youtube':
         return <YouTubeIcon color='error'/>
+      case 'Kick':
+        return <RiKickFill color='green' size={18}/> 
+      case 'Twitch':
+        return <FaTwitch color='purple' size={16}/>
+    }
+  }
+  function getPlataformColor(plataforma_fav){
+    switch (plataforma_fav){
+      case 'Facebook':
+        return 'blue';
+      case 'Youtube':
+        return 'red';
+      case 'Kick':
+        return 'green';
+      case 'Twitch':
+        return 'purple'
+      default:
+        return 'black';
     }
   }
 
@@ -136,8 +155,10 @@ function Row({ usuario}) {
         <TableCell size='small' align="center">
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {getPlatformIcon(usuario.plataforma_fav)}
-            <Typography variant="body1" sx={{ml: '2px'}}>
-              {usuario.plataforma_fav ? usuario.plataforma_fav : 'Nulo'}
+            <Typography 
+              variant="body2" 
+              sx={{ml: '4px', color: getPlataformColor(usuario.plataforma_fav), fontWeight: 'bold'}}>
+                {usuario.plataforma_fav ? usuario.plataforma_fav : 'Nulo'}
             </Typography>
           </div>
         </TableCell>

@@ -1,5 +1,7 @@
 import {BrowserRouter, Route, Routes, Navigate} from 'react-router-dom'
 import React from 'react';
+// import { ThemeProvider } from '@mui/material/styles'
+// import theme from './components/ui/theme';
 import LandingPage from './pages/home/LandingPage';
 import Login from './pages/login/register/Login';
 import Register from './pages/login/register/Register';
@@ -23,7 +25,7 @@ import NotiConfirmFinish from './pages/main_pages/forms/NotiConfirmFinish';
 import MyAccountForm from './pages/main_pages/forms/MyAccountForm';
 import PerfilImgForm from './pages/main_pages/forms/PerfilImgForm';
 import HeaderBar from './components/ui/HeaderBar';
-
+import FooterBar from './components/ui/FooterBar';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
@@ -46,38 +48,39 @@ function App() {
 
   return (
     <div className="App">
-        <BrowserRouter>
-          <Routes>
-            <Route path ="/" element={<LandingPage/>} />
-            <Route path= "/login" element={<Login onLoginLogout={onLoginLogout}/>}/>
-            <Route path= "/cadastro" element={<Register/>}/>
-            <Route path= "/sobre" element={<About/>}/>
-            <Route path= "/contato" element={<Contact/>}/>
-            <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
-            <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
-            <Route path= "/agendas/status" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
-            <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
-            <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-            <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-            <Route path= "/usuario" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
-            <Route path= "/usuario/profile/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
-            <Route path= "/usuario/image/:id" element={<AuthGuard> <PerfilImgForm/> </AuthGuard>}/>
-            <Route path= "usuario/minha_conta/:id" element={<AuthGuard> <MyAccountForm/> </AuthGuard>}/>
-            <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
-            <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
-            <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
-            <Route path= "/historico_jogo" element={<AuthGuard> <HistoricoJogos/> </AuthGuard>}/>
-            <Route path= "/historico_jogo/new" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
-            <Route path= "/historico_jogo/:id" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
-            <Route path= "/visualizacao" element={<AuthGuard> <Visualizacoes/> </AuthGuard>}/>
-            <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
-            <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
-            <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
-            <Route path= "/notificacao/confirmar-presenca/:id" element={<AuthGuard> <NotiConfirmStart/> </AuthGuard>}/>
-            <Route path= "/notificacao/confirmar-finalizacao/:id" element={<AuthGuard> <NotiConfirmFinish/> </AuthGuard>}/>
-          </Routes>
-        </BrowserRouter>
-    </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path ="/" element={<LandingPage/>} />
+          <Route path= "/login" element={<Login onLoginLogout={onLoginLogout}/>}/>
+          <Route path= "/cadastro" element={<Register/>}/>
+          <Route path= "/sobre" element={<About/>}/>
+          <Route path= "/contato" element={<Contact/>}/>
+          <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
+          <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+          <Route path= "/agendas/status" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+          <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
+          <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+          <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+          <Route path= "/usuario" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
+          <Route path= "/usuario/profile/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
+          <Route path= "/usuario/image/:id" element={<AuthGuard> <PerfilImgForm/> </AuthGuard>}/>
+          <Route path= "usuario/minha_conta/:id" element={<AuthGuard> <MyAccountForm/> </AuthGuard>}/>
+          <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
+          <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
+          <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
+          <Route path= "/historico_jogo" element={<AuthGuard> <HistoricoJogos/> </AuthGuard>}/>
+          <Route path= "/historico_jogo/new" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
+          <Route path= "/historico_jogo/:id" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
+          <Route path= "/visualizacao" element={<AuthGuard> <Visualizacoes/> </AuthGuard>}/>
+          <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
+          <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
+          <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
+          <Route path= "/notificacao/confirmar-presenca/:id" element={<AuthGuard> <NotiConfirmStart/> </AuthGuard>}/>
+          <Route path= "/notificacao/confirmar-finalizacao/:id" element={<AuthGuard> <NotiConfirmFinish/> </AuthGuard>}/>
+        </Routes>
+      </BrowserRouter>
+      <FooterBar/>
+   </div>
   )
 }
 

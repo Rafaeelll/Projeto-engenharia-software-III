@@ -14,7 +14,12 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import  Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
+import { styled } from '@mui/material/styles';
+import Toolbar from '@mui/material/Toolbar'
+import AppBar from '@mui/material/AppBar'
+import FooterBar from '../../../components/ui/FooterBar'
 
 
 export default function LoginForm({onLoginLogout}) {
@@ -83,7 +88,16 @@ export default function LoginForm({onLoginLogout}) {
     setNotif({ show: false })
   };
 
-
+  const BootstrapTooltip = styled(({ className, ...props }) => (
+    <Tooltip placement="bottom-end" {...props} arrow classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.arrow}`]: {
+      color: theme.palette.common.black,
+    },
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.black,
+    },
+  }));
 
   return(
     <div className="container">
@@ -101,6 +115,18 @@ export default function LoginForm({onLoginLogout}) {
       >
         {notif.message}
       </Notification>
+
+      <AppBar position='static' className='app-bar'>
+        <Toolbar>
+          <BootstrapTooltip title="Voltar para a página inicial" >
+            <IconButton component={Link} to="/"
+            sx={{backgroundColor: 'black'}}>
+              <ArrowBackIcon fontSize='medium' sx={{color: 'whitesmoke', fontWeight: 'bold'}}/>
+            </IconButton>
+          </BootstrapTooltip>
+        </Toolbar>
+      </AppBar>
+      
         <div className="container-login"
           style={{ 
             backgroundImage: `url(${ImagemFundo})`,
@@ -113,6 +139,7 @@ export default function LoginForm({onLoginLogout}) {
             color: 'white',
             fontFamily: 'monospace'
           }}>
+            
           <div className="wrap-login">
             <form onSubmit={handleSubmit}className="login-form">
               <span className="login-form-title" 
@@ -180,6 +207,7 @@ export default function LoginForm({onLoginLogout}) {
             </form>
           </div>
         </div>
+      <FooterBar/>
     </div>
   );
 }

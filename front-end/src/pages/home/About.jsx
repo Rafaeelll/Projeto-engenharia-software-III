@@ -6,30 +6,33 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import SteamAdvisorLogo from '../../assets/agendabutton.jpg'
-import FooterContent from "../../components/FooterContent";
+import FooterBar from '../../components/ui/FooterBar'
+import { Button, CardActions } from '@mui/material';
+import ShareIcon from '@mui/icons-material/Share';
 
 
 function About(){
   return (
     <>
+
       <HeaderBarLP/>
 
-      <Card sx={{width: '100%', borderRadius: '0px 0px 0px 0px'}}>
+      <Card className='background' sx={{borderRadius: '0px 0px 0px 0px', height: '100vh'}}>
         <CardMedia 
           style={{
             backgroundImage: `url(${SteamAdvisorLogo})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center', 
-            height: '350px'
+            height: '50vh'
           }}/>
-        <CardContent>
+        <CardContent sx={{color: "white"}}>
           <Typography gutterBottom variant="h4" component="div">
-            <u><strong>Stream Advisor</strong></u>
+            <u><strong>StreamAdvisor</strong></u>
           </Typography>
-          <Typography gutterBottom variant="h6" component="div" color="text.secondary">
+          <Typography gutterBottom variant="h6" component="div">
             <strong>Questão Problema:</strong> Excessividade no uso da tecnologia de vídeo games por gamers-streamers.
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" >
               O projeto proposto para a solução tem como objetivo de prevenir ou minimizar que os gamers-streamers use com 
             excessividade o seu tempo em transmissões jogando, criando um sistema para controlar melhor seu tempo e ainda 
             ser produtivo. Diante disso, será criado um sistema web para fazer essa função. Nessa plataforma o usuário terá 
@@ -38,8 +41,15 @@ function About(){
             de software III do professor Fernando no qual solicitou que nos alunos, desenvolvêssemos um sistema com pelo menos
             3 CRUDS.
           </Typography>
+          <CardActions>
+            <Button color='error' variant='contained'size="small"sx={{background: 'black', fontWeight: 'bold'}}>
+              <ShareIcon sx={{mr: '7px'}}/> Compartilhar
+            </Button>
+          </CardActions>    
         </CardContent>
       </Card>
+      <FooterBar/>
+      
     </>
 
   );

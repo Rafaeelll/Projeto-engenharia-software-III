@@ -24,13 +24,16 @@ function defaultOptions(body = null, method = 'GET') {
 function getErrorDescription(response) {
   switch(response.status) {
     case 401:   // Unauthorized
-      return 'ERRO: usuário ou senha incorretos'
+      return 'ERRO: usuário ou senha incorretos!'
 
     case 403:   // Expired
-      return 'ERRO: Sessão expirada, por favor, logar novamente'
+      return 'ERRO: Sessão expirada, por favor, logar novamente!'
     
-    case 404:
-      return 'ERRO: ID não foi encontrado'
+    case 404: // Not found
+      return 'ERRO: ID não foi encontrado!'
+
+    case 409: // Conflit
+      return 'ERRO: dado informado já está cadastrado!'
 
     default:
       return `ERRO: HTTP ${response.status}: ${response.statusText}`

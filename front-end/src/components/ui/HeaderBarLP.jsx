@@ -2,7 +2,6 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import sa2 from '../../../src/assets/sa2.png'
 import { Link } from 'react-router-dom'
 import '../../pages/home/styles/home-styles.css'
@@ -16,13 +15,13 @@ export default function HeaderBarLP({isLoggedIn, onLoginLogout}) {
 
   return (
     <Box>
-      <AppBar position="static" className='app-bar'>
+      <AppBar position="static" className='app-bar' enableColorOnDark>
         <Toolbar>
           <MainMenuLP/>
-          <img style={{width: '90px', borderRadius: '5px'}} src={sa2} alt='Stream Advisor logo' />
-          <Typography style={{fontFamily: 'monospace', margin: '10px'}} variant="p" component="div" sx={{ flexGrow: 1 }}>
-            Desenvolvidor por: <strong> Rafael Felipe</strong>
-          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <img style={{width: '90px', borderRadius: '5px'}} src={sa2} alt='Stream Advisor logo' />
+          </Box>
+
           {
             !isLoggedIn && 
             <Button sx={{fontFamily: 'monospace', margin: '20px', background: 'black', fontWeight: 'bold'}}

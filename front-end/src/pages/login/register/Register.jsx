@@ -5,7 +5,7 @@ import './styles/login-register-styles.css'
 import Backdrop from '@mui/material/Backdrop'
 import CircularProgress from '@mui/material/CircularProgress'
 import Notification from '../../../components/ui/Notification'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, Link} from 'react-router-dom'
 import Usuario from  '../../../../models/Usuario'
 import getValidationMessages from '../../../utils/getValidationMessages'
 import TextField from '@mui/material/TextField'
@@ -19,6 +19,14 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
+import ConfirmImgPreviewDialog from '../../../components/ui/ConfirmImgPreviewDialog'
+import Avatar from '@mui/material/Avatar'
+import Typography from '@mui/material/Typography';
+import FooterBar from '../../../components/ui/FooterBar'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import  Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
+import Toolbar from '@mui/material/Toolbar'
+import AppBar from '@mui/material/AppBar'
 
 
 
@@ -28,6 +36,7 @@ function Register(){
   const navigate = useNavigate()
   const [selectedFileName, setSelectedFileName] = React.useState('');
   const [selectedFile, setSelectedFile] = React.useState(null);
+  const [showDialog, setShowDialog] = React.useState(false);
 
   const [state, setState] = React.useState({
     usuario: {
@@ -67,6 +76,25 @@ function Register(){
     whiteSpace: 'nowrap',
     width: 1,
   });
+
+  const BootstrapTooltip = styled(({ className, ...props }) => (
+    <Tooltip placement="bottom-end" {...props} arrow classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.arrow}`]: {
+      color: theme.palette.common.black,
+    },
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.black,
+    },
+  }));
+
+  const handleImagePreviewClick = () => {
+    setShowDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setShowDialog(false);
+  };
 
   function handleFileChange(event) {
     const file = event.target.files[0];
@@ -115,11 +143,9 @@ function handleFormSubmit(event) {
 async function sendData() {
   setState({ ...state, showWaiting: true, errors: {} });
   try {
-    // Chama a validação da biblioteca Joi
     console.log('Dados a serem enviados:', usuario); // Adicione este console.log
-
+    // Chama a validação da biblioteca Joi
     await Usuario.validateAsync(usuario, { abortEarly: false });
-
 
     const formData = new FormData()
     formData.append('nome', usuario.nome)
@@ -170,7 +196,7 @@ async function sendData() {
         notif: {
           severity: 'error',
           show: !validationError,
-          message: 'ERRO: ' + error.message,
+          message: error.message,
         },
       });
     }
@@ -183,7 +209,7 @@ async function sendData() {
     }
     
     // Se o item foi salvo com sucesso, retorna à página de listagem
-    if(notif.severity === 'success') navigate('/login')
+    if(notif.severity === 'success') navigate(-1)
 
     setState({ ...state, notif: { ...notif, show: false } })
   }
@@ -191,6 +217,19 @@ async function sendData() {
 
   return(  
     <div className="container">
+
+      <ConfirmImgPreviewDialog
+        open={showDialog}
+        onClose={handleCloseDialog}
+        title="Pré-Visualização"
+        userName={<Typography> {usuario.nome + ' ' + usuario.sobrenome} </Typography>}
+        profileImgPreview = { 
+          <Avatar src={selectedFile} 
+          alt="Foto de perfil" 
+          style={{ width: '200px', height: '200px', boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.2)'}}/>}
+      >
+      </ConfirmImgPreviewDialog>
+
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
@@ -205,6 +244,17 @@ async function sendData() {
       >
         {notif.message}
       </Notification>
+
+      <AppBar position='static' className='app-bar'>
+        <Toolbar>
+          <BootstrapTooltip title="Voltar para a página login" >
+            <IconButton component={Link} to="/login"
+            sx={{backgroundColor: 'black'}}>
+              <ArrowBackIcon fontSize='medium' sx={{color: 'whitesmoke', fontWeight: 'bold'}}/>
+            </IconButton>
+          </BootstrapTooltip>
+        </Toolbar>
+      </AppBar>
 
     <div className="container-login" 
       style={{ 
@@ -307,7 +357,7 @@ async function sendData() {
               color='secondary'
               className='input2'
               variant='filled'
-              type="password"
+              type={mostrarSenha ? 'text' : 'password'}
               name='confirmar_senha'
               required
               error={errors?.confirmar_senha}
@@ -358,15 +408,18 @@ async function sendData() {
               tabIndex={-1}
               startIcon={<CloudUploadIcon />}
             >
-              {selectedFile && <img src={selectedFile} alt="Foto selecionada" style={{ marginRight: '8px', width: '24px'}} />}
-              {selectedFileName ? selectedFileName : 'Adicione uma Foto de perfil'}
-              {selectedFile && <CloseIcon onClick={clearSelection} style={{ marginLeft: '8px', cursor: 'pointer' }} />}
-              <VisuallyHiddenInput
-                type="file"
-                onChange={handleFileChange}
-                name="image"
-              />
-            </Button>
+              {selectedFile && 
+                <IconButton onClick={handleImagePreviewClick}> 
+                  <Avatar src={selectedFile} alt="Foto selecionada" sx={{ marginRight: '8px', width: '50px', height: '50px'}}/> 
+                </IconButton>}
+                {selectedFileName ? selectedFileName : 'Adicione uma Foto de perfil'}
+                {selectedFile && <CloseIcon onClick={clearSelection} style={{ marginLeft: '8px', cursor: 'pointer' }} />}
+                <VisuallyHiddenInput
+                  type="file"
+                  onChange={handleFileChange}
+                  name="image"
+                />
+              </Button>
           </div>
 
             <div className="container-login-form-btn">       
@@ -382,6 +435,7 @@ async function sendData() {
         </form>
       </div>
     </div>
+    <FooterBar/>
   </div>
   )
 }

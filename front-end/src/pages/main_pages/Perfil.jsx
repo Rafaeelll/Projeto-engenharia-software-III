@@ -15,7 +15,7 @@ import CollapsibleTableUser from '../../components/ui/CollapsibleTableUser';
         <CollapsibleTableUser/>
 
         <Box sx={{display: "flex",justifyContent: "center", marginTop: "15px"}}>
-          <Link to="new">
+          <Link to="/cadastro">
             <Button style={{marginRight: '15px'}}
               variant="contained" 
               size="medium" 

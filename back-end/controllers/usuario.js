@@ -30,7 +30,7 @@ const controller = {}   // Objeto vazio
   desde a criação de novas contas até a autenticação e manipulação dos dados dos usuários.
 */
 
-controller.create = async (req, res) => {
+controller.cadastro = async (req, res) => {
   const { nome, sobrenome, email, senha_acesso, telefone } = req.body;
   const user = await Usuario.findOne({ where: { email } });
 
@@ -115,6 +115,48 @@ controller.updateUserProfile = async (req, res) => {
       console.error(error);
     }
 };
+
+controller.updateMyAccount = async (req, res) => {
+  try {
+    const user = await Usuario.findOne({ where: { id: req.authUser.id } });
+    const { email, senha_acesso, ativo } = req.body;
+
+    // Verifica se o email informado é igual ao email do usuário logado
+    if (email !== user.email) {
+      // Verifica se o email informado já está cadastrado no banco
+      const emailExists = await Usuario.findOne({ where: { email } });
+      
+      if (emailExists) {
+        // Se o email já existir no banco e não pertencer ao usuário logado, retorna erro de conflito
+        return res.status(409).send('O e-mail informado já está em uso.');
+      }
+    }
+
+    // Criptografar a senha
+    const hashedPassword = await bcrypt.hash(senha_acesso, 12);
+
+    const response = await Usuario.update({
+      email,
+      senha_acesso: hashedPassword,
+      ativo
+    },
+    // Condição para atualização
+    { where: { id: req.params.id, id: req.authUser.id }}
+    );
+
+    // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
+    if (response[0] > 0) {
+      // HTTP 204: No Content
+      res.status(204).end();
+    } else {
+      // HTTP 404: Not Found
+      res.status(404).end();
+    }
+  } catch (error){
+    console.error(error);
+  }
+}
+
 
 controller.updateUserImg = async (req, res) => {
   try {
@@ -222,33 +264,4 @@ controller.logout = (req, res) => {
   res.json({ auth: false })
 }
 
-// Método para verificar se o e-mail já existe no banco de dados
-controller.cadastro = async (req, res) => {
-  const { nome, sobrenome, email, senha_acesso, telefone } = req.body;
-  const user = await Usuario.findOne({ where: { email } });
-
-   try {
-    // Verificação do e-mail antes de criar o usuário
-    if (user) {
-      // Se encontrou o usuário com o email, retorna um erro de conflito
-      return res.status(409).send('O e-mail informado já está em uso.');
-    }
-    // Criptografar a senha
-    const hashedPassword = await bcrypt.hash(senha_acesso, 12);
-
-    await Usuario.create({
-      nome,
-      sobrenome,
-      email,
-      senha_acesso: hashedPassword,
-      telefone,
-      image: req.file.filename
-
-    });
-    // HTTP 201: Created
-    return res.status(201).json(Usuario); // HTTP 201: Created
-  } catch (error) {
-    console.error(error);
-  }
-}
 module.exports = controller

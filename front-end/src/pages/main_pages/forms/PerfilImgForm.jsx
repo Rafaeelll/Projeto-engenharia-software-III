@@ -171,7 +171,7 @@ export default function PerfilImgForm() {
       return;
     }
     // Se o item foi salvo com sucesso, retorna à página de listagem
-    if (notif.severity === 'success') nav(-1);
+    if (notif.severity === 'success') navigate(-1);
     setState({ ...state, notif: { ...notif, show: false } });
   }
 
@@ -182,7 +182,7 @@ export default function PerfilImgForm() {
       <ConfirmImgPreviewDialog
         open={showDialog}
         onClose={handleCloseDialog}
-        title="Preview"
+        title="Pré-Visualização"
         userName={<Typography> {userProfile.nome + ' ' + userProfile.sobrenome} </Typography>}
         profileImgPreview = { 
           <Avatar src={selectedFile} 
