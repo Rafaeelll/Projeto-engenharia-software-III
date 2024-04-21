@@ -26,7 +26,7 @@ export default function FooterBar() {
           }
         }}
       >
-          <strong> &copy; 2024 Stream Advisor</strong>, desenvolvido com <FavoriteIcon fontSize="small" color='error'/> por <a href="mailto:rafaelabnelcintra@gmail.com">Rafael Felipe</a>
+        <strong> &copy; 2024 Stream Advisor</strong>, desenvolvido com <FavoriteIcon fontSize="small" color='error'/> por <a href="mailto:rafaelabnelcintra@gmail.com">Rafael Felipe</a>
       </Typography>
     </Toolbar>
   )

@@ -16,6 +16,8 @@ router.post('/login', controller.login);
 // Rota para fazer logout
 router.post('/logout', controller.logout);
 
+router.post('/logout2', controller.logout2);
+
 // Rota para cadastrar um novo usuário
 router.post('/cadastro', multerConfig.single('image'), controller.cadastro);
 
@@ -28,11 +30,15 @@ router.get('/:id', controller.retrieveOne);
 // Rota para atualizar um usuário específico por ID (requer autenticação e autorização)
 router.put('/profile/:id', controller.updateUserProfile);
 
+router.put('/account_status/:id', controller.updateUserAccountStatus);
+
 router.put('/minha_conta/:id', controller.updateMyAccount);
 
 router.put('/image/:id', multerConfig.single('image'), controller.updateUserImg);
 
 // Rota para excluir um usuário específico por ID (requer autenticação e autorização)
 router.delete('/:id', controller.delete);
+
+router.delete('/:id', controller.deleteInactiveUsers);
 
 module.exports = router;

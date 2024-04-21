@@ -30,14 +30,15 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       // Cada agenda pertence a um jogo
-      this.belongsTo(models.Jogo, {
+      this.belongsToMany(models.Jogo, {
+        through: 'agenda_jogos',
         foreignKey: 'jogo_id',    // Nome do campo na tabela de ORIGEM
         targetKey: 'id',           // Nome do campo na tabela de DESTINO
         as: 'jogo'                 // Nome do atributo para exibição
       });
 
       // Cada agenda pode ter várias visualizações
-      this.hasMany(models.Visualizacao, {
+      this.hasOne(models.Visualizacao, {
         foreignKey: 'agenda_id',   // Campo da tabela estrangeira
         sourceKey: 'id',           // Campo da tabela local 
         as: 'visualizacoes'        // Nome do campo de associação (plural)

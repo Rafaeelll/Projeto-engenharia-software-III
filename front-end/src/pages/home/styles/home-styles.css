@@ -11,27 +11,34 @@
 
 .background{
 
-    background: -webkit-linear-gradient(to left, #a426e3, #020202);
-    background: -o-linear-gradient(to left, #a426e3, #020202);
-    background: -moz-linear-gradient(to left, #a426e3, #020202);
-    background: linear-gradient(to left, #a426e3, #020202);  
+    background: -webkit-linear-gradient(to left, #b721ff, #000);
+    background: -o-linear-gradient(to left, #b721ff, #000);
+    background: -moz-linear-gradient(to left, #b721ff, #000);
+    background: linear-gradient(to left, #b721ff, #000);  
 }
 
-.cadastrar-se-LP-btn{
-    font-size: 15px;
+.cadastrar-se-LP-btn, .entrar-LP-btn{
     border: none;
-    border-radius: 50px;
-    color:#fff;
-        
+    color:#fff;        
     background: -webkit-linear-gradient(to left, #21d4fd, #b721ff);
     background: -o-linear-gradient(to left, #21d4fd, #b721ff);
     background: -moz-linear-gradient(to left, #21d4fd, #b721ff);
     background: linear-gradient(to left, #21d4fd, #b721ff);
 }
 
-.cadastrar-se-LP-btn:hover{
-    cursor: pointer;
+.cadastrar-se-LP-btn:hover, .entrar-LP-btn:hover{
     transition: box-shadow 0.5s ease;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.4);
+}
+
+.cadastrar-se-icon-btn, .entrar-icon-btn{
+    border: none;
+    color:#fff;
+}
+.cadastrar-se-icon-btn:hover, .entrar-icon-btn:hover{
+    transition: box-shadow 0.5s ease;
+    font-weight: 700;
+    border-radius: 50px;
     box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.4);
 }

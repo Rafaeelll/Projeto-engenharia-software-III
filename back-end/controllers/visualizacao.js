@@ -24,6 +24,14 @@ controller.create = async (req, res) => {
     req.body.usuario_id = req.authUser.id; // Adiciona o id do usuário autenticado ao corpo da requisição
 
     try {
+
+        const existingVisualizacao = await Visualizacao.findOne({
+            where: { agenda_id: req.body.agenda_id } // Filtra pelo id do jogo
+
+        })
+        if (existingVisualizacao){
+            return res.status(409).send("Já existe um registro de visualização para esta agenda.");
+        }
         await Visualizacao.create(req.body); // Cria uma nova visualização no banco de dados
         // HTTP 201: Created
         res.status(201).end(); // Retorna status 201 indicando que a visualização foi criada com sucesso
@@ -68,6 +76,15 @@ controller.retrieveOne = async (req, res) => {
 // Método para atualizar uma visualização específica do usuário autenticado
 controller.update = async (req, res) => {
     try {
+        const existingRecord = await Visualizacao.findOne({
+            where: { agenda_id: req.body.agenda_id } // Filtra pelo id do jogo
+
+        });
+        // Se já existe um registro associado a este jogo, retorna um erro 409 Conflict
+        if (existingRecord && existingRecord.id !== req.params.id) {
+            return res.status(409).json({ error: 'Já existe um registro de visualização para este jogo.' });
+        }
+
         const response = await Visualizacao.update(
             req.body,
             { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela ID e pelo usuário autenticado

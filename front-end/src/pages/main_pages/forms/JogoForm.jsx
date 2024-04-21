@@ -113,7 +113,7 @@ export default function jogos() {
 
         console.error(error)
         
-        if (error.response && error.response.status === 400) {
+        if (error.response && error.response.status === 409) {
             // Erro de validação personalizado
             setState({
                 ...state, 
@@ -153,7 +153,7 @@ export default function jogos() {
 
   return (
     <>
-        <Backdrop
+      <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={showWaiting}
       >

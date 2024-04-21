@@ -59,11 +59,11 @@ module.exports = {
       image:{
         type: Sequelize.STRING,
       },
-      primeiro_login:{
-        type: Sequelize.BOOLEAN,
-        defaultValue: true
+      contagem_acesso:{
+        type: Sequelize.INTEGER,
+        defaultValue: 0
       },
-      ativo:{
+      status:{
         type: Sequelize.BOOLEAN,
         defaultValue: true
       },

@@ -23,6 +23,19 @@ controller.create = async (req, res) => {
     req.body.usuario_id = req.authUser.id;
 
     try {
+        // Verifica se já existe um jogo com o mesmo nome para o usuário atual
+        const existingGame = await Jogo.findOne({
+            where: {
+                nome: req.body.nome,
+                usuario_id: req.authUser.id
+            }
+        });
+
+        if (existingGame) {
+            // Se já existir um jogo com o mesmo nome para o usuário atual, retorna um erro
+            return res.status(409).send({ error: 'Você já possui um jogo com esse nome.' });
+        }
+
         // Cria um novo registro de jogo no banco de dados
         await Jogo.create(req.body);
         // HTTP 201: Created
@@ -30,7 +43,7 @@ controller.create = async (req, res) => {
     } catch (error) {
         // Tratamento de erros
         if (error.name === 'SequelizeUniqueConstraintError') {
-            res.status(400).send({ error: 'Nome do jogo já existe.' });
+            res.status(409).send({ error: 'Nome do jogo já existe.' });
         } else {
             console.error(error);
             res.status(500).json({ error: 'Erro interno do servidor.' });

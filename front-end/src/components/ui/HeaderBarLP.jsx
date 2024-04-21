@@ -24,17 +24,17 @@ export default function HeaderBarLP({isLoggedIn, onLoginLogout}) {
 
           {
             !isLoggedIn && 
-            <Button sx={{fontFamily: 'monospace', margin: '20px', background: 'black', fontWeight: 'bold'}}
+            <Button className='entrar-LP-btn' sx={{margin: '20px', borderRadius: 40}}
               color="secondary"
               variant='contained'              
-              startIcon={<LoginIcon style={{fontWeight: 'bold'}}/>}
+              endIcon={<LoginIcon className='entrar-icon-btn'/>}
               component={Link} to="/login">
               Entrar
             </Button>
           }
           {
             isLoggedIn && 
-            <Button sx={{fontFamily: 'monospace', margin: '20px', background: 'black', fontWeight: 'bold'}}
+            <Button sx={{margin: '20px'}}
               color="error"
               variant='contained'
               startIcon={<LogoutIcon style={{fontWeight: 'bold'}}/>}

@@ -12,7 +12,6 @@ module.exports = {
       nome: {
         type: Sequelize.STRING(50),
         allowNull:false,
-        unique: true
       },
       usuario_id: {
         type: Sequelize.INTEGER,

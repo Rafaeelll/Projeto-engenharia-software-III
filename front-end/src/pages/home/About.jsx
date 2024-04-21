@@ -42,8 +42,13 @@ function About(){
             3 CRUDS.
           </Typography>
           <CardActions>
-            <Button color='error' variant='contained'size="small"sx={{background: 'black', fontWeight: 'bold'}}>
-              <ShareIcon sx={{mr: '7px'}}/> Compartilhar
+            <Button 
+              color='primary' 
+              variant='contained'
+              size="small"
+              startIcon={<ShareIcon/>}
+              sx={{background: 'black', fontWeight: 'bold'}}>
+              Compartilhar
             </Button>
           </CardActions>    
         </CardContent>

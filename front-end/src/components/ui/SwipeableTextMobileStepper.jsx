@@ -65,11 +65,11 @@ function SwipeableTextMobileStepper() {
   return (
     <Card className='background' sx={{borderRadius: '0px 0px 0px 0px', height: '100vh'}}>
       <AutoPlaySwipeableViews
-          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-          index={activeStep}
-          onChangeIndex={handleStepChange}
-          enableMouseEvents
-          interval={15000} // Intervalo de 15 segundos entre as mudanças de slide
+        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+        index={activeStep}
+        onChangeIndex={handleStepChange}
+        enableMouseEvents
+        interval={15000} // Intervalo de 15 segundos entre as mudanças de slide
 
         > 
           {images.map((step, index) => (
@@ -77,32 +77,34 @@ function SwipeableTextMobileStepper() {
               {Math.abs(activeStep - index) <= 2 ? (
                 <CardMedia image={step.imgPath} alt={step.label}
                   style={{
-                    height: 500,
+                    height: 550,
                     display: 'block',
                     overflow: 'hidden',
                     width: '100%',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center'}}>
-                  <CardContent sx={{color: "white", textAlign: 'left', marginLeft: '20px', mt: 5, width: '45%'}}>
+                  <CardContent sx={{color: "white", textAlign: 'left', marginLeft: '20px', mt: 10, width: '55%'}}>
                     <Typography sx={{fontWeight: 'bolder', fontFamily: 'Verdana'}} 
                     gutterBottom variant="h4" component="div">
-                      Bem Vindo ao Stream Advisor!
+                      Bem Vindo ao StreamAdvisor!
                     </Typography> 
-                    <Typography variant="body1" sx={{fontWeight: 'bold' }}>
-                      Sistema de agenda e monitoramento voltada a gamers, 
-                      com a objetividade de melhorar o seu desempenho e produtividade no ramo profissional de gamer-streamer.
+                    <Typography variant="body1" sx={{fontWeight: 'bold'}}>
+                      Sistema de agenda e monitoramento voltada a gamers, com a objetividade de melhorar o seu 
+                      desempenho e produtividade no ramo profissional de gamer-streamer.
                     </Typography>
 
-                    <CardActions style={{display: 'flex', justifyContent:'start', alignItems: 'center'}}>
+                    <CardActions style={{display: 'flex', justifyContent: 'start', alignItems: 'center'}}>
                       <Button className='cadastrar-se-LP-btn'
-                        sx={{borderRadius: 50}}
+                        sx={{borderRadius: 40}}
                         component={Link} 
+                        startIcon={<HowToRegIcon className='cadastrar-se-icon-btn'/>}
+                        Cadastrar-se
                         to="/cadastro" 
                         color='secondary' 
                         variant='contained' 
                         size='large'
                       > 
-                        <HowToRegIcon className='cadastrar-se-LP-btn' sx={{mr: '5px'}}/> Cadastrar-se
+                        Cadastrar-se
                       </Button>
                     </CardActions>
                   </CardContent>

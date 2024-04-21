@@ -15,13 +15,14 @@ module.exports = (sequelize, DataTypes) => {
   class Jogo extends Model {
     static associate(models) {
       // Associações do modelo Jogo com outros modelos
-      this.hasMany(models.Agenda, {
+      this.belongsToMany(models.Agenda, {
+        through: 'agenda_jogos',
         foreignKey: 'jogo_id',    // Chave estrangeira na tabela de Agenda
         sourceKey: 'id',          // Chave local na tabela de Jogo
         as: 'agendas'             // Nome do atributo para exibição (plural)
       });
 
-      this.hasMany(models.HistoricoJogo, {
+      this.hasOne(models.HistoricoJogo, {
         foreignKey: 'jogo_id',    // Chave estrangeira na tabela de HistoricoJogo
         sourceKey: 'id',          // Chave local na tabela de Jogo
         as: 'historico_jogos'     // Nome do atributo para exibição (plural)
@@ -46,7 +47,6 @@ module.exports = (sequelize, DataTypes) => {
     nome: {
       type: DataTypes.STRING(50),
       allowNull:false,
-      unique: true
     },
     usuario_id: {
       type: DataTypes.INTEGER,

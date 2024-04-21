@@ -55,7 +55,7 @@ function Row({ usuario}) {
           email: usuario.email,
           senha_acesso: usuario.senha_acesso,
           createdAt: usuario.createdAt,
-          ativo: usuario.ativo
+          status: usuario.status
         }))
         setUserAcounts(formattedUserAcount);
       }
@@ -75,8 +75,8 @@ function Row({ usuario}) {
     }
   };
 
-  function getAccountStatus(ativo){
-    switch (ativo){
+  function getAccountStatus(status){
+    switch (status){
       case false:
         return 'red';
       case true:
@@ -189,7 +189,7 @@ function Row({ usuario}) {
             <Box sx={{ margin: 1 }}>
             <Typography 
               sx={{fontWeight: 'bolder'}} variant="h6" gutterBottom component="div" color='primary'> 
-              <u>Minha Conta</u> 
+              <u>Minha Status</u> 
             </Typography>
               <Table size="small" aria-label="Visualizações">
                 <TableHead>
@@ -197,7 +197,7 @@ function Row({ usuario}) {
                     <TableCell size='small' align="center">Data De Criação</TableCell>
                     <TableCell size='small' align="center">Email</TableCell>
                     <TableCell size='small' align="center">Senha</TableCell>
-                    <TableCell size='small' align="center">Conta</TableCell>
+                    <TableCell size='small' align="center">Status</TableCell>
                     <TableCell size='small' align="center">Editar</TableCell>
                   </TableRow>
                 </TableHead>
@@ -219,7 +219,14 @@ function Row({ usuario}) {
                       </TableCell>                      
                       <TableCell size='small' align="center">{userAcountItem.email}</TableCell>
                       <TableCell size='small' align="center">{userAcountItem.senha_acesso}</TableCell>
-                      <TableCell size='small' align="center" style={{color: getAccountStatus(userAcountItem.ativo), fontWeight: 'bolder'}}>{userAcountItem.ativo ? 'Ativa': 'Inativa'}</TableCell>
+                      <TableCell size='small' align="center" sx={{color: getAccountStatus(userAcountItem.status), fontWeight: 'bolder'}}>
+                          <Link to={'./account_status/' + usuario.id}>
+                            <IconButton size='small'> 
+                              <EditIcon sx={{ml: '5px'}}/>
+                            </IconButton>
+                          </Link>
+                          {userAcountItem.status ? 'Ativo': 'Inativo'}
+                      </TableCell>
                       <TableCell size='small' align="center">
                         <Link to={'./minha_conta/' + usuario.id}>
                           <IconButton aria-label="Editar">

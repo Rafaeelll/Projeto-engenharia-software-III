@@ -11,15 +11,11 @@ import Paper  from '@mui/material/Paper';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
 import api from '../../../../services/api'
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 import InputAdornment from '@mui/material/InputAdornment'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
+
 
 export default function MyAccountForm() {
 
@@ -27,13 +23,13 @@ export default function MyAccountForm() {
   const API_PATH_MC =  '/usuarios/minha_conta'
   const { id } = useParams(); // Capturando o ID da URL
   const navigate = useNavigate()
+  // const [showDialog, setShowDialog] = React.useState(false)
 
   const [state, setState] = React.useState({
-    myAccountDatas:{
+    myAccountDatas: {
       email: '',
       senha_acesso: '',
       confirmar_senha: '',
-      ativo: '',
     },
     errors: {},
     mostrarSenha: false,
@@ -112,6 +108,10 @@ export default function MyAccountForm() {
   
       } else {
         await myfetch.post(API_PATH_MC, myAccountDatas);
+      }
+      if (myAccountDatas.ativo === false) {
+        // Se o campo ativo foi definido como false, limpe o cookie AUTH
+        document.cookie = 'AUTH=; Max-Age=-99999999;'; // Define um tempo de vida negativo para excluir o cookie
       }
       setState({
         ...state,
@@ -261,23 +261,9 @@ export default function MyAccountForm() {
                 }}
             />
 
-          <FormControl color='secondary' sx={{mt: '25px'}}>
-            <FormLabel id="demo-radio-buttons-group-label" required>Status:</FormLabel>
-            <RadioGroup
-              aria-labelledby="demo-radio-buttons-group-label"
-              row
-              name="ativo"
-              value={myAccountDatas.ativo}
-              onChange={handleFormFieldChange}
-            >
-              <FormControlLabel value={true} control={<Radio />} label="Ativa" />
-              <FormControlLabel value={false}control={<Radio />} label="Desativar" />
-            </RadioGroup>
-          </FormControl>
-
           <div style={{display: 'flex', justifyContent: 'center'}}>
             <Button
-              sx={{m: '10px', mt: '20px', background: 'black'}}
+              sx={{m: '10px', mt: '30px', background: 'black'}}
               color="secondary"
               variant='contained'
               type="submit"
@@ -286,7 +272,7 @@ export default function MyAccountForm() {
             </Button>
 
             <Button
-              sx={{m: '10px', mt: '20px', background: 'black'}}
+              sx={{m: '10px', mt: '30px', background: 'black'}}
               color="error"
               variant='contained'
               onClick={() => navigate(-1)}

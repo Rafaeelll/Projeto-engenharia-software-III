@@ -2,6 +2,8 @@
 const { Usuario } = require('../models') // Importa o modelo de usuário do sistema
 const bcrypt = require('bcrypt') // Biblioteca para hash de senhas
 const jwt = require('jsonwebtoken') // Biblioteca para geração e verificação de tokens de autenticação
+const { Op } = require('sequelize');
+const cron = require('node-cron');
 
 const controller = {}   // Objeto vazio
 
@@ -98,10 +100,10 @@ controller.updateUserProfile = async (req, res) => {
       jogo_fav: req.body.jogo_fav
 
     },
-        // Condição para atualização
-        { 
-          where: { id: req.params.id, id: req.authUser.id }
-        }
+      // Condição para atualização
+      { 
+        where: { id: req.params.id, id: req.authUser.id }
+      }
     );
     // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
     if (response[0] > 0) {
@@ -116,10 +118,61 @@ controller.updateUserProfile = async (req, res) => {
     }
 };
 
+controller.updateUserAccountStatus = async (req, res) => {
+  try {
+    
+    const user = await Usuario.findOne({ where: { id: req.authUser.id } });
+
+    if (!user) {
+      // Se o usuário não for encontrado, retorne uma resposta 404
+      return res.status(404).end();
+    }
+
+    // Verifica o status atual da conta e realiza a atualização correspondente
+    if (user.status === true) {
+      // Atualiza para inativo
+      const response1 = await Usuario.update(
+        { status: false },
+        { where: { id: req.params.id, id: req.authUser.id }}
+      );
+      // Verifica e retorna a resposta apropriada
+      if (response1[0] > 0) {  
+        // HTTP 204: No Content
+        return res.status(204).end();
+      } else {
+        // HTTP 404: Not Found
+        return res.status(404).end();
+      }
+    } else {
+      // Atualiza para ativo
+      const response2 = await Usuario.update(
+        { status: true },
+        { where: { id: req.params.id, id: req.authUser.id }}
+      );
+      // Verifica e retorna a resposta apropriada
+      if (response2[0] > 0) {  
+        // HTTP 204: No Content
+        return res.status(204).end();
+      } else {
+        // HTTP 404: Not Found
+        return res.status(404).end();
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+controller.logout2 = (req, res) => {
+  res.clearCookie('AUTH') // Apaga o cookie
+  res.json({ auth: false })
+}
+
 controller.updateMyAccount = async (req, res) => {
   try {
     const user = await Usuario.findOne({ where: { id: req.authUser.id } });
-    const { email, senha_acesso, ativo } = req.body;
+    const { email, senha_acesso } = req.body;
 
     // Verifica se o email informado é igual ao email do usuário logado
     if (email !== user.email) {
@@ -138,7 +191,6 @@ controller.updateMyAccount = async (req, res) => {
     const response = await Usuario.update({
       email,
       senha_acesso: hashedPassword,
-      ativo
     },
     // Condição para atualização
     { where: { id: req.params.id, id: req.authUser.id }}
@@ -210,6 +262,16 @@ controller.login = async (req, res) => {
 
     if(pwMatches) {
       // A senha confere
+
+      //contagem de acessos apos o usuário efetuar o login
+      const contagem = usuario.contagem_acesso + 1
+
+      // Aqui atualizamos a contagem de acesso no objeto do usuário
+      usuario.contagem_acesso = contagem;
+
+      // Agora salvamos a atualização no banco de dados
+      await usuario.save();
+
       const token = jwt.sign({
           id: usuario.id,
           nome: usuario.nome,
@@ -220,6 +282,8 @@ controller.login = async (req, res) => {
           plataforma_fav: usuario.plataforma_fav,
           jogo_fav: usuario.jogo_fav,
           image: usuario.image,
+          contagem_acesso: contagem,
+          status: usuario.status
         },
         process.env.TOKEN_SECRET,    // Chave para criptografar o token
         { expiresIn: '24h' }         // Duração do token
@@ -229,25 +293,15 @@ controller.login = async (req, res) => {
       //res.json({ auth: true, token })
       
       //verificar se é o primeiro acesso
-      if(usuario.primeiro_acesso){
         res.cookie('AUTH', token, { 
           httpOnly: true, 
           secure: true,
           sameSite: 'None',
           path: '/',
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas a partir de agora
+          maxAge: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas a partir de agora
         })
-        res.json({auth: true, primeiro_acesso: true})
-      }else{
-        res.cookie('AUTH', token, { 
-          httpOnly: true, 
-          secure: true,
-          sameSite: 'None',
-          path: '/',
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas a partir de agora
-        })
-        res.json({auth: true, primeiro_acesso: false})
-      }  
+        res.json({auth: true})
+       
     }
     else {
       // Senha errada ~> HTTP 401: Unauthorized
@@ -263,5 +317,38 @@ controller.logout = (req, res) => {
   res.clearCookie('AUTH') // Apaga o cookie
   res.json({ auth: false })
 }
+
+controller.deleteInactiveUsers = async (req, res) => {
+  try {
+    const cutoffDate = new Date();
+    cutoffDate.setMinutes(cutoffDate.getMinutes() - 1); // Alterado para 1 minuto
+
+    const inactiveUsers = await Usuario.findAll({
+      where: {
+        status: false,
+        updatedAt: { [Op.lt]: cutoffDate }
+      }
+    });
+
+    if (inactiveUsers && inactiveUsers.length > 0) { // Verifica se há usuários inativos
+      await Promise.all(inactiveUsers.map(async (user) => {
+        if (user && user.status === false) { // Verifica se o usuário existe e se está inativo
+          await Usuario.destroy({ where: { id: user.id } });
+        }
+      }));
+      res.status(204).end();
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Erro ao excluir usuários inativos.');
+  }
+};
+
+
+// Agendar a execução da função deleteInactiveUsers a cada minuto
+cron.schedule('*/1 * * * *', controller.deleteInactiveUsers);
+
 
 module.exports = controller

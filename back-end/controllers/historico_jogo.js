@@ -19,12 +19,23 @@ controller.create = async (req, res) => {
     req.body.usuario_id = req.authUser.id;
 
     try {
+        // Verifica se já existe um registro de histórico para o jogo fornecido
+        const existingHistorico = await HistoricoJogo.findOne({
+            where: { jogo_id: req.body.jogo_id } // Filtra pelo id do jogo
+        });
+
+        // Se já existe um registro de histórico para o jogo, retorna um erro
+        if (existingHistorico) {
+            return res.status(409).send("Já existe um registro de histórico para este jogo.");
+        }
+
         // Cria um novo registro de histórico de jogo no banco de dados
         await HistoricoJogo.create(req.body);
         // HTTP 201: Created
         res.status(201).end();
     } catch (error) {
         console.error(error);
+        res.status(500).send("Erro interno do servidor.");
     }
 };
 
@@ -68,11 +79,22 @@ controller.retrieveOne = async (req, res) => {
 // Método para atualizar um registro específico de histórico de jogo do usuário autenticado
 controller.update = async (req, res) => {
     try {
+        // Verifica se já existe um registro de histórico de jogo associado ao jogo atual
+        const existingRecord = await HistoricoJogo.findOne({
+            where: { jogo_id: req.body.jogo_id }
+        });
+
+        // Se já existe um registro associado a este jogo, retorna um erro 409 Conflict
+        if (existingRecord && existingRecord.id !== req.params.id) {
+            return res.status(409).json({ error: 'Já existe um registro de histórico para este jogo.' });
+        }
+
         // Atualiza um registro específico de histórico de jogo do usuário autenticado pelo id
         const response = await HistoricoJogo.update(
             req.body,
             { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pelo id do jogo e do usuário autenticado
         );
+
         // Se a atualização for bem-sucedida, retorna HTTP 204: No Content, caso contrário, retorna HTTP 404: Not Found
         if (response[0] > 0) {
             res.status(204).end();
@@ -83,6 +105,7 @@ controller.update = async (req, res) => {
         console.error(error);
     }
 };
+
 
 // Método para deletar um registro específico de histórico de jogo do usuário autenticado
 controller.delete = async (req, res) => {

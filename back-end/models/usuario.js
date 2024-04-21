@@ -93,11 +93,11 @@ module.exports = (sequelize, DataTypes) => {
     image:{
       type: DataTypes.STRING,
     },
-    primeiro_login:{
-      type: DataTypes.BOOLEAN,
-      defaultValue: true
+    contagem_acesso:{
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     },
-    ativo:{
+    status:{
       type: DataTypes.BOOLEAN,
       defaultValue: true
     },

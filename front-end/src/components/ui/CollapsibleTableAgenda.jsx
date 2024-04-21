@@ -121,7 +121,7 @@ function Row({ agenda, onDelete }) {
   function getPlataformColor(plt_transm){
     switch (plt_transm){
       case 'Facebook':
-        return 'blue';
+        return 'navy';
       case 'Youtube':
         return 'red';
       case 'Kick':
