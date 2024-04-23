@@ -11,7 +11,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 
-export default function HeaderBarLP({isLoggedIn, onLoginLogout}) {
+export default function HeaderBarLP({isLoggedIn}) {
 
   return (
     <Box>
@@ -24,8 +24,7 @@ export default function HeaderBarLP({isLoggedIn, onLoginLogout}) {
 
           {
             !isLoggedIn && 
-            <Button className='entrar-LP-btn' sx={{margin: '20px', borderRadius: 40}}
-              color="secondary"
+            <Button className='entrar-LP-btn' sx={{margin: '20px', borderRadius: 40, background: '#000'}}
               variant='contained'              
               endIcon={<LoginIcon className='entrar-icon-btn'/>}
               component={Link} to="/login">

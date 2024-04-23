@@ -124,6 +124,15 @@ function Row({ notificacao, onDelete }) {
         return 'black';
     }
   }
+  //Direcionar para pagina de Editar Notificação dependendo da mensagem
+  const notificationMessage = notificacao.mensagem
+  let redirectPath = '';
+  if (notificationMessage.includes('prestes a começar')) {
+    redirectPath = `./confirmar-presença/${notificacao.id}`;
+  } else {
+    redirectPath = `./confirmar-finalizacao/${notificacao.id}`;
+
+  }
 
   return (
     <>
@@ -159,7 +168,7 @@ function Row({ notificacao, onDelete }) {
           {notificacao.confirmacao_finalizacao ? 'Sim' : 'Não'}
         </TableCell>      
         <TableCell size='small' align="center">
-          <Link to={'./' + notificacao.id}>
+          <Link to={redirectPath}>
             <IconButton aria-label="Editar">
               <EditIcon />
             </IconButton>
@@ -207,7 +216,8 @@ function Row({ notificacao, onDelete }) {
                       <TableCell size='small' component="th" scope="row">
                         {agendaItem.titulo_agenda}
                       </TableCell>
-                      <TableCell size='small' align="center">{agendaItem.id}</TableCell>                      <TableCell size='small' align="center">
+                      <TableCell size='small' align="center">{agendaItem.id}</TableCell>                      
+                      <TableCell size='small' align="center">
                         {format(parseISO(agendaItem.data_horario_inicio), 'dd/MM/yyyy - HH:mm')}
                       </TableCell>
                       <TableCell size='small' align="center">
@@ -346,7 +356,7 @@ export default function CollapsibleTable() {
 
       <TableContainer sx={{ width: '90%', margin: '0 auto', marginTop: '50px', 
         background: 'whitesmoke', overflow: 'auto', maxHeight: '70vh'}} component={Paper}> 
-        <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Agendas</u> </Typography>
+        <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Notificações</u> </Typography>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
@@ -365,7 +375,7 @@ export default function CollapsibleTable() {
             {notificacoes.length === 0 ? ( // Verifica se não há jogos
               <TableRow>
                 <TableCell colSpan={9} align="center">
-                  <Typography style={{color: 'GrayText'}}>Tabela vazia, crie uma nova notificacao</Typography> 
+                  <Typography style={{color: 'GrayText'}}>Tabela vazia</Typography> 
                 </TableCell>
               </TableRow>
             ) : (

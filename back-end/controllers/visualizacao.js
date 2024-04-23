@@ -1,5 +1,6 @@
 // Importar o model correspondente ao controller
-const {Visualizacao, Usuario, Agenda} = require('../models') // Importa os modelos necessários para o controlador
+const {Visualizacao, Usuario, Agenda} = require('../models'); // Importa os modelos necessários para o controlador
+const agenda = require('../models/agenda');
 
 const controller = {} // Objeto vazio para o controlador
 
@@ -24,7 +25,12 @@ controller.create = async (req, res) => {
     req.body.usuario_id = req.authUser.id; // Adiciona o id do usuário autenticado ao corpo da requisição
 
     try {
-
+        const verifyAgendaStatus = await Agenda.findOne({
+            where: {id: req.body.agenda_id}
+        })
+        if (verifyAgendaStatus.status !== 'Finalizada'){
+            return res.status(409).send("A agenda informada não foi finalizada ainda.");
+        }
         const existingVisualizacao = await Visualizacao.findOne({
             where: { agenda_id: req.body.agenda_id } // Filtra pelo id do jogo
 

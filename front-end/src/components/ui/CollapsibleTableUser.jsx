@@ -189,7 +189,7 @@ function Row({ usuario}) {
             <Box sx={{ margin: 1 }}>
             <Typography 
               sx={{fontWeight: 'bolder'}} variant="h6" gutterBottom component="div" color='primary'> 
-              <u>Minha Status</u> 
+              <u>Minha Conta</u> 
             </Typography>
               <Table size="small" aria-label="Visualizações">
                 <TableHead>

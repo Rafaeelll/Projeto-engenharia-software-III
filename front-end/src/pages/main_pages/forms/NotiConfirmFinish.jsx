@@ -26,7 +26,7 @@ export default function NotiConfirmFinish() {
         notificacoes: {
           agenda_id: '',
           mensagem: '',
-          confirmacao_finalizacao: false
+          confirmacao_finalizacao: ''
         },
         showWaiting: false,
         notif: {
@@ -79,32 +79,6 @@ export default function NotiConfirmFinish() {
       async function sendData() {
         setState({ ...state, showWaiting: true, errors: {} });
         try {
-          // Verificar se confirmacao_presenca está como false e atualizá-lo para true se necessário
-          if (!notificacoes.confirmacao_presenca) {
-            notificacoes.confirmacao_presenca = true;
-          }
-      
-          // Verificar se data_horario_fim está expirada
-          const agenda = await myfetch.get(`/agendas/${notificacoes.agenda_id}`);
-          const dataHorarioFim = new Date(agenda.data_horario_fim);
-          const now = new Date();
-      
-          if (dataHorarioFim > now) {
-            // Exibir mensagem de erro e não prosseguir com a atualização
-            setState({
-              ...state,
-              showWaiting: false,
-              notif: {
-                severity: 'error',
-                show: true,
-                message: 'Esta agenda ainda está em andamento. Por favor, realize essa operação depois que o tempo da agenda expirar!',
-              },
-            });
-            return;
-          }
-      
-          // Atualizar confirmacao_finalizacao para true
-          notificacoes.confirmacao_finalizacao = true;
           if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, notificacoes)
           else await myfetch.post(API_PATH, notificacoes)
     

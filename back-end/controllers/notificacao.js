@@ -1,6 +1,6 @@
 const { Notificacao, Agenda, Usuario } = require('../models');
 const cron = require('node-cron');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({ port: 8080 });
@@ -197,41 +197,52 @@ controller.retrieveOne = async (req, res) => {
 
 // Método para atualizar uma notificação específica do usuário autenticado
 controller.update = async (req, res) => {
-    try {
-        const response = await Notificacao.update(
-            req.body,
-            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela notificação do usuário autenticado
-        );
-        if (response[0] > 0) {
-            // HTTP 204: No Content
-            res.status(204).end();
-        } else {
-            // Não encontrou o registro para atualizar
-            // HTTP 404: Not Found
-            res.status(404).end();
-        }
-    } catch (error) {
-        console.error(error);
+  try {
+    const notificacao = await Notificacao.findOne({where: {id: req.body.id}})
+    const agenda = await Agenda.findOne({where: {id: req.body.agenda_id}})
+    if (req.body.confirmacao_finalizacao === true) {
+      const notifConfirmPresenca = true
+      notificacao.confirmacao_presenca = notifConfirmPresenca;
+      const agendaStatus = 'Finalizada'
+      agenda.status = agendaStatus;
+
+      await notificacao.save();
+      await agenda.save();
     }
+    const response = await Notificacao.update(
+      req.body,
+      { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela notificação do usuário autenticado
+    );
+    if (response[0] > 0) {
+        // HTTP 204: No Content
+        res.status(204).end();
+    } else {
+        // Não encontrou o registro para atualizar
+        // HTTP 404: Not Found
+        res.status(404).end();
+    }
+  } catch (error) {
+      console.error(error);
+  }
 };
 
 // Método para deletar uma notificação específica do usuário autenticado
 controller.delete = async (req, res) => {
-    try {
-        const response = await Notificacao.destroy(
-            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela notificação do usuário autenticado
-        );
-        if (response) {
-            // Encontrou e excluiu
-            // HTTP 204: No Content
-            res.status(204).end();
-        } else {
-            // Não encontrou e não excluiu
-            // HTTP 404: Not Found
-            res.status(404).end();
-        }
+  try {
+    const response = await Notificacao.destroy(
+        { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela notificação do usuário autenticado
+    );
+    if (response) {
+        // Encontrou e excluiu
+        // HTTP 204: No Content
+        res.status(204).end();
+    } else {
+        // Não encontrou e não excluiu
+        // HTTP 404: Not Found
+        res.status(404).end();
+    }
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
 };
 
