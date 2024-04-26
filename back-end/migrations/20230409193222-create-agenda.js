@@ -56,7 +56,7 @@ module.exports = {
         type: Sequelize.TEXT,
       },
       status:{
-        type: Sequelize.ENUM('Agendado', 'Em andamento', 'Finalizada'),
+        type: Sequelize.ENUM('Agendado', 'Em andamento', 'Finalização Pendente', 'Finalizada',),
         defaultValue: 'Agendado'
       },
       createdAt: {

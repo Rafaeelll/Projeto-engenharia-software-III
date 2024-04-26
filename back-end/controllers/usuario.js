@@ -1,5 +1,5 @@
 // Importar o model correspondente ao controller
-const { Usuario } = require('../models') // Importa o modelo de usuário do sistema
+const { Usuario, Configuracao } = require('../models') // Importa o modelo de usuário do sistema
 const bcrypt = require('bcrypt') // Biblioteca para hash de senhas
 const jwt = require('jsonwebtoken') // Biblioteca para geração e verificação de tokens de autenticação
 const { Op } = require('sequelize');

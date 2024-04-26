@@ -128,7 +128,7 @@ function Row({ notificacao, onDelete }) {
   const notificationMessage = notificacao.mensagem
   let redirectPath = '';
   if (notificationMessage.includes('prestes a começar')) {
-    redirectPath = `./confirmar-presença/${notificacao.id}`;
+    redirectPath = `./confirmar-presenca/${notificacao.id}`;
   } else {
     redirectPath = `./confirmar-finalizacao/${notificacao.id}`;
 
@@ -151,7 +151,7 @@ function Row({ notificacao, onDelete }) {
         <TableCell size='small' component="th" scope="row">
           {notificacao.id}
         </TableCell>
-        <TableCell size='small' align="center">{notificacao.agenda_id} - {notificacao.agenda_title}</TableCell>
+        <TableCell size='small' align="center">{notificacao.agenda_id}</TableCell>
         <TableCell size='small' align="center">
           {format(parseISO(notificacao.data_notificacao), 'dd/MM/yyyy - HH:mm')}
         </TableCell>

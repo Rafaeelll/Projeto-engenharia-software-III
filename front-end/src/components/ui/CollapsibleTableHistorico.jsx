@@ -81,7 +81,7 @@ function Row({ historicoJogo, onDelete }) {
         <TableCell align="center" size='small' component="th" scope="row">
           {historicoJogo.id}
         </TableCell>
-        <TableCell size='small' align="center">{historicoJogo.jogo_id} - {historicoJogo.nome_do_jogo}</TableCell>
+        <TableCell size='small' align="center">{historicoJogo.jogo_id}</TableCell>
         <TableCell size='small' align="center">{historicoJogo.nivel}</TableCell>
         <TableCell size='small' align="center">{historicoJogo.jogo_status}</TableCell>
         <TableCell size='small' align="center">
@@ -254,7 +254,7 @@ export default function CollapsibleTable() {
             <TableRow>
               <TableCell />
               <TableCell align="center">Historíco ID</TableCell>
-              <TableCell align="center">ID - Nome do Jogo</TableCell>
+              <TableCell align="center">Jogo ID</TableCell>
               <TableCell align="center">Nível</TableCell>
               <TableCell align="center">Status</TableCell>
               <TableCell align="center">Avaliação</TableCell>

@@ -16,8 +16,6 @@ router.get('/contagem', controller.retrieveNotificationCount);
 router.get('/', controller.retrieve); // Rota para recuperar todas as notificações
 router.get('/:id', controller.retrieveOne); // Rota para recuperar uma notificação específica por ID
 router.put('/:id', controller.update); // Rota para atualizar uma notificação existente por ID
-// Rota para atualizar a contagem de notificações para zero
-router.put('/atualizar_contagem_notificacoes', controller.updateNotificationCountToZero);
 router.delete('/:id', controller.delete); // Rota para excluir uma notificação existente por ID
 
 // Exporta o roteador para ser utilizado em outros arquivos

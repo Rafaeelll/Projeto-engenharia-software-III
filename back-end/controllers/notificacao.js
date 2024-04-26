@@ -1,4 +1,4 @@
-const { Notificacao, Agenda, Usuario } = require('../models');
+const { Notificacao, Agenda, Usuario, Configuracao } = require('../models');
 const cron = require('node-cron');
 const { Op, where } = require('sequelize');
 const WebSocket = require('ws');
@@ -143,39 +143,27 @@ controller.retrieveNotificationCount = async (req, res) => {
     }
 };
 
-controller.updateNotificationCountToZero = async (req, res) => {
-    try {
-        const notificacoes = await Notificacao.findAll({ where: { usuario_id: req.authUser.id } });
-        const ids = notificacoes.map(notificacao => notificacao.id);
-
-        if (ids.length > 0) {
-            await Notificacao.update({ count: 0 }, { where: { id: ids } });
-            res.send({ message: 'Contagem de notificações atualizada para zero.' });
-        } else {
-            res.send({ message: 'Não há notificações para atualizar.' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-};
-
 
 // Método para recuperar todas as notificações do usuário autenticado
 controller.retrieve = async (req, res) => {
-    try {
-        const data = await Notificacao.findAll({
-            where: { usuario_id: req.authUser.id }, // Filtra apenas as notificações do usuário autenticado
-            include: [
-                { model: Agenda, as: 'agenda' },
-                { model: Usuario, as: 'usuario' }
-            ]
-        });
-        res.send(data);
+  try {
+      const data = await Notificacao.findAll({
+          where: { usuario_id: req.authUser.id }, // Filtra apenas as notificações do usuário autenticado
+          include: [
+              { model: Agenda, as: 'agenda' },
+              { model: Usuario, as: 'usuario' },
+              { model: Configuracao, as: 'configuracao'}
+          ]
+      });
+
+      if (data) res.send(data);
+
     } catch (error) {
-        console.error(error);
-    }
+      console.error(error);
+      res.status(500).send("Erro interno do servidor.");
+  }
 };
+
 
 
 // Método para recuperar uma notificação específica do usuário autenticado
@@ -184,8 +172,9 @@ controller.retrieveOne = async (req, res) => {
         const data = await Notificacao.findOne({
             where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela notificação do usuário autenticado
             include: [
-                { model: Agenda, as: 'agenda' },
-                { model: Usuario, as: 'usuario' }
+              { model: Agenda, as: 'agenda' },
+              { model: Usuario, as: 'usuario' },
+              { model: Configuracao, as: 'configuracao'}
             ]
         });
         if (data) res.send(data);
@@ -198,33 +187,48 @@ controller.retrieveOne = async (req, res) => {
 // Método para atualizar uma notificação específica do usuário autenticado
 controller.update = async (req, res) => {
   try {
-    const notificacao = await Notificacao.findOne({where: {id: req.body.id}})
-    const agenda = await Agenda.findOne({where: {id: req.body.agenda_id}})
-    if (req.body.confirmacao_finalizacao === true) {
-      const notifConfirmPresenca = true
-      notificacao.confirmacao_presenca = notifConfirmPresenca;
-      const agendaStatus = 'Finalizada'
-      agenda.status = agendaStatus;
+    // Obtém o ID da notificação a ser atualizada
+    const notificationId = req.params.id;
 
-      await notificacao.save();
-      await agenda.save();
-    }
-    const response = await Notificacao.update(
-      req.body,
-      { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela notificação do usuário autenticado
-    );
-    if (response[0] > 0) {
-        // HTTP 204: No Content
-        res.status(204).end();
+    // Obtém os novos dados da notificação a serem atualizados
+    const newData = { ...req.body };
+    delete newData.id; // Remove o campo "id" dos novos dados
+
+    // Encontra a notificação a ser atualizada para obter o ID da agenda associada
+    const notification = await Notificacao.findOne({
+      where: { id: notificationId, usuario_id: req.authUser.id }
+    });
+
+    if (notification) {
+      // Obtém o ID da agenda da notificação
+      const agendaId = notification.agenda_id;
+
+      // Verifica se a notificação confirma a finalização ou a inicialização
+      if (newData.confirmacao_finalizacao === true) {
+        // Se confirmar finalização, atualiza o status da agenda para 'Finalizada'
+        await Agenda.update({ status: 'Finalizada' }, { where: { id: agendaId } });
+      } else if (newData.confirmacao_presenca === true) {
+        // Se confirmar inicialização, atualiza o status da agenda para 'Em andamento'
+        await Agenda.update({ status: 'Em andamento' }, { where: { id: agendaId } });
+      }
+
+      // Atualiza todas as notificações com o mesmo ID de agenda
+      await Notificacao.update(newData, { where: { agenda_id: agendaId } });
+
+      // HTTP 204: No Content
+      res.status(204).end();
     } else {
-        // Não encontrou o registro para atualizar
-        // HTTP 404: Not Found
-        res.status(404).end();
+      // Não encontrou o registro para atualizar
+      // HTTP 404: Not Found
+      res.status(404).end();
     }
   } catch (error) {
-      console.error(error);
+    console.error(error);
+    // HTTP 500: Internal Server Error
+    res.status(500).send('Erro interno do servidor.');
   }
 };
+
 
 // Método para deletar uma notificação específica do usuário autenticado
 controller.delete = async (req, res) => {

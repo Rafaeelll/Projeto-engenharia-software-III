@@ -49,6 +49,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',              // Chave na tabela Usuario
         as: 'notificacoes'           // Alias para a associação
       });
+      this.belongsTo(models.Configuracao, {
+        foreignKey: 'usuario_id',    // Chave estrangeira na tabela Notificacao
+        sourceKey: 'id',              // Chave na tabela Usuario
+        as: 'configuracoes'           // Alias para a associação
+      });
     }
   }
 

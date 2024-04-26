@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'usuario'             // Nome do atributo para exibição
       });
 
-      // Cada agenda pertence a um jogo
+      // relação N para N
       this.belongsToMany(models.Jogo, {
         through: 'agenda_jogos',
         foreignKey: 'jogo_id',    // Nome do campo na tabela de ORIGEM
@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'jogo'                 // Nome do atributo para exibição
       });
 
-      // Cada agenda pode ter várias visualizações
+      // Cada agenda pode ter uma visualização
       this.hasOne(models.Visualizacao, {
         foreignKey: 'agenda_id',   // Campo da tabela estrangeira
         sourceKey: 'id',           // Campo da tabela local 
@@ -95,7 +95,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
     },
     status:{
-      type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalizada'),
+      type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalização Pendente', 'Finalizada'),
       defaultValue: 'Agendado'
     },
   }, {
@@ -119,8 +119,26 @@ module.exports = (sequelize, DataTypes) => {
         }
 
         // Definir o status da agenda
-        agenda.status = statusAgenda;    }
-  }
+        agenda.status = statusAgenda;    
+      },
+      beforeUpdate: (agenda, options) =>{
+        const dataAtual = new Date();
+        const dataInicial = new Date(agenda.data_horario_inicio);
+        const dataFinal = new Date(agenda.data_horario_fim);
+
+        let statusAgenda = "Agendado";
+
+        if (dataAtual >= dataInicial && dataAtual <= dataFinal) {
+          statusAgenda = "Em andamento";
+        } else if (dataAtual > dataFinal) {
+          statusAgenda = "Finalizada";
+        }
+
+        // Definir o status da agenda
+        agenda.status = statusAgenda;  
+      }
+
+    }
 });
   
   return Agenda;

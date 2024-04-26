@@ -39,6 +39,18 @@ module.exports = {
       onDelete: 'CASCADE', // Não permite apagar uma agenda em uso nas notificações
       onUpdate: 'CASCADE'   // Atualiza agenda_id nas notificações se id da agenda mudar
     });
+    // Adiciona a restrição de chave estrangeira para o campo 'config_id'
+    await queryInterface.addConstraint('notificacoes', {
+      fields: ['config_id'], // Campo(s) da tabela de origem
+      type: 'foreign key',
+      name: 'notificacao_config_fk', // Nome da chave estrangeira (deve ser único do BD)
+      references:{
+        table: 'configuracoes', // Tabela estrangeira
+        field: 'id'      // Campo da tabela estrangeira
+      },
+      onDelete: 'CASCADE', // Não permite apagar uma agenda em uso nas notificações
+      onUpdate: 'CASCADE'   // Atualiza agenda_id nas notificações se id da agenda mudar
+    });
   },
 
   /**
@@ -46,6 +58,8 @@ module.exports = {
    * Remove as restrições de chave estrangeira da tabela 'notificacoes'.
    */
   async down(queryInterface, Sequelize) {
+    // Remove a restrição de chave estrangeira para o campo 'agenda_id'
+    await queryInterface.removeConstraint('notificacoes', 'notificacao_config_fk');
     // Remove a restrição de chave estrangeira para o campo 'agenda_id'
     await queryInterface.removeConstraint('notificacoes', 'notificacao_agendas_fk');
     // Remove a restrição de chave estrangeira para o campo 'usuario_id'

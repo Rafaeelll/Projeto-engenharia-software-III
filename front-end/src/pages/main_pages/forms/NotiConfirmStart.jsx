@@ -26,7 +26,7 @@ export default function NotiConfirmStart() {
         notificacoes: {
             agenda_id: '',
             mensagem: '',
-            confirmacao_presenca: false,
+            confirmacao_presenca: '',
         },
         showWaiting: false,
         notif: {
@@ -177,7 +177,7 @@ export default function NotiConfirmStart() {
                   <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={notificacoes.confirmacao_presenca}
+                    value={notificacoes.confirmacao_presenca ? 'true' : 'false'} // Converte o booleano para string
                     label="Confirmar presença"
                     name='confirmacao_presenca'
                     required

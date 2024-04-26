@@ -17,6 +17,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
+      config_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       data_notificacao: {
         type: Sequelize.DATE,
         allowNull: false
@@ -35,9 +39,9 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
-      configuracao: {
-        type: Sequelize.JSON, // Ou outro tipo de dados apropriado
-        allowNull: true // Ou false, dependendo se a configuração é obrigatória ou não
+      notif_view:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
