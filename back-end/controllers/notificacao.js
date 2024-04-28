@@ -35,47 +35,205 @@ const controller = {};
     Cada método executa uma operação específica no banco de dados, lidando com a criação, recuperação, 
     atualização e exclusão de registros de notificação, com base no usuário autenticado. 
     Além disso, há também a implementação de tarefas agendadas usando o módulo cron para enviar notificações 
-    quando as agendas estão prestes a comerçarem, terminar ou já terminaram.
+    quando as agendasPrestesComecar estão prestes a comerçarem, terminar ou já terminaram.
 */
 
 controller.createAutomaticStartNotifications = async () => {
   try {
-    const agendas = await Agenda.findAll({
+    const agendasPrestesComecar = await Agenda.findAll({
       where: {
         data_horario_inicio: { [Op.gte]: new Date() }
       },
       include: ['usuario']
     });
+    const agendasInicializadas = await Agenda.findAll({
+      where: {
+        data_horario_inicio: { [Op.lte]: new Date() }
+      },
+      include: ['usuario']
+    });
+    const configUmaHoraAntes = await Configuracao.findOne({
+      where:{
+        config: {notificar_hora_antes_inicio: true}
+      },
+      include: ['usuario']
+    })
+    const configTrintaMinAntes = await Configuracao.findOne({
+      where:{
+        config: {notif_trinta_min_antes_inicio: true}
+      },
+      include: ['usuario']
+    })
+    const configNoInicio = await Configuracao.findOne({
+      where:{
+        config: {notif_no_inicio: true}
+      },
+      include: ['usuario']
+    })
 
-    for (const agenda of agendas) {
-      const umHoraAntesInicio = new Date(agenda.data_horario_inicio);
-      umHoraAntesInicio.setHours(umHoraAntesInicio.getHours() - 1);
+    const configIniAuto = await Configuracao.findOne({
+      where:{
+        config: {confirmar_auto_ini: true}
+      },
+      include: ['usuario']
+    })
 
-      const notificationExists = await Notificacao.findOne({
-        where: {
-          agenda_id: agenda.id,
-          data_notificacao: umHoraAntesInicio
-        }
-      });
+    // Notificar 1 hora antes da agenda começar (Padrão)
+    if (configUmaHoraAntes) {
 
-      if (!notificationExists) {
-        await Notificacao.create({
-          agenda_id: agenda.id,
-          usuario_id: agenda.usuario_id,
-          data_notificacao: umHoraAntesInicio,
-          mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Confirme sua presença clicando no ícone "Editar".`,
-          confirmacao_presenca: false,              
-          confirmacao_finalizacao: false,
-          configuracao: null,
+      for (const agenda of agendasPrestesComecar) {
+        const umHoraAntesInicio = new Date(agenda.data_horario_inicio);
+        umHoraAntesInicio.setHours(umHoraAntesInicio.getHours() - 1);
+
+        const notificationExists = await Notificacao.findOne({
+          where: {
+            agenda_id: agenda.id,
+            data_notificacao: umHoraAntesInicio
+          }
         });
+
+        if (!notificationExists) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configUmaHoraAntes.id,
+            data_notificacao: umHoraAntesInicio,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Confirme sua presença clicando no ícone "Editar".`,
+            confirmacao_presenca: false
+          });
+        }
+        else if (!notificationExists && configIniAuto) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configUmaHoraAntes.id,
+            data_notificacao: umHoraAntesInicio,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Sua presença ja esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
+            confirmacao_presenca: true
+          });
+          if (agenda.status !== 'Em andamento'){
+            await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
+
+          }
+          
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de início de agenda',
+            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
+      }
+    }
+
+    // Notificar 30 minutos antes da agenda começar
+    if (configTrintaMinAntes) {
+      for (const agenda of agendasPrestesComecar) {
+        const trintaMinAntesInicio = new Date(agenda.data_horario_inicio);
+        trintaMinAntesInicio.setMinutes(trintaMinAntesInicio.getMinutes() - 30);
+
+        const notificationExists = await Notificacao.findOne({
+          where: {
+            agenda_id: agenda.id,
+            data_notificacao: trintaMinAntesInicio
+          }
+        });
+
+        if (!notificationExists) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configTrintaMinAntes.id,
+            data_notificacao: trintaMinAntesInicio,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`,
+            confirmacao_presenca: false
+          });
+          
+          
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de início de agenda',
+            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
+        else if (!notificationExists && configIniAuto) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configUmaHoraAntes.id,
+            data_notificacao: umHoraAntesInicio,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Sua presença ja esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
+            confirmacao_presenca: true
+          });
+          if (agenda.status !== 'Em andamento'){
+            await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
+
+          }
+          
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de início de agenda',
+            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
         
-        // Envia a notificação via WebSocket
-        const novaNotificacao = {
-          titulo: 'Nova notificação de início de agenda',
-          corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
-          // Adicione outros campos conforme necessário
-        };
-        enviarNotificacaoWebSocket(novaNotificacao);
+      }
+    }
+    // Notificar somente quando a agenda começar
+    if (configNoInicio) {
+      for (const agenda of agendasInicializadas) {
+        const notificationExists = await Notificacao.findOne({
+          where: {
+            agenda_id: agenda.id,
+            data_notificacao: agenda.data_horario_inicio
+          }
+        });
+
+        if (!notificationExists) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configNoInicio.id,
+            data_notificacao: agenda.data_horario_inicio,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" ja começou. Confirme sua presença clicando no ícone "Editar".`,
+            confirmacao_presenca: false
+          });
+          
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de início de agenda',
+            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
+        else if (!notificationExists && configIniAuto) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configUmaHoraAntes.id,
+            data_notificacao: umHoraAntesInicio,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" ja começou. Sua presença já esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
+            confirmacao_presenca: true
+          });
+          if (agenda.status !== 'Em andamento'){
+            await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
+
+          }
+          
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de início de agenda',
+            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
       }
     }
   } catch (error) {
@@ -85,40 +243,204 @@ controller.createAutomaticStartNotifications = async () => {
 
 controller.createAutomaticFinishNotifications = async() =>{
   try{
+    const agendasPrestesFin = await Agenda.findAll({
+      where: {
+        data_horario_fim: {[Op.gte]: new Date()  }   
+    },
+    include: ['usuario']
+    })
     const agendaTerminadas = await Agenda.findAll({
       where: {
         data_horario_fim: { [Op.lte]: new Date() }
       },
       include: ['usuario']
     })
-    for (const agenda of agendaTerminadas){
-      const notificationEndExists = await Notificacao.findOne({
-        where:{
-          agenda_id: agenda.id,
-          data_notificacao: agenda.data_horario_fim
-        }
-      });
+    const configUmaHoraAntesFin = await Configuracao.findOne({
+      where:{
+        config: {notificar_hora_antes_fim: true}
+      },
+      include: ['usuario']
+    })
+    const configTrintaMinAntesFin = await Configuracao.findOne({
+      where:{
+        config: {notif_trinta_min_antes_fim: true}
+      },
+      include: ['usuario']
+    })
+    const configNoFim = await Configuracao.findOne({
+      where:{
+        config: {notificar_no_fim: true}
+      },
+      include: ['usuario']
+    })
 
-      if (!notificationEndExists){
-        await Notificacao.create({
-          agenda_id: agenda.id,
-          usuario_id: agenda.usuario_id,
-          data_notificacao: agenda.data_horario_fim,
-          mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. Confirme a finalização clicando no ícone "Editar".`,
-          confirmacao_presenca: false,              
-          confirmacao_finalizacao: false,
-          configuracao: null,
+    const configFinAuto = await Configuracao.findOne({
+      where:{
+        config: {confirmar_auto_fim: true}
+      },
+      include: ['usuario']
+    })
+    
+    // Notificar sobre o fim da agenda assim que a agenda finalizar (Padrão)
+    if (configNoFim) {
+      for (const agenda of agendaTerminadas){
+        const notificationEndExists = await Notificacao.findOne({
+          where:{
+            agenda_id: agenda.id,
+            data_notificacao: agenda.data_horario_fim
+          }
         });
+  
+        if (!notificationEndExists) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configNoFim.id,
+            data_notificacao: agenda.data_horario_fim,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. Confirme a finalização clicando no ícone "Editar".`,
+            confirmacao_finalizacao: false
 
-        // Envia a notificação via WebSocket
-        const novaNotificacao = {
-          titulo: 'Nova notificação de término de agenda',
-          corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
-          // Adicione outros campos conforme necessário
-        };
-        enviarNotificacaoWebSocket(novaNotificacao);
+          });
+  
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de término de agenda',
+            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
+        else if (!notificationEndExists && configFinAuto) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configNoFim.id,
+            data_notificacao: agenda.data_horario_fim,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. A finalização já esta confirmada devido as suas configurações.`,
+            confirmacao_finalizacao: true
+          });
+          if (agenda.status !== 'Finalizada'){
+            await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
+
+          }
+          const novaNotificacao = {
+            titulo: 'Nova notificação de término de agenda',
+            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+
+        }
       }
     }
+    // Notificar sobre o fim da agenda uma hora antes da agenda finalizar
+    if (configUmaHoraAntesFin) {
+      for (const agenda of agendasPrestesFin) {
+        const umHoraAntesFim = new Date(agenda.data_horario_inicio);
+        umHoraAntesFim.setHours(umHoraAntesFim.getHours() - 1);
+
+        const notificationEndExists = await Notificacao.findOne({
+          where:{
+            agenda_id: agenda.id,
+            data_notificacao: umHoraAntesFim
+          }
+        });
+  
+        if (!notificationEndExists){
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configUmaHoraAntesFin.id,
+            data_notificacao: umHoraAntesFim,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" esta preste a finalizar em 1 hora. Confirme a finalização clicando no ícone "Editar".`,
+            confirmacao_finalizacao: false
+          });
+  
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de término de agenda',
+            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
+        else if (!notificationEndExists && configFinAuto) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configNoFim.id,
+            data_notificacao: agenda.data_horario_fim,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" esta preste a finalizar em 1 hora. A finalização já esta confirmada devido as suas configurações.`,
+            confirmacao_finalizacao: true
+          });
+          if (agenda.status !== 'Finalizada'){
+            await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
+
+          }
+          const novaNotificacao = {
+            titulo: 'Nova notificação de término de agenda',
+            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
+      }
+    }
+     // Notificar 30 minutos antes da agenda começar
+     if (configTrintaMinAntesFin) {
+      for (const agenda of agendasPrestesFin) {
+        const trintaMinAntesFin = new Date(agenda.data_horario_inicio);
+        trintaMinAntesFin.setMinutes(trintaMinAntesFin.getMinutes() - 30);
+
+        const notificationExists = await Notificacao.findOne({
+          where: {
+            agenda_id: agenda.id,
+            data_notificacao: trintaMinAntesFin
+          }
+        });
+
+        if (!notificationExists) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configTrintaMinAntesFin.id,
+            data_notificacao: trintaMinAntesFin,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`,
+            confirmacao_finalizacao: false
+
+          });
+          
+          // Envia a notificação via WebSocket
+          const novaNotificacao = {
+            titulo: 'Nova notificação de início de agenda',
+            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }
+        else if (!notificationExists && configFinAuto) {
+          await Notificacao.create({
+            agenda_id: agenda.id,
+            usuario_id: agenda.usuario_id,
+            config_id: configNoFim.id,
+            data_notificacao: agenda.data_horario_fim,
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 30 minutos. A finalização já esta confirmada devido as suas configurações.`,
+            confirmacao_finalizacao: true
+          });
+          if (agenda.status !== 'Finalizada'){
+            await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
+
+          }
+          const novaNotificacao = {
+            titulo: 'Nova notificação de término de agenda',
+            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
+            // Adicione outros campos conforme necessário
+          };
+          enviarNotificacaoWebSocket(novaNotificacao);
+        }  
+      }
+    }
+    
   } catch (error) {
     console.error(error)
   }

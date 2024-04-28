@@ -36,7 +36,7 @@ controller.cadastro = async (req, res) => {
   const { nome, sobrenome, email, senha_acesso, telefone } = req.body;
   const user = await Usuario.findOne({ where: { email } });
 
-   try {
+  try {
     // Verificação do e-mail antes de criar o usuário
     if (user) {
       // Se encontrou o usuário com o email, retorna um erro de conflito
@@ -45,26 +45,47 @@ controller.cadastro = async (req, res) => {
     // Criptografar a senha
     const hashedPassword = await bcrypt.hash(senha_acesso, 12);
 
-    await Usuario.create({
+    // Criar usuário
+    const novoUsuario = await Usuario.create({
       nome,
       sobrenome,
       email,
       senha_acesso: hashedPassword,
       telefone,
       image: req.file.filename
-
     });
+
+    // Criar configuração associada ao novo usuário
+    await Configuracao.create({
+      usuario_id: novoUsuario.id, // Atribuir o ID do novo usuário
+      config:{
+        confirmar_auto_ini: true,
+        confirmar_auto_fim: true,
+        notificar_hora_antes_inicio: true, // Padrão: notificar 1 hora antes da inicialização
+        notif_trinta_min_antes_inicio: false, 
+        notif_no_inicio: false, 
+        notificar_no_fim: true, // Padrão: notificar na hora exata finalização
+        notificar_hora_antes_fim: false,
+        notif_trinta_min_antes_fim: false, 
+      }
+    });
+
     // HTTP 201: Created
-    return res.status(201).json(Usuario); // HTTP 201: Created
+    return res.status(201).json(novoUsuario); // HTTP 201: Created
   } catch (error) {
     console.error(error);
+    // Tratar erros aqui
   }
 }
 
 controller.retrieve = async (req, res) => {
   try {
     const data = await Usuario.findAll({
+      include: [
+        {model: Configuracao, as: 'configuracoes'}
+      ],
       where: { id: req.authUser.id }  // Filtra pelos dados do usuário autenticado
+      
     });
     res.send(data);
   } catch (error) {

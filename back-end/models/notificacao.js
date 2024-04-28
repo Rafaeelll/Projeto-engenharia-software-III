@@ -75,52 +75,28 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    // confirmar_auto_ini: {
-    //   type: DataTypes.BOOLEAN,
-    //   allowNull: true,
-    //   defaultValue: false
-    // },
-    // confirmar_auto_fim: {
-    //   type: DataTypes.BOOLEAN,
-    //   allowNull: true,
-    //   defaultValue: false
-    // },
-    // notificar_minutos_antes_inicio: {
-    //   type: DataTypes.DATE,
-    // }
-
-        // confirmar_auto_ini: false,
-        // confirmar_auto_fim: false,
-        // notificar_minutos_antes_inicio: 60, // Padrão: notificar 1 hora antes
-        // notificar_minutos_antes_fim: 0
+    
   }, {
     sequelize,
     modelName: 'Notificacao',
     tableName: 'notificacoes',
-    // hooks: {
-    //   beforeCreate: (notificacao, options) => {
-    //     notificacao.contagem++; // Incrementa a contagem toda vez que uma notificação for criada
-        
-    //     const confirmIniAuto = notificacao.confirmar_auto_ini
-    //     const confirmFinaAuto = notificacao.confirmar_auto_fim
-
-
-    //     if (confirmIniAuto === true) {
-    //       notificacao.confirmacao_presenca = true
-    //     }
-    //     else if (confirmFinaAuto === true){
-    //       notificacao.confirmacao_finalizacao = true
-    //     }
-    //   },
-    //   beforeUpdate: (notificacao, options) => {
-    //     const confirmacao_finalizacao = notificacao.confirmacao_finalizacao;
-    //     if (confirmacao_finalizacao === true) {
-    //       notificacao.confirmacao_presenca = true
-    //     }
-    //   }
-    // }
+  
+    hooks: {
+      beforeCreate: (notificacao, options) => {
+        notificacao.contagem++; // Incrementa a contagem toda vez que uma notificação for criada
+      },
+      
+      beforeUpdate: (notificacao, options) => {
+        const confirmacao_finalizacao = notificacao.confirmacao_finalizacao;
+        if (confirmacao_finalizacao === true) {
+          notificacao.confirmacao_presenca = true
+        }
+      }
+    }
   });
   
 
   return Notificacao;
 };
+
+

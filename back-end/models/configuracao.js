@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.INTEGER
     },
+    usuario_id:{
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     config: {
       type: DataTypes.JSON,
       allowNull: true,
