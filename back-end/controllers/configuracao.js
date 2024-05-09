@@ -42,11 +42,11 @@ controller.retrieve = async (req, res)=>{
 }
 controller.retrieveOne = async (req, res)=>{
     try{
-        const data = await Configuracao.findByPk({
+        const data = await Configuracao.findOne({
             where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela usuario do usuário autenticado
             include: [
-                {model: Agenda, as: 'usuario'},
-                {model: Jogo, as: 'notificacoes'}
+                {model: Usuario, as: 'usuario'},
+                {model: Notificacao, as: 'notificacoes'}
             ]
         })
 

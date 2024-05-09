@@ -59,8 +59,8 @@ controller.cadastro = async (req, res) => {
     await Configuracao.create({
       usuario_id: novoUsuario.id, // Atribuir o ID do novo usuário
       config:{
-        confirmar_auto_ini: true,
-        confirmar_auto_fim: true,
+        confirmar_auto_ini: false, // Confirmar na notificação a inicialização da agenda automaticamente
+        confirmar_auto_fim: false, // Confirmar na notificação a finalização da agenda automaticamente
         notificar_hora_antes_inicio: true, // Padrão: notificar 1 hora antes da inicialização
         notif_trinta_min_antes_inicio: false, 
         notif_no_inicio: false, 

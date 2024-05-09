@@ -8,7 +8,6 @@ import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import Jogo from '../../../../models/Jogo'
 import Paper from '@mui/material/Paper'
-import Typography  from '@mui/material/Typography';
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
 import Select from '@mui/material/Select';
@@ -180,7 +179,6 @@ export default function jogos() {
         <FormTitle
           title={params.id ? "Editar Jogo" : "Cadastrar jogos"} 
         /> 
-        <Typography variant="h5" component="div">
         <form onSubmit={handleFormSubmit}>
           <TextField sx={{marginTop: '12px'}}
             id="standard-basic"
@@ -298,7 +296,6 @@ export default function jogos() {
             </Button>
           </div>         
         </form>
-        </Typography>
       </Paper>
     </>
   );

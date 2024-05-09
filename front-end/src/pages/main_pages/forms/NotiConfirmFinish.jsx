@@ -141,7 +141,6 @@ export default function NotiConfirmFinish() {
         <FormTitle
           title={"Editar notificações"}
         />
-        <Typography variant="h5" component="div">
           <form onSubmit={handleFormSubmit}>
               <TextField sx={{marginTop: '10px'}}
                 id="standard-basic"
@@ -238,7 +237,6 @@ export default function NotiConfirmFinish() {
               </Button>
             </div>
           </form>
-        </Typography>
       </Paper>
     </>
   );

@@ -23,6 +23,8 @@ import NotiConfirmFinish from './pages/main_pages/forms/NotiConfirmFinish';
 import MyAccountForm from './pages/main_pages/forms/MyAccountForm';
 import PerfilImgForm from './pages/main_pages/forms/PerfilImgForm';
 import MyAccountStatusForm from './pages/main_pages/forms/MyAccountStatusForm'
+import Configuracao from './pages/main_pages/Configuracao';
+import ConfigForm from './pages/main_pages/forms/ConfigForm';
 import HeaderBar from './components/ui/HeaderBar';
 import FooterBar from './components/ui/FooterBar';
 
@@ -77,6 +79,8 @@ function App() {
           <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
           <Route path= "/notificacao/confirmar-presenca/:id" element={<AuthGuard> <NotiConfirmStart/> </AuthGuard>}/>
           <Route path= "/notificacao/confirmar-finalizacao/:id" element={<AuthGuard> <NotiConfirmFinish/> </AuthGuard>}/>
+          <Route path= "/configuracao" element={<AuthGuard> <Configuracao/> </AuthGuard>}/>
+          <Route path= "/configuracao/:id" element={<AuthGuard> <ConfigForm/> </AuthGuard>}/>
         </Routes>
       </BrowserRouter>
       <FooterBar/>

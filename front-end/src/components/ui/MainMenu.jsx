@@ -21,7 +21,7 @@ import Badge from '@mui/material/Badge';
 import myfetch from '../../utils/myfetch';
 import { styled } from '@mui/material/styles';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-
+import PermDataSettingIcon from '@mui/icons-material/PermDataSetting';
 
 export default function MainMenu() {
   const location = useLocation();
@@ -243,7 +243,24 @@ export default function MainMenu() {
           </IconButton>
           <Typography style={{marginLeft: '5px'}}> Notificações </Typography>
         </MenuItem>
+
+        <MenuItem 
+          onClick={handleClose}
+          component={Link} to="/configuracao"
+          style={{
+            backgroundColor: location.pathname === '/configuracao' ? '#21d4fd' : 'transparent',
+            color: location.pathname === '/configuracao' ? 'white' : 'black',
+          }}>
+          <IconButton
+            color='inherit'
+            size='small'
+          >
+            <PermDataSettingIcon/> 
+          </IconButton>
+          <Typography style={{marginLeft: '5px'}}> Configurações </Typography>
+        </MenuItem>
       </Menu>
+
     </div>
   );
 }

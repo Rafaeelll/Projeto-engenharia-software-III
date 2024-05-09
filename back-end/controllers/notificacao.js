@@ -38,7 +38,7 @@ const controller = {};
     quando as agendasPrestesComecar estão prestes a comerçarem, terminar ou já terminaram.
 */
 
-controller.createAutomaticStartNotifications = async () => {
+controller.createAutomaticStartNotifications = async(req, res) => {
   try {
     const agendasPrestesComecar = await Agenda.findAll({
       where: {
@@ -67,20 +67,12 @@ controller.createAutomaticStartNotifications = async () => {
     const configNoInicio = await Configuracao.findOne({
       where:{
         config: {notif_no_inicio: true}
-      },
-      include: ['usuario']
-    })
-
-    const configIniAuto = await Configuracao.findOne({
-      where:{
-        config: {confirmar_auto_ini: true}
-      },
-      include: ['usuario']
+      }
     })
 
     // Notificar 1 hora antes da agenda começar (Padrão)
     if (configUmaHoraAntes) {
-
+      
       for (const agenda of agendasPrestesComecar) {
         const umHoraAntesInicio = new Date(agenda.data_horario_inicio);
         umHoraAntesInicio.setHours(umHoraAntesInicio.getHours() - 1);
@@ -92,7 +84,13 @@ controller.createAutomaticStartNotifications = async () => {
           }
         });
 
-        if (!notificationExists) {
+        const usuarioConfig = await Configuracao.findOne({
+          where: {
+            usuario_id: agenda.usuario_id
+          }
+        });
+
+        if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === false) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
@@ -102,11 +100,11 @@ controller.createAutomaticStartNotifications = async () => {
             confirmacao_presenca: false
           });
         }
-        else if (!notificationExists && configIniAuto) {
+        else if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === true){
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configUmaHoraAntes.id,
+            config_id: configUmaHoraAntes.usuario.id,
             data_notificacao: umHoraAntesInicio,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Sua presença ja esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
             confirmacao_presenca: true
@@ -139,12 +137,17 @@ controller.createAutomaticStartNotifications = async () => {
             data_notificacao: trintaMinAntesInicio
           }
         });
+        const usuarioConfig = await Configuracao.findOne({
+          where: {
+            usuario_id: agenda.usuario_id
+          }
+        });
 
-        if (!notificationExists) {
+        if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === false) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configTrintaMinAntes.id,
+            config_id: configTrintaMinAntes.usuario.id,
             data_notificacao: trintaMinAntesInicio,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`,
             confirmacao_presenca: false
@@ -159,7 +162,7 @@ controller.createAutomaticStartNotifications = async () => {
           };
           enviarNotificacaoWebSocket(novaNotificacao);
         }
-        else if (!notificationExists && configIniAuto) {
+        else if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === true) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
@@ -181,7 +184,6 @@ controller.createAutomaticStartNotifications = async () => {
           };
           enviarNotificacaoWebSocket(novaNotificacao);
         }
-        
       }
     }
     // Notificar somente quando a agenda começar
@@ -193,8 +195,13 @@ controller.createAutomaticStartNotifications = async () => {
             data_notificacao: agenda.data_horario_inicio
           }
         });
+        const usuarioConfig = await Configuracao.findOne({
+          where: {
+            usuario_id: agenda.usuario_id
+          }
+        });
 
-        if (!notificationExists) {
+        if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === false) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
@@ -212,12 +219,12 @@ controller.createAutomaticStartNotifications = async () => {
           };
           enviarNotificacaoWebSocket(novaNotificacao);
         }
-        else if (!notificationExists && configIniAuto) {
+        else if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === true) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
             config_id: configUmaHoraAntes.id,
-            data_notificacao: umHoraAntesInicio,
+            data_notificacao: agenda.data_horario_inicio,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" ja começou. Sua presença já esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
             confirmacao_presenca: true
           });
@@ -241,7 +248,7 @@ controller.createAutomaticStartNotifications = async () => {
   }
 };
 
-controller.createAutomaticFinishNotifications = async() =>{
+controller.createAutomaticFinishNotifications = async(req, res) =>{
   try{
     const agendasPrestesFin = await Agenda.findAll({
       where: {
@@ -257,26 +264,19 @@ controller.createAutomaticFinishNotifications = async() =>{
     })
     const configUmaHoraAntesFin = await Configuracao.findOne({
       where:{
-        config: {notificar_hora_antes_fim: true}
+        config: {notificar_hora_antes_fim: true},
       },
       include: ['usuario']
     })
     const configTrintaMinAntesFin = await Configuracao.findOne({
       where:{
-        config: {notif_trinta_min_antes_fim: true}
+        config: {notif_trinta_min_antes_fim: true},
       },
       include: ['usuario']
     })
     const configNoFim = await Configuracao.findOne({
       where:{
-        config: {notificar_no_fim: true}
-      },
-      include: ['usuario']
-    })
-
-    const configFinAuto = await Configuracao.findOne({
-      where:{
-        config: {confirmar_auto_fim: true}
+        config: {notificar_no_fim: true},
       },
       include: ['usuario']
     })
@@ -290,12 +290,17 @@ controller.createAutomaticFinishNotifications = async() =>{
             data_notificacao: agenda.data_horario_fim
           }
         });
+        const usuarioConfig = await Configuracao.findOne({
+          where: {
+            usuario_id: agenda.usuario_id
+          }
+        });
   
-        if (!notificationEndExists) {
+        if (!notificationEndExists && usuarioConfig.config.confirmar_auto_fim === false) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configNoFim.id,
+            config_id: configNoFim.usuario.id,
             data_notificacao: agenda.data_horario_fim,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. Confirme a finalização clicando no ícone "Editar".`,
             confirmacao_finalizacao: false
@@ -310,16 +315,17 @@ controller.createAutomaticFinishNotifications = async() =>{
           };
           enviarNotificacaoWebSocket(novaNotificacao);
         }
-        else if (!notificationEndExists && configFinAuto) {
+        else if (!notificationEndExists && usuarioConfig.config.confirmar_auto_fim === true) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configNoFim.id,
+            config_id: configNoFim.usuario.id,
             data_notificacao: agenda.data_horario_fim,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. A finalização já esta confirmada devido as suas configurações.`,
+            confirmacao_presenca: true,
             confirmacao_finalizacao: true
           });
-          if (agenda.status !== 'Finalizada'){
+          if (agenda.status !== 'Finalizada') {
             await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
 
           }
@@ -345,12 +351,17 @@ controller.createAutomaticFinishNotifications = async() =>{
             data_notificacao: umHoraAntesFim
           }
         });
+        const usuarioConfig = await Configuracao.findOne({
+          where: {
+            usuario_id: agenda.usuario_id
+          }
+        });
   
-        if (!notificationEndExists){
+        if (!notificationEndExists && usuarioConfig.config.confirmar_auto_fim === false) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configUmaHoraAntesFin.id,
+            config_id: configUmaHoraAntesFin.usuario.id,
             data_notificacao: umHoraAntesFim,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" esta preste a finalizar em 1 hora. Confirme a finalização clicando no ícone "Editar".`,
             confirmacao_finalizacao: false
@@ -364,14 +375,15 @@ controller.createAutomaticFinishNotifications = async() =>{
           };
           enviarNotificacaoWebSocket(novaNotificacao);
         }
-        else if (!notificationEndExists && configFinAuto) {
+        else if (!notificationEndExists && usuarioConfig.config.confirmar_auto_fim === true) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configNoFim.id,
+            config_id: configNoFim.usuario.id,
             data_notificacao: agenda.data_horario_fim,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" esta preste a finalizar em 1 hora. A finalização já esta confirmada devido as suas configurações.`,
-            confirmacao_finalizacao: true
+            confirmacao_presenca: true,
+            confirmacao_finalizacao: true          
           });
           if (agenda.status !== 'Finalizada'){
             await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
@@ -398,12 +410,17 @@ controller.createAutomaticFinishNotifications = async() =>{
             data_notificacao: trintaMinAntesFin
           }
         });
+        const usuarioConfig = await Configuracao.findOne({
+          where: {
+            usuario_id: agenda.usuario_id
+          }
+        });
 
-        if (!notificationExists) {
+        if (!notificationExists && usuarioConfig.config.confirmar_auto_fim === false) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configTrintaMinAntesFin.id,
+            config_id: configTrintaMinAntesFin.usuario.id,
             data_notificacao: trintaMinAntesFin,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`,
             confirmacao_finalizacao: false
@@ -418,14 +435,15 @@ controller.createAutomaticFinishNotifications = async() =>{
           };
           enviarNotificacaoWebSocket(novaNotificacao);
         }
-        else if (!notificationExists && configFinAuto) {
+        else if (!notificationExists && usuarioConfig.config.confirmar_auto_fim === true) {
           await Notificacao.create({
             agenda_id: agenda.id,
             usuario_id: agenda.usuario_id,
-            config_id: configNoFim.id,
+            config_id: configNoFim.usuario.id,
             data_notificacao: agenda.data_horario_fim,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 30 minutos. A finalização já esta confirmada devido as suas configurações.`,
-            confirmacao_finalizacao: true
+            confirmacao_presenca: true,
+            confirmacao_finalizacao: true          
           });
           if (agenda.status !== 'Finalizada'){
             await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });

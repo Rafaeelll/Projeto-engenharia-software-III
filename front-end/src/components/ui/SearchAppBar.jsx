@@ -137,18 +137,11 @@ export default function SearchAppBar() {
         </Notification>
 
         <Tooltip 
-          title="Barra de Pesquisa: Pressione enter após selecionar o que deseja pesquisar e digitar o ID"
+          title="Pressione enter após selecionar o que deseja pesquisar e digitar o ID"
           placement="bottom-start"
           arrow>
           <Box sx={{ flexGrow: 1, marginBottom: '10px', marginLeft: '10px'}}>
-            <IconButton
-              size="small"
-              color="inherit"
-              aria-label="open drawer"
-              sx={{ mr: 2}}
-              onClick={handleSearchClick} // Adicione um evento de clique para exibir o Select ao clicar no ícone de pesquisa
-            > 
-            </IconButton>
+          
       
             <Search>
               <SearchIconWrapper>

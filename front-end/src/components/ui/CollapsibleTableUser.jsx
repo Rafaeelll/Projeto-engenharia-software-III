@@ -55,6 +55,7 @@ function Row({ usuario}) {
           email: usuario.email,
           senha_acesso: usuario.senha_acesso,
           createdAt: usuario.createdAt,
+          updatedAt: usuario.updatedAt,
           status: usuario.status
         }))
         setUserAcounts(formattedUserAcount);
@@ -195,6 +196,7 @@ function Row({ usuario}) {
                 <TableHead>
                   <TableRow>
                     <TableCell size='small' align="center">Data De Criação</TableCell>
+                    <TableCell size='small' align="center">Ultima Atualização</TableCell>
                     <TableCell size='small' align="center">Email</TableCell>
                     <TableCell size='small' align="center">Senha</TableCell>
                     <TableCell size='small' align="center">Status</TableCell>
@@ -214,6 +216,12 @@ function Row({ usuario}) {
                       <TableCell size='small' align="center">
                         {userAcountItem.createdAt ? 
                           format(parseISO(userAcountItem.createdAt), 'dd/MM/yyyy') :
+                          'Nulo'
+                        }
+                      </TableCell>  
+                      <TableCell size='small' align="center">
+                        {userAcountItem.updatedAt ? 
+                          format(parseISO(userAcountItem.updatedAt), 'dd/MM/yyyy') :
                           'Nulo'
                         }
                       </TableCell>                      
