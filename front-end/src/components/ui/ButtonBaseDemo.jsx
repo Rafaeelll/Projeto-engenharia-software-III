@@ -11,7 +11,7 @@ const images = [
     id: 1,
     url: '/src/assets/jogosbutton.jpg',
     title: 'Jogos',
-    width: '20%',
+    width: '30%',
     instruction1: 'Neste item o sistema permitirá o usúario à registrar, editar, listar e excluir seus jogos favoritos.',
     warningTitle: 'Atenção:',
     warning1: `Crie pelo menos um jogo antes de realizar outras funções do sistema.`,
@@ -25,14 +25,14 @@ const images = [
     id: 2,
     url: '/src/assets/agendabutton.jpg',
     title: 'Agendas',
-    width: '20%',
+    width: '30%',
     instruction1: `Neste item o sistema permitirá o usúario à registrar, editar, listar e excluir suas agendas.
     A agenda é umas das principais funções do sistema, seu objetivo é armazenar dados referentes as
     transmissões do usuário como data de início e término da agenda, horario de pausas etc.`,
     warningTitle: 'Atenção:',
     warning1: `Crie pelo menos um jogo antes de realizar esta função.`,
     warning2: `O sistema não permitirá criar agendas no mesmo intervalo de tempo. Para agendas com duração de 3 horas ou mais 
-    o sistema exige que o usuário informe uma de pausa estratégica`,
+    o sistema exige que o usuário informe uma pausa estratégica`,
     warning3: `Caso desejar excluir uma agenda e o ID deste estiver registrado em outros itens como o de 
     "Notificação e Visualização" os dados destes itens tambem serão excluídos.`,
     acessarInstrucao: 'Para criar clique no botão "Acessar" logo abaixo.',
@@ -42,7 +42,7 @@ const images = [
     id: 3,
     url: '/src/assets/viewsbutton.jpg',
     title: 'Visualizações',
-    width: '20%',
+    width: '30%',
     instruction1: `Neste item o sistema permitirá o usúario à registrar, editar, listar e excluir suas visualizações. 
     As visualizações estão associadas as agendas e tem o objetivo de armazenar a quantidade de visualização 
     que a transmissão teve, depois que o usuário finalizar sua agenda.`,

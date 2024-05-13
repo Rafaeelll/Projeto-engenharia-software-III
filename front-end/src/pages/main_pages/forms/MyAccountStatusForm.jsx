@@ -66,7 +66,7 @@ export default function MyAccountStatusForm({onLoginLogout}) {
         setNotif({
           severity: 'success',
           show: true,
-          message: 'Conta inativada com sucesso!'
+          message: 'Dados salvos com sucesso!'
         });
 
         await myfetch.post('/usuarios/logout2');
@@ -161,7 +161,7 @@ export default function MyAccountStatusForm({onLoginLogout}) {
           warning2={
             <Typography> 
               Ao confirmar essa operação clicando no 
-              botão "OK" você sera direcionado para página de login e precisara realizar o login novamente.
+              botão "OK" você será direcionado para página de login e precisará realizar o login novamente.
             </Typography>
           }
         >
@@ -196,7 +196,7 @@ export default function MyAccountStatusForm({onLoginLogout}) {
           maxWidth: '90%',
           margin: '25px auto 0 auto',
           borderRadius: '5px',
-          p: '12px',
+          p: '5px 20px 5px 20px',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >

@@ -8,6 +8,10 @@ import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import Jogo from '../../../../models/Jogo'
 import Paper from '@mui/material/Paper'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { ptBR } from 'date-fns/locale/pt-BR'
+import { parseISO } from 'date-fns'
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
 import Select from '@mui/material/Select';
@@ -15,7 +19,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
-
+import InputAdornment from '@mui/material/InputAdornment';
 
 export default function jogos() {
   const API_PATH = '/jogos';
@@ -29,7 +33,7 @@ export default function jogos() {
       plataforma_jogo: '',
       preco_jogo: '',
       categoria: '',
-      data_aquisicao: '',
+      data_aquisicao: null,
     },
     errors: {},
     showWaiting: false,
@@ -42,11 +46,24 @@ export default function jogos() {
   const { jogos, errors, showWaiting, notif } = state;
   
   function handleFormFieldChange(event) {
-    const jogosCopy = {...jogos}
-    jogosCopy[event.target.name] = event.target.value
-    setState({...state, jogos: jogosCopy})
+    const { name, value } = event.target;
+  
+    let updatedValuePrice = value;
+    if (name === 'preco_jogo') {
+      // Remove qualquer caractere que não seja dígito
+      const cleanedValue = value.replace(/\D/g, '');
+      // Converte o valor para decimal
+      const decimalValue = parseFloat(cleanedValue / 100).toFixed(2); // Divida por 100 para converter centavos para reais
+      updatedValuePrice = decimalValue;
+    }
+    // Atualiza o valor do campo correspondente no objeto jogos
+    const jogosCopy = { ...jogos, [name]: updatedValuePrice };
+  
+    // Atualiza o estado com o novo objeto jogosCopy
+    setState({ ...state, jogos: jogosCopy });
   }
-
+  
+  
   
   function handleFormSubmit(event) {
     event.preventDefault(); // Evita que a página seja recarregada
@@ -64,6 +81,9 @@ export default function jogos() {
     setState({...state, showWaiting: true, errors:{}})
     try {
       const result = await myfetch.get(`${API_PATH}/${params.id}`)
+      if (result.data_aquisicao) {
+        result.data_aquisicao = parseISO(result.data_aquisicao)
+      }
       setState({
         ...state,
         jogos: result,
@@ -75,7 +95,6 @@ export default function jogos() {
       setState({
         ...state, 
         showWaiting: false,
-        errors: errorMessages,
         notif: {
           severity: 'error',
           show: true,
@@ -172,7 +191,7 @@ export default function jogos() {
           maxWidth: '90%',
           margin: '25px auto 0 auto',
           borderRadius: '5px',
-          p: '12px',
+          p: '5px 20px 5px 20px',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >
@@ -243,33 +262,37 @@ export default function jogos() {
             label="Preço Do Jogo"
             name='preco_jogo'
             fullWidth
-            type='number'
             required
             onChange={handleFormFieldChange}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">R$</InputAdornment>
+            }}
           />
 
-          <TextField sx={{marginTop: '12px'}}
-            required
-            variant='filled'
-            label='Data de aquisição'
-            type="date"
-            name="data_aquisicao"
-            fullWidth
-            value={jogos.data_aquisicao}
-            onChange={handleFormFieldChange}
-          />
+          <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+            <DatePicker sx={{marginTop: '12px'}}
+              label='Data de aquisição'
+              value={jogos.data_aquisicao}
+              onChange={value => handleFormFieldChange({
+                target: {name:'data_aquisicao', value}
+              })}
+              slotProps={{
+                textField:{
+                  variant:'outlined',
+                  fullWidth: true,
+                  required: true
+                }
+              }}
+            />
+          </LocalizationProvider>
+          
           
           <div className='jogo-form-btn' style={{display: 'flex', justifyContent: 'center'}}>
             <Button
               sx={{
                 margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
                 background: 'black',
-                fontFamily: 'monospace',
                 fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
               }}
               color="secondary"
               variant='contained'
@@ -280,13 +303,8 @@ export default function jogos() {
             <Button
               sx={{
                 margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
                 background: 'black',
-                fontFamily: 'monospace',
                 fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
               }}
               color="error"
               variant='contained'

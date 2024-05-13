@@ -10,6 +10,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Typography from '@mui/material/Typography';
 import ConfirmDialogGreeting  from '../../components/ui/ConfirmDialogGretting'
 import myfetch from '../../utils/myfetch';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 
 
@@ -54,12 +55,19 @@ export default function PaginaInicial() {
       <ConfirmDialogGreeting
         open={showDialog}
         onClose={handleCloseDialog}
-        title="Stream Advisor"
+        title="Bem Vindo"
         greetings={
           <Typography>
             Olá, {userAccessCount.map((userAccessCountItem) => (
               userAccessCountItem.nome
-            ))}
+            ))} 
+            <br />
+            <br />
+            Antes de  realizar as funções do sistema orientamos a ver as Instruções do sistema logo aqui na
+            pagina inicial. 
+            <br />
+            <br />
+            Agradecemos ter você como membro! <FavoriteIcon fontSize='small' color='error'/>
           </Typography>
         }
       >

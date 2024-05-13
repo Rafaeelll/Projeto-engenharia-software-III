@@ -11,7 +11,7 @@ const images = [
     id: 4,
     url: '/src/assets/historicobutton.jpg',
     title: 'Histórico De Jogos',
-    width: '20%',
+    width: '30%',
     instruction1: `Neste item o sistema permitirá o usúario à registrar, editar, visualizar e excluir históricos de jogos salvos no sistema.
     Os históricos estão associados aos jogos e tem o objetivo de armazenar a progressão do usuário em um jogo, além disso 
     poderá avaliar o jogo e fazer comentários sobre os jogos.`, 
@@ -26,7 +26,7 @@ const images = [
     id: 5,
     url: 'https://c4.wallpaperflare.com/wallpaper/658/253/180/girl-headphones-computer-face-girl-hd-wallpaper-preview.jpg',
     title: 'Notificações',
-    width: '20%',
+    width: '30%',
     instruction1: `Neste item o sistema irá criar notificações automaticamente e permitirá o usuário à editar, listar e excluir suas notificações.
     As notificações estão associadas às agendas e tem o objetivo de armazenar e notificar os usuários sobre a inicialização, finalização, pausa 
     estratégica, confirmação de sua presença e confirmação da finalização da agenda. 
@@ -43,10 +43,17 @@ const images = [
   {
     id: 6,
     url: '/src/assets/perfilbutton.jpg',
-    title: 'Perfil',
-    width: '20%',
-    instruction1: 'Conteúdo relacionado às visualizações...',
-    route: '/perfil'
+    title: 'Perfil/Conta',
+    width: '30%',
+    instruction1: `Neste item o sistema permitirá o usuário a registrar, editar, visualizar e inativar seu cadastro. Os dados dos usuários
+    como e-mail, senha, foto de perfil entre outros ficaram salvos neste item, por trata-se de dados pessoais, o sistema garantirá que alguns
+    destes sejam criptografados, assim impedindo vazamentos de dados.`,
+    warningTitle: 'Atenção:',
+    warning1: `O sistema deverá permitir o cadastro de apenas um usuário por e-mail.`,
+    warning2: `Caso o usuário desejar excluir seu cadastro é orientado inativar sua conta, o cadastro ficará inativo por 
+    ate 30 dias, se o usuário não reativar sua conta dentro desse periodo o sistema irá excluir o cadastro e todos os dados relacionado ao usuário.`,
+    warning3: `O sistema irá permitir somente registrar senhas com entre 5 e 10 caracteres`,
+    route: '/usuario'
   },
 ];
 

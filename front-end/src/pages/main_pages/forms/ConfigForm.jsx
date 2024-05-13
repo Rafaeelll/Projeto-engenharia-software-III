@@ -146,9 +146,10 @@ export default function ConfigForm() {
           background: 'whitesmoke',
           maxHeight: '75vh',
           overflow: 'auto',
+          maxWidth: '90%',
           margin: '25px auto 0 auto',
           borderRadius: '5px',
-          p: '12px',
+          p: '5px 20px 5px 20px',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >
@@ -299,7 +300,7 @@ export default function ConfigForm() {
             </FormControl>
           </Box>
 
-          <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+          <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center'}}>
             <Button
               sx={{
                 margin: '10px',

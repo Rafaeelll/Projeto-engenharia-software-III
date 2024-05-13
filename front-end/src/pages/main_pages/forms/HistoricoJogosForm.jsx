@@ -245,7 +245,7 @@ export default function HistoricoJogosForm() {
           background: 'whitesmoke',
           margin: '25px auto 0 auto',
           borderRadius: '5px',
-          p: '12px',
+          p: '5px 20px 5px 20px',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >
@@ -339,13 +339,8 @@ export default function HistoricoJogosForm() {
             <Button
               sx={{
                 margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
                 background: 'black',
-                fontFamily: 'monospace',
                 fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
               }}
               color="secondary"
               variant='contained'
@@ -357,13 +352,8 @@ export default function HistoricoJogosForm() {
             <Button
               sx={{
                 margin: '10px',
-                padding: '5px 15px 5px 15px',
-                border: 'none',
                 background: 'black',
-                fontFamily: 'monospace',
                 fontWeight: 'bold',
-                borderRadius: '5px',
-                cursor: 'pointer',
               }}
               color="error"
               variant='contained'

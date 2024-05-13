@@ -35,6 +35,7 @@ controller.create = async (req, res) => {
             // Se já existir um jogo com o mesmo nome para o usuário atual, retorna um erro
             return res.status(409).send({ error: 'Você já possui um jogo com esse nome.' });
         }
+        req.body.preco_jogo = parseFloat(req.body.preco_jogo);
 
         // Cria um novo registro de jogo no banco de dados
         await Jogo.create(req.body);
@@ -92,11 +93,16 @@ controller.retrieveOne = async (req, res) => {
 // Método para atualizar um registro de jogo específico associado ao usuário autenticado
 controller.update = async (req, res) => {
     try {
+        // Converte o preço para decimal antes de atualizar
+        if (req.body.preco_jogo !== undefined) {
+            req.body.preco_jogo = parseFloat(req.body.preco_jogo);
+        }
         // Atualiza o registro de jogo específico associado ao usuário autenticado
         const response = await Jogo.update(
             req.body,
             { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pelo id do jogo e do usuário autenticado
         );
+        
         // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
         if (response[0] > 0) {
             // HTTP 204: No Content

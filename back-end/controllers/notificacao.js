@@ -97,7 +97,8 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             config_id: configUmaHoraAntes.id,
             data_notificacao: umHoraAntesInicio,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Confirme sua presença clicando no ícone "Editar".`,
-            confirmacao_presenca: false
+            confirmacao_presenca: false,
+            confirmacao_finalizacao: false
           });
         }
         else if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === true){
@@ -106,8 +107,9 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             usuario_id: agenda.usuario_id,
             config_id: configUmaHoraAntes.usuario.id,
             data_notificacao: umHoraAntesInicio,
-            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Sua presença ja esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
-            confirmacao_presenca: true
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Sua presença já esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
+            confirmacao_presenca: true,
+            confirmacao_finalizacao: false
           });
           if (agenda.status !== 'Em andamento'){
             await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
@@ -150,7 +152,9 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             config_id: configTrintaMinAntes.usuario.id,
             data_notificacao: trintaMinAntesInicio,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`,
-            confirmacao_presenca: false
+            confirmacao_presenca: false,
+            confirmacao_finalizacao: false
+
           });
           
           
@@ -168,8 +172,10 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             usuario_id: agenda.usuario_id,
             config_id: configUmaHoraAntes.id,
             data_notificacao: umHoraAntesInicio,
-            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Sua presença ja esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
-            confirmacao_presenca: true
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Sua presença já esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
+            confirmacao_presenca: true,
+            confirmacao_finalizacao: false
+
           });
           if (agenda.status !== 'Em andamento'){
             await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
@@ -207,8 +213,10 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             usuario_id: agenda.usuario_id,
             config_id: configNoInicio.id,
             data_notificacao: agenda.data_horario_inicio,
-            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" ja começou. Confirme sua presença clicando no ícone "Editar".`,
-            confirmacao_presenca: false
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já começou. Confirme sua presença clicando no ícone "Editar".`,
+            confirmacao_presenca: false,
+            confirmacao_finalizacao: false
+
           });
           
           // Envia a notificação via WebSocket
@@ -225,8 +233,9 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             usuario_id: agenda.usuario_id,
             config_id: configUmaHoraAntes.id,
             data_notificacao: agenda.data_horario_inicio,
-            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" ja começou. Sua presença já esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
-            confirmacao_presenca: true
+            mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já começou. Sua presença já esta confirmada devido suas configuraçoes, caso deseja adiar a agenda clique no ícone "Editar".`,
+            confirmacao_presenca: true,
+            confirmacao_finalizacao: false
           });
           if (agenda.status !== 'Em andamento'){
             await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
@@ -303,7 +312,8 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             config_id: configNoFim.usuario.id,
             data_notificacao: agenda.data_horario_fim,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. Confirme a finalização clicando no ícone "Editar".`,
-            confirmacao_finalizacao: false
+            confirmacao_finalizacao: false,
+            confirmacao_presenca: false
 
           });
   
@@ -364,7 +374,9 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             config_id: configUmaHoraAntesFin.usuario.id,
             data_notificacao: umHoraAntesFim,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" esta preste a finalizar em 1 hora. Confirme a finalização clicando no ícone "Editar".`,
-            confirmacao_finalizacao: false
+            confirmacao_finalizacao: false,
+            confirmacao_presenca: false
+
           });
   
           // Envia a notificação via WebSocket
@@ -423,7 +435,8 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             config_id: configTrintaMinAntesFin.usuario.id,
             data_notificacao: trintaMinAntesFin,
             mensagem: `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`,
-            confirmacao_finalizacao: false
+            confirmacao_finalizacao: false,
+            confirmacao_presenca: false
 
           });
           
@@ -542,9 +555,14 @@ controller.update = async (req, res) => {
     if (notification) {
       // Obtém o ID da agenda da notificação
       const agendaId = notification.agenda_id;
+      const confirmPresenca = true 
+
 
       // Verifica se a notificação confirma a finalização ou a inicialização
       if (newData.confirmacao_finalizacao === true) {
+        notification.confirmacao_presenca = confirmPresenca;
+        await notification.save();
+
         // Se confirmar finalização, atualiza o status da agenda para 'Finalizada'
         await Agenda.update({ status: 'Finalizada' }, { where: { id: agendaId } });
       } else if (newData.confirmacao_presenca === true) {

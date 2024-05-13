@@ -9,6 +9,10 @@ import getValidationMessages from '../../../utils/getValidationMessages';
 import Agenda from '../../../../models/Agenda';
 import FormTitle from '../../../components/ui/FormTitle';
 import Paper from '@mui/material/Paper';
+import { MobileDateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { ptBR } from 'date-fns/locale/pt-BR'
+import { parseISO } from 'date-fns'
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Select from '@mui/material/Select';
@@ -16,20 +20,24 @@ import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel'
+import AccessAlarmIcon from '@mui/icons-material/AccessAlarm';
 
 export default function CriarAgendas() {
   const API_PATH = '/agendas';
   const params = useParams();
   const navigate = useNavigate();
   const [showWaiting, setShowWaiting] = React.useState(false)
+  const [definirPausa, setDefinir] = React.useState(false)
   const [state, setState] = React.useState({
     criarAgendas: {
       titulo_agenda: '',
       plt_transm: '',
       jogo_id: '',
       descricao: '',
-      data_horario_inicio: '',
-      data_horario_fim: '',
+      data_horario_inicio: null,
+      data_horario_fim: null,
+      p_data_horario_inicio: null,
+      p_data_horario_fim: null,
     },
     jogosList: [], // Estado para armazenar a lista de jogos
     errors: {},
@@ -48,6 +56,30 @@ export default function CriarAgendas() {
 
     setState({ ...state, criarAgendas: criarAgendasCopy });
   }
+
+  // Função para calcular a duração da agenda
+  const calculateDuration = () => {
+    if (criarAgendas.data_horario_inicio && criarAgendas.data_horario_fim) {
+      const diffInMs = criarAgendas.data_horario_fim - criarAgendas.data_horario_inicio;
+      const diffInHours = diffInMs / (1000 * 60 * 60);
+      return diffInHours;
+    }
+    return 0;
+  };
+
+  // Verificar se a duração é maior que 3 horas
+  const isDurationGreaterThan3Hours = calculateDuration() >= 3;
+
+  // Lidar com a mudança dos campos de data e hora
+  const handleDateTimeChange = (name, value) => {
+    setState({
+      ...state,
+      criarAgendas: {
+        ...criarAgendas,
+        [name]: value,
+      },
+    });
+  };
 
   async function handleGameIdClick() {
     try {
@@ -114,20 +146,6 @@ export default function CriarAgendas() {
   async function handleFormSubmit(event) {
     event.preventDefault();
 
-    const inicio = new Date(criarAgendas.data_horario_inicio);
-    const fim = new Date(criarAgendas.data_horario_fim);
-    if (fim <= inicio) {
-      setState({
-        ...state,
-        notif: {
-          severity: 'error',
-          show: true,
-          message: 'A data de término deve ser maior do que a data de início!',
-        },
-      });
-      return;
-    }
-
     const agendaExists = await verifyAgendaExists(
       criarAgendas.usuario_id,
       criarAgendas.data_horario_inicio,
@@ -157,6 +175,8 @@ export default function CriarAgendas() {
     setShowWaiting(true)
     try {
       const result = await myfetch.get(`${API_PATH}/${params.id}`);
+      result.data_horario_inicio = parseISO(result.data_horario_inicio)
+      result.data_horario_fim = parseISO(result.data_horario_fim)
       setState({
         ...state,
         criarAgendas: result,
@@ -167,7 +187,6 @@ export default function CriarAgendas() {
       console.error(error);
       setState({
         ...state,
-        errors: errorMessages,
         notif: {
           severity: 'error',
           show: true,
@@ -255,6 +274,9 @@ export default function CriarAgendas() {
       },
     });
   }
+  function handleDefinirPausaClick(){
+    setDefinir(!definirPausa);
+  }
 
   return (
     <>
@@ -274,14 +296,15 @@ export default function CriarAgendas() {
       <Paper
         className="agenda-container"
         sx={{
-          width: '512px',
-          maxWidth: '90%',
+          width: '500px',
           margin: '25px auto 0 auto',
+          overflow: 'auto',
+          maxWidth: '90%',
           background: 'whitesmoke',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)',
           borderRadius: '5px',
-          p: '12px',
-          maxHeight: '100%',
+          p: '5px 20px 5px 20px',
+          maxHeight: '80vh',
         }}
       >
         <FormTitle title={params.id ? 'Editar agenda' : 'Criar agendas'} />
@@ -334,28 +357,143 @@ export default function CriarAgendas() {
             </Box>
 
 
-            <TextField
-              sx={{ marginTop: '12px' }}
-              required
-              type="datetime-local"
-              label="Início"
-              name="data_horario_inicio"
-              fullWidth
-              value={criarAgendas.data_horario_inicio}
-              onChange={handleFormFieldChange}
-            />
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+              <MobileDateTimePicker
+                sx={{ marginTop: '12px' }}
+                label="Início"
+                value={criarAgendas.data_horario_inicio}
+                onChange={value => handleFormFieldChange({
+                  target: {name:'data_horario_inicio', value}
 
-            <TextField
-              sx={{ marginTop: '12px' }}
-              required
-              label="Fim"
-              color="secondary"
-              type="datetime-local"
-              name="data_horario_fim"
-              fullWidth
-              value={criarAgendas.data_horario_fim}
-              onChange={handleFormFieldChange}
-            />
+                })}
+                slotProps={{
+                  textField: {
+                    variant: 'outlined',
+                    fullWidth: true,
+                    required: true
+                  }
+                }}
+
+              />
+            </LocalizationProvider>
+              
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+              <MobileDateTimePicker 
+                sx={{ marginTop: '12px' }}
+                label="Fim"
+                value={criarAgendas.data_horario_fim}
+                onChange={value => handleFormFieldChange({
+                  target: {name:'data_horario_fim', value}
+
+                })}
+                slotProps={{
+                  textField: {
+                    variant: 'outlined',
+                    color: 'secondary',
+                    fullWidth: true,
+                    required: true
+                  }
+                }}
+                minDateTime={criarAgendas.data_horario_inicio}
+              />
+            </LocalizationProvider>
+
+            {/* Exibir botão de definir pausa somente se a duração da agenda não for >= que 3 horas*/}
+            {!isDurationGreaterThan3Hours && (
+              <Button
+                sx={{mt: '6px'}}
+                variant='text'
+                startIcon={<AccessAlarmIcon/>}
+                onClick={handleDefinirPausaClick}>
+                {definirPausa ? 'Nâo Definir Pausa': 'Definir Pausa'}
+              </Button>
+            )}
+            
+
+             {/* Exibir campos de pausa se a duração for >= que 3 horas (obrigatorio) */}
+             {isDurationGreaterThan3Hours&& (
+              <Box>
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+                  <MobileDateTimePicker
+                    sx={{ marginTop: '12px' }}
+                    label="Pausa Início"
+                    value={criarAgendas.p_data_horario_inicio}
+                    onChange={(value) => handleDateTimeChange('p_data_horario_inicio', value)}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                        fullWidth: true,
+                        required: true,
+                      },
+                    }}
+                    minDateTime={criarAgendas.data_horario_inicio}
+                    maxDateTime={criarAgendas.data_horario_fim}
+                  />
+                </LocalizationProvider>
+
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+                  <MobileDateTimePicker
+                    sx={{ marginTop: '12px' }}
+                    label="Pausa Fim"
+                    value={criarAgendas.p_data_horario_fim}
+                    onChange={(value) => handleDateTimeChange('p_data_horario_fim', value)}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                        color: 'secondary',
+                        fullWidth: true,
+                        required: true,
+                      },
+                    }}
+                    minDateTime={criarAgendas.p_data_horario_inicio}
+                    maxDateTime={criarAgendas.data_horario_fim}
+                  />
+                </LocalizationProvider>
+              </Box>
+            )}
+
+            {/* Exibir campos de pausa se usuario quiser definir o horario de pausa*/}
+            {definirPausa && (
+              <Box>
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+                  <MobileDateTimePicker
+                    sx={{ marginTop: '12px' }}
+                    label="Pausa Início"
+                    value={criarAgendas.p_data_horario_inicio}
+                    onChange={(value) => handleDateTimeChange('p_data_horario_inicio', value)}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                        fullWidth: true,
+                        required: false,
+                      },
+                    }}
+                    minDateTime={criarAgendas.data_horario_inicio}
+                    maxDateTime={criarAgendas.data_horario_fim}
+                  />
+                </LocalizationProvider>
+
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+                  <MobileDateTimePicker
+                    sx={{ marginTop: '12px' }}
+                    label="Pausa Fim"
+                    value={criarAgendas.p_data_horario_fim}
+                    onChange={(value) => handleDateTimeChange('p_data_horario_fim', value)}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                        fullWidth: true,
+                        required: false,
+                      },
+                    }}
+                    minDateTime={criarAgendas.p_data_horario_inicio}
+                    maxDateTime={criarAgendas.data_horario_fim}
+                  />
+                </LocalizationProvider>
+              </Box>
+            )}
+
+
 
             <Box sx={{ minWidth: 120, marginTop: '12px'}}>
               <FormControl fullWidth>
@@ -389,17 +527,12 @@ export default function CriarAgendas() {
               error={errors?.descricao}
               helperText={errors?.descricao}
             />
-            <div className="agenda-form-btn" style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
+            <Box className="agenda-form-btn" sx={{ display: 'flex', justifyContent: 'center' }}>
               <Button
                 sx={{
                   margin: '10px',
-                  padding: '5px 15px 5px 15px',
-                  border: 'none',
                   background: 'black',
-                  fontFamily: 'monospace',
                   fontWeight: 'bold',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
                 }}
                 color="secondary"
                 variant="contained"
@@ -410,13 +543,8 @@ export default function CriarAgendas() {
               <Button
                 sx={{
                   margin: '10px',
-                  padding: '5px 15px 5px 15px',
-                  border: 'none',
                   background: 'black',
-                  fontFamily: 'monospace',
                   fontWeight: 'bold',
-                  borderRadius: '5px',
-                  cursor: 'pointer',
                 }}
                 color="error"
                 variant="contained"
@@ -424,7 +552,7 @@ export default function CriarAgendas() {
               >
                 Cancelar
               </Button>
-            </div>
+            </Box>
           </form>
         </Typography>
       </Paper>

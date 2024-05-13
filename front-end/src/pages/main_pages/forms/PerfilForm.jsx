@@ -8,9 +8,12 @@ import Notification from '../../../components/ui/Notification';
 import getValidationMessages from '../../../utils/getValidationMessages'
 import Perfil from '../../../../models/Perfil';
 import Paper  from '@mui/material/Paper';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
+import { ptBR } from 'date-fns/locale/pt-BR'
+import { parseISO } from 'date-fns'
 import FormTitle from '../../../components/ui/FormTitle';
 import Button  from '@mui/material/Button';
-import api from '../../../../services/api'
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
@@ -31,7 +34,7 @@ export default function PerfilForm() {
       sobrenome: '',
       telefone: '',
       plataforma_fav: '',
-      data_nasc: '',
+      data_nasc: null,
       jogo_fav: '',
     },
     errors: {},
@@ -80,31 +83,29 @@ export default function PerfilForm() {
   async function fetchData() {
     setState({...state, showWaiting: true, errors:{}})
     try {
-      // Verifica se params.id é definido antes de fazer a busca
-      if (id) {
-        const result = await api.get(`${API_PATH_US}/${id}`);
+        const result = await myfetch.get(`${API_PATH_US}/${id}`);
+        if (result.data_nasc) {
+          result.data_nasc = parseISO(result.data_nasc);
+        }
         setState({
           ...state,
           perfils: result,
           showWaiting: false
         });
-      } else {
-        console.error('ID do perfil não definido.');
+
       }
-    }
-    catch(error) {
-      console.error(error)
-      setState({
-        ...state, 
-        showWaiting: false,
-        errors: errorMessages,
-        notif: {
-          severity: 'error',
-          show: true,
-          message: 'ERRO: ' + error.message
-        }
-      })
-    }
+      catch(error) {
+        console.error(error)
+        setState({
+          ...state, 
+          showWaiting: false,
+          notif: {
+            severity: 'error',
+            show: true,
+            message: 'ERRO: ' + error.message
+          }
+        })
+      }
   }
 
   async function sendData() {
@@ -177,7 +178,7 @@ export default function PerfilForm() {
           maxWidth: '90%',
           margin: '25px auto 0 auto',
           borderRadius: '5px',
-          p: '12px',
+          p: '5px 20px 5px 20px',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >
@@ -230,15 +231,22 @@ export default function PerfilForm() {
               }}
             />
 
-            <TextField sx={{marginTop: '15px'}}
-              label='Data nascimento'
-              color='secondary'
-              type="date"
-              name="data_nasc"
-              fullWidth
-              value={perfils.data_nasc}
-              onChange={handleFormFieldChange}
-            />
+            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
+              <DatePicker sx={{marginTop: '12px'}}
+                label='Data de aquisição'
+                value={perfils.data_nasc}
+                onChange={value => handleFormFieldChange({
+                  target: {name:'data_nasc', value}
+                })}
+                slotProps={{
+                  textField:{
+                    variant:'outlined',
+                    fullWidth: true,
+                    required: true
+                  }
+                }}
+              />
+            </LocalizationProvider>
 
             <Box sx={{ minWidth: 120, marginTop: '15px'}}>
               <FormControl fullWidth>
