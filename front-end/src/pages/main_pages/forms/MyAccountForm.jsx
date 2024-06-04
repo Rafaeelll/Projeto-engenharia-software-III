@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import myfetch from '../../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop';
@@ -15,6 +15,8 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
+import Box from '@mui/material/Box'
+import { Typography } from '@mui/material';
 
 
 export default function MyAccountForm() {
@@ -28,6 +30,7 @@ export default function MyAccountForm() {
   const [state, setState] = React.useState({
     myAccountDatas: {
       email: '',
+      senhaAtual: '',
       senha_acesso: '',
       confirmar_senha: '',
     },
@@ -209,7 +212,37 @@ export default function MyAccountForm() {
             />
 
           <TextField sx={{marginTop: '15px'}}
-            label="Senha"
+            label="Informe a senha atual"
+            type={mostrarSenha ? 'text' : 'password'}
+            variant='filled'
+            fullWidth
+            required
+            name="senhaAtual" // Nome do campo na tabela
+            value={myAccountDatas.senhaAtual} // Nome do campo na tabela
+            onChange={handleFormFieldChange}
+            error={errors?.senhaAtual}
+            helperText={errors?.senhaAtual}
+            InputProps={{
+              endAdornment: 
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {mostrarSenha ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }}
+          />
+          <Box sx={{mt: '10px'}}> 
+            <Typography sx={{color: 'GrayText'}} variant='body6'> Esqueceu sua senha atual?</Typography> 
+            <Link to={'/esqueci_senha'}> Clique aqui</Link>
+          </Box>
+
+          <TextField sx={{marginTop: '15px'}}
+            label="Informe a nova senha"
             type={mostrarSenha ? 'text' : 'password'}
             variant='filled'
             fullWidth
@@ -235,7 +268,7 @@ export default function MyAccountForm() {
           />
 
             <TextField sx={{marginTop: '15px'}}
-              label='Confirmar Senha'
+              label='Confirme a nova Senha'
               color='secondary'
               className='input2'
               variant='filled'

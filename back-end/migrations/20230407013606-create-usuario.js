@@ -67,6 +67,14 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: true
       },
+      passwordResetToken: {
+        type: Sequelize.STRING(200),
+        select: false,
+      },
+      passwordResetExpires: {
+        type: Sequelize.DATE,
+        select: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

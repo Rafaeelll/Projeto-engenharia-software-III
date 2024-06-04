@@ -3,6 +3,8 @@ import React from 'react';
 import LandingPage from './pages/home/LandingPage';
 import Login from './pages/login/register/Login';
 import Register from './pages/login/register/Register';
+import EsqueciSenha from './pages/login/esqueci_senha/EsqueciSenha';
+import RecuperarSenha from './pages/login/recuper_senha/RecuperarSenha';
 import About from './pages/home/About';
 import Contact from './pages/home/Contact';
 import PaginaInicial from './pages/main_pages/PaginaInicial';
@@ -56,6 +58,8 @@ function App() {
           <Route path= "/cadastro" element={<Register/>}/>
           <Route path= "/sobre" element={<About/>}/>
           <Route path= "/contato" element={<Contact/>}/>
+          <Route path= "/esqueci_senha" element={<EsqueciSenha/>}/>
+          <Route path= "/recuperar_senha" element={<RecuperarSenha/>}/>
           <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
           <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
           <Route path= "/agendas/status" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>

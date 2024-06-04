@@ -13,6 +13,11 @@ const multerConfig = require('../config/multer');
 // Rota para fazer login
 router.post('/login', controller.login);
 
+router.post('/esqueci_senha', controller.esqueciSenha);
+
+// Rota para redefinir/recuperar senha
+router.post('/recuperar_senha', controller.recuperSenha);
+
 // Rota para fazer logout
 router.post('/logout', controller.logout);
 

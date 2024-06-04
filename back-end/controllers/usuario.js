@@ -4,6 +4,10 @@ const bcrypt = require('bcrypt') // Biblioteca para hash de senhas
 const jwt = require('jsonwebtoken') // Biblioteca para geração e verificação de tokens de autenticação
 const { Op } = require('sequelize');
 const cron = require('node-cron');
+const crypto = require('crypto')
+const mailer = require('../modules/mailer')
+require('dotenv').config(); // Carregar variáveis de ambiente
+
 
 const controller = {}   // Objeto vazio
 
@@ -192,7 +196,8 @@ controller.logout2 = (req, res) => {
 
 controller.updateMyAccount = async (req, res) => {
   try {
-    const user = await Usuario.findOne({ where: { id: req.authUser.id } });
+    const user = await Usuario.scope('withPassword').findOne({ where: { id: req.authUser.id } });
+
     const { email, senha_acesso } = req.body;
 
     // Verifica se o email informado é igual ao email do usuário logado
@@ -205,26 +210,33 @@ controller.updateMyAccount = async (req, res) => {
         return res.status(409).send('O e-mail informado já está em uso.');
       }
     }
+    const pwMatches = await bcrypt.compare(req.body.senhaAtual, user.senha_acesso)
 
-    // Criptografar a senha
-    const hashedPassword = await bcrypt.hash(senha_acesso, 12);
+    if (pwMatches) {
+        // A senha antiga confere com a que o usuário digitou
+        // Criptografar a senha
+      const hashedPassword = await bcrypt.hash(senha_acesso, 12);
 
-    const response = await Usuario.update({
-      email,
-      senha_acesso: hashedPassword,
-    },
-    // Condição para atualização
-    { where: { id: req.params.id, id: req.authUser.id }}
-    );
+      const response = await Usuario.update({
+        email,
+        senha_acesso: hashedPassword,
+      },
+      // Condição para atualização
+      { where: { id: req.params.id, id: req.authUser.id }}
+      );
 
-    // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
-    if (response[0] > 0) {
-      // HTTP 204: No Content
-      res.status(204).end();
-    } else {
-      // HTTP 404: Not Found
-      res.status(404).end();
+      // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
+      if (response[0] > 0) {
+        // HTTP 204: No Content
+        res.status(204).end();
+      } else {
+        // HTTP 404: Not Found
+        res.status(404).end();
+      }
     }
+    // Senha antiga informada pelo usuário não confere ~> HTTP 401: Unauthorized
+    else res.status(401).end()
+
   } catch (error){
     console.error(error);
   }
@@ -371,5 +383,67 @@ controller.deleteInactiveUsers = async (req, res) => {
 // Agendar a execução da função deleteInactiveUsers a cada minuto
 cron.schedule('*/1 * * * *', controller.deleteInactiveUsers);
 
+controller.esqueciSenha = async (req, res) => {
+  try{
+    const user = await Usuario.findOne({ where: {email: req.body.email}})
+
+    if(!user) return res.status(401).end()
+
+      const token = crypto.randomBytes(20).toString('hex')
+
+      const now = new Date();
+      now.setHours(now.getHours() + 1);
+
+      await Usuario.update({
+        passwordResetToken: token,
+        passwordResetExpires: now,
+      }, {
+        where: { id: user.id }
+      });
+
+      mailer.sendMail({
+        to: req.body.email,
+        from: process.env.EMAIL_USER,
+        template: 'auth/esqueci_senha',
+        context: {token},
+      }, (error) => {
+        if (error) {
+          console.log(error)
+          return res.status(400).send({error: 'Erro ao enviar o email'})
+        }
+        return res.send();
+      })
+
+    }
+  catch (error){
+    console.log(error)
+  }
+}
+controller.recuperSenha = async (req, res) => {
+  const {email, token, senha_acesso} = req.body
+
+  try {
+    const user = await Usuario.scope('withResetTokenPassword').findOne({ where: {email}})
+
+    if (!user) return res.status(401).end()
+
+    if (token !== user.passwordResetToken) return res.status(400).send({error: 'Token inválido'})
+
+    const now = new Date()
+
+    if (now > user.passwordResetExpires) return res.status(400).send({error: 'Token expirado, gere um novo'})
+
+    const hashedPassword = await bcrypt.hash(senha_acesso, 12);
+
+    user.senha_acesso = hashedPassword
+    
+    await user.save();
+
+    res.send();
+  }
+  catch (error) {
+    console.log(error)
+  }
+}
 
 module.exports = controller

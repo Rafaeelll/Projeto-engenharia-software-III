@@ -79,15 +79,6 @@ controller.retrieveOne = async (req, res) => {
 // Método para atualizar um registro específico de histórico de jogo do usuário autenticado
 controller.update = async (req, res) => {
     try {
-        // Verifica se já existe um registro de histórico de jogo associado ao jogo atual
-        const existingRecord = await HistoricoJogo.findOne({
-            where: { jogo_id: req.body.jogo_id }
-        });
-
-        // Se já existe um registro associado a este jogo, retorna um erro 409 Conflict
-        if (existingRecord && existingRecord.id !== req.params.id) {
-            return res.status(409).json({ error: 'Já existe um registro de histórico para este jogo.' });
-        }
 
         // Atualiza um registro específico de histórico de jogo do usuário autenticado pelo id
         const response = await HistoricoJogo.update(

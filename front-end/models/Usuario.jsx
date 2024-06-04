@@ -21,7 +21,7 @@ const Usuario = Joi.object({
         .min(5)
         .max(10)
         .required()
-        .messages({'*': 'A senha é obrigatória e deve ter entre 5 e 200 caracteres.'}),
+        .messages({'*': 'A senha é obrigatória e deve ter entre 5 e 10 caracteres.'}),
     confirmar_senha: Joi.string()
         .valid(Joi.ref('senha_acesso'))
         .required()

@@ -19,7 +19,6 @@ import  Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
 import { styled } from '@mui/material/styles';
 import Toolbar from '@mui/material/Toolbar'
 import AppBar from '@mui/material/AppBar'
-import FooterBar from '../../../components/ui/FooterBar'
 
 
 export default function LoginForm({onLoginLogout}) {
@@ -158,7 +157,7 @@ export default function LoginForm({onLoginLogout}) {
                   type="name"
                   name='email'
                   required
-                  value={email.nome}
+                  value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
                 </div>
@@ -201,13 +200,18 @@ export default function LoginForm({onLoginLogout}) {
               </div>
               
               <div className="text-center">
-                <span className="txt1">Não possui cadastro?</span>
-                <Link className ="txt2" to="/cadastro"><p><u>Criar cadastro</u></p></Link>
+                <div className="line">
+                  <span className="txt1">Não possui cadastro?</span>
+                  <Link className="txt2" to="/cadastro"><u>Criar cadastro</u></Link>
+                </div>
+                <div className="line">
+                  <span className="txt1">Esqueceu sua senha?</span>
+                  <Link className="txt2" to="/esqueci_senha"><u>Clique aqui</u></Link>
+                </div>
               </div>
             </form>
           </div>
         </div>
-      <FooterBar/>
     </div>
   );
 }

@@ -26,9 +26,6 @@ function getErrorDescription(response) {
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos!'
 
-    case 403:   // Expired
-      return 'Sessão expirada, por favor, logar novamente!'
-    
     case 404: // Not found
       return 'ERRO: ID não foi encontrado!'
 

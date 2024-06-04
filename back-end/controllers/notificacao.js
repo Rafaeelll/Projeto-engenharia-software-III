@@ -477,8 +477,73 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
   }
 }
 
+controller.createAutoPauseStartNotifications = async (req, res) =>{
+  try{
+    const PausaInicializadas = await Agenda.findAll({
+      where: {
+        p_data_horario_inicio: {[Op.gte]: new Date()}
+      },
+      include: ['usuario']
+    })
+    for (const agenda of PausaInicializadas){
+      const notificationExists = await Notificacao.findOne({
+        where: {
+          agenda_id: agenda.id,
+          data_notificacao: agenda.p_data_horario_inicio
+        }
+      })
+      if (!notificationExists) {
+        await Notificacao.create({
+          agenda_id: agenda.id,
+          usuario_id: agenda.usuario_id,
+          config_id: agenda.usuario_id,
+          data_notificacao: agenda.p_data_horario_inicio,
+          mensagem: `Olá ${agenda.usuario.nome}, a pausa da sua agenda já iniciou!`
+        })
+      }
+    }
+  }
+  catch (error){
+    console.log(error)
+  }
+}
+
+controller.createAutoPauseFinishNotifications = async (req, res) =>{
+  try {
+    const PausaTerminadas = await Agenda.findAll({
+      where:{
+        p_data_horario_fim: { [Op.lte]: new Date() }
+      },
+      include: ['usuario']
+    })
+    for (const agenda of PausaTerminadas) {
+      const notificationEndExists = await Notificacao.findOne({
+        where: {
+          agenda_id: agenda.id,
+          data_notificacao: agenda.p_data_horario_fim
+        }
+      })
+      if (!notificationEndExists){
+        await Notificacao.create({
+          agenda_id: agenda.id,
+          usuario_id: agenda.usuario_id,
+          config_id: agenda.usuario_id,
+          data_notificacao: agenda.p_data_horario_fim,
+          mensagem: `Olá ${agenda.usuario.nome}, a pausa da sua agenda já finalizou!`
+        })
+      }
+    }
+  }
+  catch (error) {
+    console.log(error)
+  }
+}
+
 cron.schedule('*/1 * * * *', controller.createAutomaticStartNotifications);
 cron.schedule('*/1 * * * *', controller.createAutomaticFinishNotifications);
+cron.schedule('*/1 * * * *', controller.createAutoPauseStartNotifications);
+cron.schedule('*/1 * * * *', controller.createAutoPauseFinishNotifications);
+
 
 
 // Método para recuperar o número total de notificações do usuário autenticado

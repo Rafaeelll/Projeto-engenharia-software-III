@@ -1,6 +1,6 @@
 'use strict';
 /*
-  Este código define o modelo Usuario usando o Sequelize. 
+  Este código define o modelo Usuario usando o DataTypes. 
   Ele descreve a estrutura da tabela de usuários e suas associações com outros modelos.
   Os campos definidos na tabela de usuários incluem id, nome, sobrenome, email, senha_acesso, 
   telefone, data_nasc, plataforma_fav, jogo_fav, image e primeiro_login.
@@ -106,6 +106,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true
     },
+    passwordResetToken: {
+      type: DataTypes.STRING(200),
+    },
+    passwordResetExpires: {
+      type: DataTypes.DATE,
+    },
   }, {
     sequelize,
     modelName: 'Usuario',      // Nome do modelo
@@ -114,7 +120,7 @@ module.exports = (sequelize, DataTypes) => {
     // Define os escopos para ocultar ou exibir o campo senha_acesso
     defaultScope: {
       attributes: {
-        exclude: ['senha_acesso']  // Exclui o campo senha_acesso por padrão
+        exclude: ['senha_acesso', 'passwordResetToken']  // Exclui o campo senha_acesso por padrão
       }
     },
     scopes: {
@@ -122,8 +128,13 @@ module.exports = (sequelize, DataTypes) => {
         attributes: {
           include: ['senha_acesso']  // Inclui o campo senha_acesso
         }
+      },
+      withResetTokenPassword: {
+        attributes: {
+          include: ['passwordResetToken']  // Inclui o campo passwordResetToken
+        }
       }
-    }
+    },
   });
 
   return Usuario;

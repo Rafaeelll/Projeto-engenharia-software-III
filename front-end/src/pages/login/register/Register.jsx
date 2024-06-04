@@ -22,7 +22,6 @@ import IconButton from '@mui/material/IconButton'
 import ConfirmImgPreviewDialog from '../../../components/ui/ConfirmImgPreviewDialog'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography';
-import FooterBar from '../../../components/ui/FooterBar'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import  Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
 import Toolbar from '@mui/material/Toolbar'
@@ -435,7 +434,6 @@ async function sendData() {
         </form>
       </div>
     </div>
-    <FooterBar/>
   </div>
   )
 }

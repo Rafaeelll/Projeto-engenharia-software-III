@@ -6,6 +6,10 @@ module.exports = (req, res, next) => {
     { url: '/usuarios/login', method: 'POST' },
     { url: '/usuarios', method: 'POST' },
     { url: '/usuarios/cadastro', method: 'POST' },
+    { url: '/usuarios/esqueci_senha', method: 'POST' },
+    { url: '/usuarios/recuperar_senha', method: 'POST' },
+
+
   ];
 
   for (let route of bypassRoutes) {
