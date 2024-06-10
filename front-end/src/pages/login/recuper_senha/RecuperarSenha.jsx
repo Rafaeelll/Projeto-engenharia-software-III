@@ -54,7 +54,7 @@ export default function RecuperarSenha() {
           // Exibe o snackbar de sucesso
           setNotif({
               show: true,
-              message: 'Sua senha recuperada com sucesso!',
+              message: 'Sua senha foi recuperada com sucesso!',
               severity: 'success'
           })        
           setTimeout(()=>{

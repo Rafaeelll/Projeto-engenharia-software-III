@@ -30,6 +30,9 @@ import ConfigForm from './pages/main_pages/forms/ConfigForm';
 import HeaderBar from './components/ui/HeaderBar';
 import FooterBar from './components/ui/FooterBar';
 
+
+navigator.serviceWorker.register('service-worker.js')
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
 

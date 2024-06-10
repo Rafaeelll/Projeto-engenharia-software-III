@@ -1,25 +1,16 @@
 const { Notificacao, Agenda, Usuario, Configuracao } = require('../models');
 const cron = require('node-cron');
 const { Op, where } = require('sequelize');
-const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 8080 });
+const WebPush = require('web-push');
+require('dotenv').config();
 
-wss.on('connection', function connection(ws) {
-  console.log('Cliente conectado ao servidor WebSocket.');
+const publicKey = process.env.PUBLIC_KEY
+const privateKey = process.env.PRIVATE_KEY
+const host = process.env.APP_URL
 
-  ws.on('close', function close() {
-    console.log('Cliente desconectado do servidor WebSocket.');
-  });
-});
+WebPush.setVapidDetails(host, publicKey, privateKey)
 
-function enviarNotificacaoWebSocket(notificacao) {
-  wss.clients.forEach(function each(client) {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(notificacao));
-    }
-  });
-}
 
 const controller = {};
 
@@ -115,14 +106,6 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
 
           }
-          
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de início de agenda',
-            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
       }
     }
@@ -156,15 +139,6 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             confirmacao_finalizacao: false
 
           });
-          
-          
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de início de agenda',
-            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
         else if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === true) {
           await Notificacao.create({
@@ -181,14 +155,6 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
 
           }
-          
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de início de agenda',
-            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
       }
     }
@@ -218,14 +184,6 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             confirmacao_finalizacao: false
 
           });
-          
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de início de agenda',
-            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
         else if (!notificationExists && usuarioConfig.config.confirmar_auto_ini === true) {
           await Notificacao.create({
@@ -241,14 +199,6 @@ controller.createAutomaticStartNotifications = async(req, res) => {
             await Agenda.update({ status: 'Em andamento' }, { where: { id: agenda.id } });
 
           }
-          
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de início de agenda',
-            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
       }
     }
@@ -316,14 +266,6 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             confirmacao_presenca: false
 
           });
-  
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de término de agenda',
-            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
         else if (!notificationEndExists && usuarioConfig.config.confirmar_auto_fim === true) {
           await Notificacao.create({
@@ -339,13 +281,6 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
 
           }
-          const novaNotificacao = {
-            titulo: 'Nova notificação de término de agenda',
-            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
-
         }
       }
     }
@@ -378,14 +313,6 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             confirmacao_presenca: false
 
           });
-  
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de término de agenda',
-            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
         else if (!notificationEndExists && usuarioConfig.config.confirmar_auto_fim === true) {
           await Notificacao.create({
@@ -401,12 +328,6 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
 
           }
-          const novaNotificacao = {
-            titulo: 'Nova notificação de término de agenda',
-            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
       }
     }
@@ -440,13 +361,6 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
 
           });
           
-          // Envia a notificação via WebSocket
-          const novaNotificacao = {
-            titulo: 'Nova notificação de início de agenda',
-            corpo: `Uma nova notificação de início de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }
         else if (!notificationExists && usuarioConfig.config.confirmar_auto_fim === true) {
           await Notificacao.create({
@@ -462,12 +376,6 @@ controller.createAutomaticFinishNotifications = async(req, res) =>{
             await Agenda.update({ status: 'Finalizada' }, { where: { id: agenda.id } });
 
           }
-          const novaNotificacao = {
-            titulo: 'Nova notificação de término de agenda',
-            corpo: `Uma nova notificação de término de agenda foi criada para ${agenda.usuario.nome}.`
-            // Adicione outros campos conforme necessário
-          };
-          enviarNotificacaoWebSocket(novaNotificacao);
         }  
       }
     }
@@ -543,7 +451,6 @@ cron.schedule('*/1 * * * *', controller.createAutomaticStartNotifications);
 cron.schedule('*/1 * * * *', controller.createAutomaticFinishNotifications);
 cron.schedule('*/1 * * * *', controller.createAutoPauseStartNotifications);
 cron.schedule('*/1 * * * *', controller.createAutoPauseFinishNotifications);
-
 
 
 // Método para recuperar o número total de notificações do usuário autenticado
@@ -672,6 +579,24 @@ controller.delete = async (req, res) => {
       console.error(error);
     }
 };
+
+controller.publicKey = function () {
+  return {
+    publicKey
+  }
+}
+
+controller.register = function (request, reply) {
+  console.log(request.body)
+
+  return reply.status(201).send()
+}
+
+controller.send = async  (request, reply) => {
+  console.log(request.body)
+
+  return reply.status(201).send()
+}
 
 // Exporta o controlador
 module.exports = controller;  
