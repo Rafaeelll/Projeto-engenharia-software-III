@@ -15,6 +15,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import { Typography } from '@mui/material';
 
 
 
@@ -24,12 +25,13 @@ export default function VisualizacaoForm() {
   const navigate = useNavigate();
 
   const [showWaiting, setShowWaiting] = React.useState(false)
+  const [agendaTitle, setAgendaTitle] = React.useState('')
+  const [loadingAgendaTitle, setLoadingAgendaTitle] = React.useState(false);
   const [state, setState] = React.useState({
     visualizacoes: {
       agenda_id: '',
       numero_visualizacao: ''
     },
-    agendaList: [], // Estado para armazenar a lista de jogos
     errors: {},
     notif: {
       show: false,
@@ -37,49 +39,34 @@ export default function VisualizacaoForm() {
       severity: 'success' // ou 'error'
     }
   });
-  const { visualizacoes, agendaList, errors, notif } = state;
+  const { visualizacoes, errors, notif } = state;
   
   function handleFormFieldChange(event) {
     const visualizacoesCopy = {...visualizacoes}
     visualizacoesCopy[event.target.name] = event.target.value
     setState({...state, visualizacoes: visualizacoesCopy})
+
+    if (event.target.name === 'agenda_id'){
+      fetchAgendaTitle(event.target.value)
+    }
   }
 
-  async function handleAgendaIdClick() {
-    try {
-      // Verifica se a lista de jogos já está preenchida
-      if (agendaList.length === 0) {
-        setState({ ...state, errors: {} }); 
-        setShowWaiting(true)// Define o estado como true quando a busca começar
-
-        const response = await myfetch.get('/agendas');
-
-        if (response.length === 0) {
-          throw new Error('Nenhum jogo encontrado');
-        }
-
-        const formattedAgendasList = response.map(agenda => ({
-          id: agenda.id,
-          titulo_agenda: agenda.titulo_agenda,
-        }));
-
-        setState({ ...state, agendaList: formattedAgendasList }); // Atualiza apenas a lista de jogos
-      }
-    } catch (error) {
-      console.error(error);
-      setState({
-        ...state,
-        errors: errorMessages,
-        notif: {
-          severity: 'error',
-          show: true,
-          message: 'ERRO: ' + error.message,
-        },
-      });
-      setShowWaiting(false)
-
-    } finally {
-      setShowWaiting(false)
+  async function fetchAgendaTitle(agendaId) {
+    if (!agendaId){
+      setAgendaTitle('')
+      return;
+    }
+    setLoadingAgendaTitle(true);
+    try{
+      const result = await myfetch.get(`/agendas/${agendaId}`);
+      setAgendaTitle(result.titulo_agenda)
+    }
+    catch(error){
+      console.log(error);
+      setAgendaTitle('A agenda não foi encontrada, informe um ID valído!')
+    }
+    finally{
+      setLoadingAgendaTitle(false)
     }
   }
   
@@ -104,6 +91,10 @@ export default function VisualizacaoForm() {
         ...state,
         visualizacoes: result,
       })
+
+      if(result.agenda_id){
+        await fetchAgendaTitle(result.agenda_id)
+      }
       setShowWaiting(false)
     }
     catch(error) {
@@ -195,18 +186,6 @@ export default function VisualizacaoForm() {
     setState({ ...state, notif: { ...notif, show: false } });
   }
 
-   // Função para lidar com a mudança de seleção de agenda
-   function handleAgendaListChange(event) {
-    const selectedAgendaId = event.target.value;
-    setState({
-      ...state,
-      visualizacoes: {
-        ...visualizacoes,
-        agenda_id: selectedAgendaId,
-      },
-    });
-  }
-
   return (
     <>
       <Backdrop
@@ -238,34 +217,48 @@ export default function VisualizacaoForm() {
         /> 
         <form onSubmit={handleFormSubmit}>
           <Box sx={{ minWidth: 120, marginTop: '12px' }}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Selecione uma agenda</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Selecione uma agenda"
-                  variant='outlined'
-                  required
-                  value={visualizacoes.agenda_id}
-                  onChange={handleAgendaListChange}
-                  onClick={handleAgendaIdClick}
-                  name="agenda_id"
-                  displayEmpty
-                >
-                 {agendaList.length === 0 ? (
-                  <MenuItem disabled>
-                    Nenhuma agenda encontrada!
-                  </MenuItem>
-                 ) : (
-                  agendaList.map(agenda => (
-                    <MenuItem key={agenda.id} value={agenda.id}>
-                      {agenda.id} - {agenda.titulo_agenda}
-                    </MenuItem>
-                  ))
-                 )}
-                </Select>
-              </FormControl>
-            </Box>
+            <TextField
+              id="standard-basic"
+              label="ID Agenda"
+              type="number"
+              variant="outlined"
+              color="secondary"
+              required
+              fullWidth
+              name="agenda_id"
+              value={visualizacoes.agenda_id}
+              onChange={handleFormFieldChange}
+              error={errors?.agenda_id}
+              helperText={errors?.agenda_id}
+            />
+          </Box>
+
+          <Box sx={{ minWidth: 120, marginTop: '12px', position: 'relative' }}>
+            <TextField
+              id="standard-basic"
+              label="Titulo da Agenda"
+              type="text"
+              variant="outlined"
+              color="secondary"
+              fullWidth
+              value={agendaTitle}
+              InputProps={{
+                disabled: true,
+              }}
+            />
+            {loadingAgendaTitle && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            )}
+          </Box>
 
           <TextField sx={{marginTop: '12px'}}
             fullWidth

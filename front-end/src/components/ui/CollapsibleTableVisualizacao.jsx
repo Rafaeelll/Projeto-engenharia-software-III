@@ -116,7 +116,7 @@ function Row({ visualizacao, onDelete }) {
         <TableCell size='small' component="th" scope="row">
           {visualizacao.id}
         </TableCell>
-        <TableCell size='small' align="center">{visualizacao.agenda_id} - {visualizacao.agenda_title}</TableCell>
+        <TableCell size='small' align="center">{visualizacao.agenda_id}</TableCell>
         <TableCell size='small' align="center">{visualizacao.numero_visualizacao}</TableCell>
         <TableCell size='small' align="center">
           <Link to={'./' + visualizacao.id}>
@@ -292,7 +292,7 @@ export default function CollapsibleTable() {
             <TableRow>
               <TableCell/>
               <TableCell size='small'>ID Visualização</TableCell>
-              <TableCell size='small' align="center">ID - Título Agenda</TableCell>
+              <TableCell size='small' align="center">ID Agenda</TableCell>
               <TableCell size='small' align="center">Qtde De Visualizações</TableCell>
               <TableCell size='small' align="center">Editar</TableCell>
               <TableCell size='small' align="center">Excluir</TableCell>

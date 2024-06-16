@@ -18,10 +18,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
 
 
 
@@ -32,6 +29,9 @@ export default function HistoricoJogosForm() {
   const navigate = useNavigate();
 
   const [showWaiting, setShowWaiting] = React.useState(false)
+  const [jogoName, setJogoName] = React.useState('')
+  const [loadingJogoName, setLoadingJogoName] = React.useState(false);
+
   const [state, setState] = React.useState({
     historicoJogos: {
       jogo_id: '',
@@ -40,7 +40,6 @@ export default function HistoricoJogosForm() {
       avaliacao: 1,
       comentario_usuario: '',
     },
-    jogosList: [], // Estado para armazenar a lista de jogos
     errors: {},
     notif: {
       show: false,
@@ -48,51 +47,34 @@ export default function HistoricoJogosForm() {
       severity: 'success' // ou 'error'
     }
   });
-  const { historicoJogos, jogosList, errors, notif} = state;
+  const { historicoJogos, errors, notif} = state;
   
   
   function handleFormFieldChange(event) {
     const historicoJogosCopy = {...historicoJogos}
     historicoJogosCopy[event.target.name] = event.target.value
     setState({...state, historicoJogos: historicoJogosCopy})
+
+    if (event.target.name === 'jogo_id') {
+      fetchJogoName(event.target.value);
+    }
   }
 
-  async function handleGameIdClick() {
+  async function fetchJogoName(jogoId) {
+    if (!jogoId) {
+      setJogoName('');
+      return;
+    }
+  
+    setLoadingJogoName(true);
     try {
-      // Verifica se a lista de jogos já está preenchida
-      if (jogosList.length === 0) {
-        setState({ ...state, errors: {} }); 
-        setShowWaiting(true)// Define o estado como true quando a busca começar
-
-        const response = await myfetch.get('/jogos');
-
-        if (response.length === 0) {
-          throw new Error('Nenhum jogo encontrado');
-        }
-
-        const formattedJogosList = response.map(jogo => ({
-          id: jogo.id,
-          nome: jogo.nome,
-        }));
-
-        setState({ ...state, jogosList: formattedJogosList }); // Atualiza apenas a lista de jogos
-      }
+      const result = await myfetch.get(`/jogos/${jogoId}`);
+      setJogoName(result.nome);
     } catch (error) {
       console.error(error);
-      setState({
-        ...state,
-        errors: errorMessages,
-        notif: {
-          severity: 'error',
-          show: true,
-          message: 'ERRO: ' + error.message,
-        },
-      });
-      setShowWaiting(false)
-
-
+      setJogoName('O jogo não foi encontrado, informe um ID valído!');
     } finally {
-      setShowWaiting(false)
+      setLoadingJogoName(false);
     }
   }
   
@@ -118,6 +100,10 @@ export default function HistoricoJogosForm() {
         ...state,
         historicoJogos: result,
       })
+
+      if (result.jogo_id) {
+        await fetchJogoName(result.jogo_id);
+      }
       setShowWaiting(false)
 
     }
@@ -211,18 +197,6 @@ export default function HistoricoJogosForm() {
     setState({ ...state, notif: { ...notif, show: false } });
   }
 
-  // Função para lidar com a mudança de seleção de jogo
-  function handleJogoListChange(event) {
-    const selectedJogoId = event.target.value;
-    setState({
-      ...state,
-      historicoJogos: {
-        ...historicoJogos,
-        jogo_id: selectedJogoId,
-      },
-    });
-  }
-
   return (
     <>
       <Backdrop
@@ -254,33 +228,47 @@ export default function HistoricoJogosForm() {
         /> 
         <form onSubmit={handleFormSubmit}>
           <Box sx={{ minWidth: 120, marginTop: '12px' }}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Selecione um jogo</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Selecione um jogo"
-                  variant='outlined'
-                  required
-                  value={historicoJogos.jogo_id}
-                  onChange={handleJogoListChange}
-                  onClick={handleGameIdClick}
-                  name="jogo_id"
-                  displayEmpty
-                >
-                    {jogosList.length === 0 ? (
-                      <MenuItem disabled>
-                        Nenhum jogo encontrado!
-                      </MenuItem>
-                    ) : (
-                    jogosList.map(jogo => (
-                      <MenuItem key={jogo.id} value={jogo.id}>
-                        {jogo.id} - {jogo.nome}
-                      </MenuItem>
-                    ))
-                  )}
-                </Select>
-            </FormControl>
+            <TextField
+              id="standard-basic"
+              label="ID Jogo"
+              type="number"
+              variant="outlined"
+              color="secondary"
+              required
+              fullWidth
+              name="jogo_id"
+              value={historicoJogos.jogo_id}
+              onChange={handleFormFieldChange}
+              error={errors?.jogo_id}
+              helperText={errors?.jogo_id}
+            />
+          </Box>
+
+          <Box sx={{ minWidth: 120, marginTop: '12px', position: 'relative' }}>
+            <TextField
+              id="standard-basic"
+              label="Nome do Jogo"
+              type="text"
+              variant="outlined"
+              color="secondary"
+              fullWidth
+              value={jogoName}
+              InputProps={{
+                disabled: true,
+              }}
+            />
+            {loadingJogoName && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: '-12px',
+                  marginLeft: '-12px',
+                }}
+              />
+            )}
           </Box>
 
           <TextField sx={{marginTop: '12px'}}

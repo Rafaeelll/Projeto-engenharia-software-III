@@ -28,6 +28,8 @@ export default function CriarAgendas() {
   const navigate = useNavigate();
   const [showWaiting, setShowWaiting] = React.useState(false)
   const [definirPausa, setDefinir] = React.useState(false)
+  const [jogoName, setJogoName] = React.useState('')
+  const [loadingJogoName, setLoadingJogoName] = React.useState(false);
   const [state, setState] = React.useState({
     criarAgendas: {
       titulo_agenda: '',
@@ -39,7 +41,6 @@ export default function CriarAgendas() {
       p_data_horario_inicio: null,
       p_data_horario_fim: null,
     },
-    jogosList: [], // Estado para armazenar a lista de jogos
     errors: {},
     notif: {
       show: false,
@@ -48,14 +49,19 @@ export default function CriarAgendas() {
     },
   });
 
-  const { criarAgendas, jogosList, errors, notif } = state;
+  const { criarAgendas, errors, notif } = state;
 
   function handleFormFieldChange(event) {
     const criarAgendasCopy = { ...criarAgendas };
     criarAgendasCopy[event.target.name] = event.target.value;
-
     setState({ ...state, criarAgendas: criarAgendasCopy });
+  
+    if (event.target.name === 'jogo_id') {
+      fetchJogoName(event.target.value);
+    }
   }
+  
+  
 
   // Função para calcular a duração da agenda
   const calculateDuration = () => {
@@ -81,43 +87,24 @@ export default function CriarAgendas() {
     });
   };
 
-  async function handleGameIdClick() {
+  async function fetchJogoName(jogoId) {
+    if (!jogoId) {
+      setJogoName('');
+      return;
+    }
+  
+    setLoadingJogoName(true);
     try {
-      // Verifica se a lista de jogos já está preenchida
-      if (jogosList.length === 0) {
-        setState({ ...state, errors: {} }); 
-        setShowWaiting(true)// Define o estado como true quando a busca começar
-
-        const response = await myfetch.get('/jogos');
-
-        if (response.length === 0) {
-          throw new Error('Nenhum jogo encontrado');
-        }
-
-        const formattedJogosList = response.map(jogo => ({
-          id: jogo.id,
-          nome: jogo.nome,
-        }));
-
-        setState({ ...state, jogosList: formattedJogosList }); // Atualiza apenas a lista de jogos
-      }
+      const result = await myfetch.get(`/jogos/${jogoId}`);
+      setJogoName(result.nome);
     } catch (error) {
       console.error(error);
-      setState({
-        ...state,
-        errors: errorMessages,
-        notif: {
-          severity: 'error',
-          show: true,
-          message: 'ERRO: ' + error.message,
-        },
-      });
-      setShowWaiting(false)
-
+      setJogoName('O jogo não foi encontrado, digite um ID valído!');
     } finally {
-      setShowWaiting(false)
+      setLoadingJogoName(false);
     }
   }
+  
 
   async function verifyAgendaExists(usuarioId, dataHorarioInicio, dataHorarioFim) {
     try {
@@ -180,7 +167,12 @@ export default function CriarAgendas() {
       setState({
         ...state,
         criarAgendas: result,
-      });        
+      }); 
+      
+      if (result.jogo_id) {
+        await fetchJogoName(result.jogo_id);
+      }
+      
       setShowWaiting(false)
 
     } catch (error) {
@@ -263,17 +255,7 @@ export default function CriarAgendas() {
     setState({ ...state, notif: { ...notif, show: false } });
   }
 
-  // Função para lidar com a mudança de seleção de jogo
-  function handleJogoListChange(event) {
-    const selectedJogoId = event.target.value;
-    setState({
-      ...state,
-      criarAgendas: {
-        ...criarAgendas,
-        jogo_id: selectedJogoId,
-      },
-    });
-  }
+
   function handleDefinirPausaClick(){
     setDefinir(!definirPausa);
   }
@@ -308,6 +290,7 @@ export default function CriarAgendas() {
         }}
       >
         <FormTitle title={params.id ? 'Editar agenda' : 'Criar agendas'} />
+
         <Typography variant="h5" component="div">
           <form onSubmit={handleFormSubmit}>
             <TextField
@@ -327,35 +310,48 @@ export default function CriarAgendas() {
             />
 
             <Box sx={{ minWidth: 120, marginTop: '12px' }}>
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Selecione um jogo</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    label="Selecione um jogo"
-                    variant='outlined'
-                    required
-                    value={criarAgendas.jogo_id}
-                    onChange={handleJogoListChange}
-                    onClick={handleGameIdClick}
-                    name="jogo_id"
-                    displayEmpty
-                  >
-                    {jogosList.length === 0 ? (
-                      <MenuItem disabled>
-                        Nenhum jogo encontrado!
-                      </MenuItem>
-                    ) : (
-                    jogosList.map(jogo => (
-                      <MenuItem key={jogo.id} value={jogo.id}>
-                        {jogo.id} - {jogo.nome}
-                      </MenuItem>
-                    ))
-                  )}
-                  </Select>
-              </FormControl>
+              <TextField
+                id="standard-basic"
+                label="ID Jogo"
+                type="number"
+                variant="outlined"
+                color="secondary"
+                required
+                fullWidth
+                name="jogo_id"
+                value={criarAgendas.jogo_id}
+                onChange={handleFormFieldChange}
+                error={errors?.jogo_id}
+                helperText={errors?.jogo_id}
+              />
             </Box>
 
+            <Box sx={{ minWidth: 120, marginTop: '12px', position: 'relative' }}>
+              <TextField
+                id="standard-basic"
+                label="Nome do Jogo"
+                type="text"
+                variant="outlined"
+                color="secondary"
+                fullWidth
+                value={jogoName}
+                InputProps={{
+                  disabled: true,
+                }}
+              />
+              {loadingJogoName && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: '-12px',
+                    marginLeft: '-12px',
+                  }}
+                />
+              )}
+            </Box>
 
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
               <MobileDateTimePicker

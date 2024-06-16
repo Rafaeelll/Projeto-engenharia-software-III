@@ -196,7 +196,7 @@ export default function MyAccountStatusForm({onLoginLogout}) {
           maxWidth: '90%',
           margin: '25px auto 0 auto',
           borderRadius: '5px',
-          p: '5px 20px 5px 20px',
+          p: '20px',
           boxShadow: '0 5px 10px 0px rgba(0, 0, 0, 0.4)'
         }}
       >
