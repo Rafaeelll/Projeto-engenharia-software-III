@@ -11,8 +11,8 @@ app.set('port', port);
 
 // Leitura dos certificados SSL
 var options = {
-  key: fs.readFileSync(path.resolve(__dirname, '..', 'keys/key.pem')),
-  cert: fs.readFileSync(path.resolve(__dirname, '..', 'keys/cert.pem'))
+  key: fs.readFileSync('keys/code.key'),
+  cert: fs.readFileSync('keys/code.crt')
 };
 
 var server = https.createServer(options, app); // Use https.createServer

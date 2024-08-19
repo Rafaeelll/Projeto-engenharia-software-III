@@ -22,16 +22,10 @@ export default function ConfigForm() {
 
   const [state, setState] = React.useState({
     configuracoes: {
-      config: {
-        confirmar_auto_ini: '',
-        confirmar_auto_fim: '',
-        notificar_hora_antes_inicio: '',
-        notif_trinta_min_antes_inicio: '',
-        notif_no_inicio: '',
-        notificar_no_fim: '',
-        notificar_hora_antes_fim: '',
-        notif_trinta_min_antes_fim: ''
-      }
+      confirmar_auto_ini: '',
+      confirmar_auto_fim: '',
+      horario_notif_inicio: '',
+      horario_notif_fim: '',
     },
     showWaiting: false,
     notif: {
@@ -42,20 +36,11 @@ export default function ConfigForm() {
   })
   const {configuracoes, showWaiting, notif} = state;
 
-  function handleFormFieldChange(event){
-    const { name, value } = event.target;
-    setState(prevState => ({
-      ...prevState,
-      configuracoes: {
-        ...prevState.configuracoes,
-        config: {
-          ...prevState.configuracoes.config,
-          [name]: value
-        }
-      }
-    }));
+  function handleFormFieldChange(event) {
+    const ConfiguracoesCopy = {...configuracoes}
+    ConfiguracoesCopy[event.target.name] = event.target.value
+    setState({...state, configuracoes: ConfiguracoesCopy})
   }
-  
 
   function handleFormSubmit(event){
     event.preventDefault();
@@ -163,7 +148,7 @@ export default function ConfigForm() {
                   id="demo-simple-select"
                   label="Confirmar Inicialização Das Agendas Automaticamente?"
                   name="confirmar_auto_ini"
-                  value={configuracoes.config.confirmar_auto_ini}
+                  value={configuracoes.confirmar_auto_ini}
                   onChange={handleFormFieldChange}
                   required
                 >
@@ -181,7 +166,7 @@ export default function ConfigForm() {
                   id="demo-simple-select"
                   label="Confirmar Finalização Das Agendas Automaticamente?"
                   name="confirmar_auto_fim"
-                  value={configuracoes.config.confirmar_auto_fim}
+                  value={configuracoes.confirmar_auto_fim}
                   onChange={handleFormFieldChange}
                   required
                 >
@@ -193,18 +178,19 @@ export default function ConfigForm() {
 
           <Box sx={{ minWidth: 120, marginTop: '20px'}}>
             <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Notificar Sobre O Início Das Agendas Com 1 Hora De Antecedência?</InputLabel>
+              <InputLabel id="demo-simple-select-label">Notificações De Início (Agendas)</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  label="Notificar Sobre O Início Das Agendas Com 1 Hora De Antecedência?"
-                  name="notificar_hora_antes_inicio"
-                  value={configuracoes.config.notificar_hora_antes_inicio}
+                  label="Notificações De Início (Agendas)"
+                  name="horario_notif_inicio"
+                  value={configuracoes.horario_notif_inicio}
                   onChange={handleFormFieldChange}
                   required
                 >
-                  <MenuItem value={true}> Sim (Padrão) </MenuItem>
-                  <MenuItem value={false}> Não </MenuItem>
+                  <MenuItem value={'1 Hora Antes (Padrão)'}> 1 Hora Antes (Padrão)</MenuItem>
+                  <MenuItem value={'30 minutos antes'}> 30 minutos antes</MenuItem>
+                  <MenuItem value={'No Início'}> Notificar somente no início</MenuItem>
                 </Select>
             </FormControl>
           </Box>
@@ -212,90 +198,19 @@ export default function ConfigForm() {
 
           <Box sx={{ minWidth: 120, marginTop: '20px'}}>
             <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Notificar Sobre O Início Das Agendas Com 30 Minutos De Antecedência?</InputLabel>
+              <InputLabel id="demo-simple-select-label">Notificações De Fim (Agendas)</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  label="Notificar Sobre O Início Das Agendas Com 30 Minutos De Antecedência?"
-                  name="notif_trinta_min_antes_inicio"
-                  value={configuracoes.config.notif_trinta_min_antes_inicio}
+                  label=">Notificações De Início (Agendas)"
+                  name="horario_notif_fim"
+                  value={configuracoes.horario_notif_fim}
                   onChange={handleFormFieldChange}
                   required
                 >
-                  <MenuItem value={true}> Sim </MenuItem>
-                  <MenuItem value={false}> Não </MenuItem>
-                </Select>
-            </FormControl>
-          </Box>
-
-          <Box sx={{ minWidth: 120, marginTop: '20px'}}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Notificar Sobre O Início Das Agendas Somente Quando Começar?</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Notificar Sobre O Início Das Agendas Somente Quando Começar?"
-                  name="notif_no_inicio"
-                  value={configuracoes.config.notif_no_inicio}
-                  onChange={handleFormFieldChange}
-                  required
-                >
-                  <MenuItem value={true}> Sim </MenuItem>
-                  <MenuItem value={false}> Não </MenuItem>
-                </Select>
-            </FormControl>
-          </Box>
-
-          <Box sx={{ minWidth: 120, marginTop: '20px'}}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Notificar Sobre A Finalização Das Agendas Somente Quando Finalizar?</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Notificar Sobre A finalização Das Agendas Somente Quando Finalizar?"
-                  name="notificar_no_fim"
-                  value={configuracoes.config.notificar_no_fim}
-                  onChange={handleFormFieldChange}
-                  required
-                >
-                  <MenuItem value={true}> Sim (Padrão)</MenuItem>
-                  <MenuItem value={false}> Não </MenuItem>
-                </Select>
-            </FormControl>
-          </Box>
-
-          <Box sx={{ minWidth: 120, marginTop: '20px'}}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Notificar Sobre A Finalização Das Agendas Com 1 Hora De Antecedência?</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Notificar Sobre A Finalização Das Agendas Com 1 Hora De Antecedência?"
-                  name="notificar_hora_antes_fim"
-                  value={configuracoes.config.notificar_hora_antes_fim}
-                  onChange={handleFormFieldChange}
-                  required
-                >
-                  <MenuItem value={true}> Sim </MenuItem>
-                  <MenuItem value={false}> Não </MenuItem>
-                </Select>
-            </FormControl>
-          </Box>
-
-          <Box sx={{ minWidth: 120, marginTop: '20px'}}>
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label">Notificar Sobre A Finalização Das Agendas Com 30 Minutos De Antecedência?</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Notificar Sobre A Finalização Das Agendas Com 30 Minutos De Antecedência?"
-                  name="notif_trinta_min_antes_fim"
-                  value={configuracoes.config.notif_trinta_min_antes_fim}
-                  onChange={handleFormFieldChange}
-                  required
-                >
-                  <MenuItem value={true}> Sim </MenuItem>
-                  <MenuItem value={false}> Não </MenuItem>
+                  <MenuItem value={'1 Hora Antes'}> 1 Hora Antes</MenuItem>
+                  <MenuItem value={'30 minutos antes'}> 30 minutos antes</MenuItem>
+                  <MenuItem value={'No Fim (Padrão)'}> Notificar somente no fim (Padrão)</MenuItem>
                 </Select>
             </FormControl>
           </Box>

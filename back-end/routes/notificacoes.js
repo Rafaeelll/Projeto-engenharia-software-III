@@ -13,13 +13,14 @@ const controller = require('../controllers/notificacao');
 // Define as rotas CRUD para o recurso "notificacao"
 router.post('/', controller.createAutomaticStartNotifications); // Rota para criar uma nova notificação
 router.post('/', controller.createAutomaticFinishNotifications);
+router.post('/atualizar_status/:agenda_id', controller.updateAgendaConfirmation);
 router.post('/push/register', controller.register)
 router.post('/push/send', controller.send)
+router.post('/atualizar_notif', controller.updateNotificationCount);
 router.get('/contagem', controller.retrieveNotificationCount);
 router.get('/push/public_key', controller.publicKey)
 router.get('/', controller.retrieve); // Rota para recuperar todas as notificações
 router.get('/:id', controller.retrieveOne); // Rota para recuperar uma notificação específica por ID
-router.put('/:id', controller.update); // Rota para atualizar uma notificação existente por ID
 router.delete('/:id', controller.delete); // Rota para excluir uma notificação existente por ID
 
 // Exporta o roteador para ser utilizado em outros arquivos

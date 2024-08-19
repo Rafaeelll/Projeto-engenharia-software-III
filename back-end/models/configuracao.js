@@ -21,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',           // Campo da tabela local 
         as: 'notificacoes'         // Nome do campo de associação (plural)
       });
+
+      this.hasMany(models.Agenda, {
+        foreignKey: 'config_id',   // Campo da tabela estrangeira
+        sourceKey: 'id',           // Campo da tabela local 
+        as: 'agendas'         // Nome do campo de associação (plural)
+      });
     }
   }
   Configuracao.init({
@@ -34,19 +40,24 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    config: {
-      type: DataTypes.JSON,
+    confirmar_auto_ini: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    confirmar_auto_fim: {
+      type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: {
-        confirmar_auto_ini: false,
-        confirmar_auto_fim: false,
-        notificar_hora_antes_inicio: true, // Padrão: notificar 1 hora antes da inicialização
-        notif_trinta_min_antes_inicio: false, 
-        notif_no_inicio: false, 
-        notificar_no_fim: true, // Padrão: notificar na hora exata finalização
-        notificar_hora_antes_fim: false,
-        notif_trinta_min_antes_fim: false, 
-      }
+      defaultValue: false
+    },
+    horario_notif_inicio: {
+      type: DataTypes.ENUM('1 Hora Antes (Padrão)', '30 minutos antes', 'No Início'),
+      allowNull: false,
+
+    },
+    horario_notif_fim: {
+      type: DataTypes.ENUM('1 Hora Antes', '30 minutos antes', 'No Fim (Padrão)'),
+      allowNull: false,
     },
   }, {
     sequelize,

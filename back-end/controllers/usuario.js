@@ -62,16 +62,11 @@ controller.cadastro = async (req, res) => {
     // Criar configuração associada ao novo usuário
     await Configuracao.create({
       usuario_id: novoUsuario.id, // Atribuir o ID do novo usuário
-      config:{
-        confirmar_auto_ini: false, // Confirmar na notificação a inicialização da agenda automaticamente
-        confirmar_auto_fim: false, // Confirmar na notificação a finalização da agenda automaticamente
-        notificar_hora_antes_inicio: true, // Padrão: notificar 1 hora antes da inicialização
-        notif_trinta_min_antes_inicio: false, 
-        notif_no_inicio: false, 
-        notificar_no_fim: true, // Padrão: notificar na hora exata finalização
-        notificar_hora_antes_fim: false,
-        notif_trinta_min_antes_fim: false, 
-      }
+      confirmar_auto_ini: false, // Confirmar na notificação a inicialização da agenda automaticamente
+      confirmar_auto_fim: false, // Confirmar na notificação a finalização da agenda automaticamente
+      horario_notif_inicio: '1 Hora Antes (Padrão)', // Padrão: notificar 1 hora antes da inicialização
+      horario_notif_fim: 'No Fim (Padrão)', // Padrão: notificar na hora exata finalização
+
     });
 
     // HTTP 201: Created
@@ -381,7 +376,7 @@ controller.deleteInactiveUsers = async (req, res) => {
 
 
 // Agendar a execução da função deleteInactiveUsers a cada minuto
-cron.schedule('*/1 * * * *', controller.deleteInactiveUsers);
+cron.schedule('*/20 * * * *', controller.deleteInactiveUsers);
 
 controller.esqueciSenha = async (req, res) => {
   try{

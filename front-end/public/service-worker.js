@@ -1,7 +1,8 @@
-self.addEventListener('push', function (event){
+self.addEventListener('push', function(event) {
+    const body = event.data?.text() ?? ''
     event.waitUntil(
-        self.ServiceWorkerRegistration.showNotification('Stream Advisor', {
-            body: 'Testando...'
+        self.registration.showNotification('Stream Advisor', {
+            body,
         })
-    )
-})
+    );
+});

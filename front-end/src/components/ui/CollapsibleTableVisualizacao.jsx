@@ -22,179 +22,15 @@ import myfetch from '../../utils/myfetch';
 import Notification from './Notification';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import '../../pages/main_pages/styles/main-pages-styles.css';
 import Tooltip from '@mui/material/Tooltip';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventIcon from '@mui/icons-material/Event';
 
-function Row({ visualizacao, onDelete }) {
-  const API_PATH_AG = '/agendas';
-  const API_PATH_JG = '/jogos'
-
-  const [open, setOpen] = React.useState(false);
-  const [agendas, setAgendas] = React.useState([]);
-  const [jogos, setJogos] = React.useState([]); // Estado para armazenar os dados dos jogos
-
-
-  const handleDeleteClick = () => {
-    onDelete(visualizacao.id);
-  };
-
-  const fetchAgenda = async () => {
-    try {
-      const result = await myfetch.get(`${API_PATH_AG}`);
-
-      // Filtrar apenas agendas relacionado a uma visualização específica
-      const agendaRelacionada = result.find(item => item.id === visualizacao.agenda_id);
-
-      if (agendaRelacionada) {
-        // Adicionar o titulo da agenda diretamente ao objeto visualizacao
-        visualizacao.agenda_title = agendaRelacionada.titulo_agenda;
-        setAgendas([agendaRelacionada]);
-
-         // Buscar o jogo correspondente ao ID da agenda
-         const resultJogos = await myfetch.get(`${API_PATH_JG}`);
-         const jogoRelacionado = resultJogos.find(jogo => jogo.id === agendaRelacionada.jogo_id);
-         setJogos([jogoRelacionado]);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchAgenda();
-  }, []);
-
-  const handleCollapseToggle = () => {
-    setOpen(!open);
-    if (!open) {
-      fetchAgenda();
-    }
-  };
-
-  function getStatusColor(status){
-    switch (status){
-      case 'Agendado':
-        return 'red';
-      case 'Finalizada':
-        return 'green';
-      case 'Em andamento':
-        return 'lightblue';
-      default:
-        return 'black';
-    }
-  }
-  function getStatusIcon(status){
-    switch (status){
-      case 'Agendado':
-        return <EventIcon/>;
-      case 'Finalizada':
-        return <EventAvailableIcon/>;
-      case 'Em andamento':
-        return <PendingActionsIcon/>;
-      default:
-        return null;
-    }
-  }
-
-  return (
-    <>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <Tooltip title="Detalhes" arrow>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={handleCollapseToggle}
-            >
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </Tooltip>
-        </TableCell>
-        <TableCell size='small' component="th" scope="row">
-          {visualizacao.id}
-        </TableCell>
-        <TableCell size='small' align="center">{visualizacao.agenda_id}</TableCell>
-        <TableCell size='small' align="center">{visualizacao.numero_visualizacao}</TableCell>
-        <TableCell size='small' align="center">
-          <Link to={'./' + visualizacao.id}>
-            <IconButton aria-label="Editar">
-              <EditIcon />
-            </IconButton>
-          </Link>
-        </TableCell>
-        <TableCell align="right">
-          <IconButton aria-label="Excluir" onClick={handleDeleteClick}>
-            <DeleteForeverIcon color="error" />
-          </IconButton>
-        </TableCell>
-      </TableRow>
-
-
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-            <Typography 
-              sx={{fontWeight: 'bolder'}} variant="h6" gutterBottom component="div" color='primary'> 
-              <u>Agendas</u> 
-            </Typography>
-              <Table size="small" aria-label="Agendas">
-                <TableHead>
-                  <TableRow>
-                    <TableCell size='small' align="center">Agenda ID</TableCell>
-                    <TableCell size='small' align="center">Título</TableCell>
-                    <TableCell size='small' align="center">ID - Nome Do Jogo</TableCell>
-                    <TableCell size='small' align="center">Início</TableCell>
-                    <TableCell size='small' align="center">
-                      Fim
-                    </TableCell>
-                    <TableCell size='small' align="center">
-                      Status
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {agendas.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} align="center">
-                        <Typography style={{ color: 'GrayText' }}>Agenda vazia</Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    agendas.map((agendaItem) => (
-                    <TableRow key={agendaItem.id}>
-                      <TableCell size='small' align="center">{agendaItem.id}</TableCell>
-                      <TableCell size='small' align="center">{agendaItem.titulo_agenda}</TableCell>
-                      <TableCell size='small' align="center">
-                          {agendaItem.jogo_id} - {jogos[0]?.nome}
-                        </TableCell>
-                      <TableCell size='small' align="center">
-                        {format(parseISO(agendaItem.data_horario_inicio), 'dd/MM/yyyy - HH:mm')}
-                      </TableCell>
-                      <TableCell size='small' align="center">
-                        {format(parseISO(agendaItem.data_horario_fim), 'dd/MM/yyyy - HH:mm')}
-                      </TableCell>
-                      <TableCell size='small' align="center" style={{ color: getStatusColor(agendaItem.status)}}>
-                        {getStatusIcon(agendaItem.status)} {agendaItem.status}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
-  );
-}
-
-export default function CollapsibleTable() {
+export default function CollapsibleTableVisualizacao() {
   const API_PATH_VS = '/visualizacoes';
+  const API_PATH_AG = '/agendas';
+  const API_PATH_JG = '/jogos';
 
   const [visualizacoes, setVisualizacoes] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
@@ -217,7 +53,7 @@ export default function CollapsibleTable() {
       setShowWaiting(false);
     }
   };
-  
+
   React.useEffect(() => {
     fetchData();
   }, []);
@@ -259,6 +95,156 @@ export default function CollapsibleTable() {
     setNotif({ ...notif, show: false });
   };
 
+  function Row({ visualizacao, onDelete }) {
+    const [open, setOpen] = React.useState(false);
+    const [agendas, setAgendas] = React.useState([]);
+    const [jogos, setJogos] = React.useState([]);
+
+    const fetchAgenda = async () => {
+      try {
+        const resultAgendas = await myfetch.get(API_PATH_AG);
+        const agendaRelacionada = resultAgendas.find(item => item.id === visualizacao.agenda_id);
+
+        if (agendaRelacionada) {
+          visualizacao.agenda_title = agendaRelacionada.titulo_agenda;
+          setAgendas([agendaRelacionada]);
+
+          const resultJogos = await myfetch.get(API_PATH_JG);
+          const jogoRelacionado = resultJogos.find(jogo => jogo.id === agendaRelacionada.jogo_id);
+          setJogos([jogoRelacionado]);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    React.useEffect(() => {
+      if (open) {
+        fetchAgenda();
+      }
+    }, [open]);
+
+    const handleCollapseToggle = () => {
+      setOpen(!open);
+      if (!open) {
+        fetchAgenda();
+      }
+    };
+
+    function getStatusColor(status) {
+      switch (status) {
+        case 'Agendado':
+          return 'red';
+        case 'Finalizada':
+          return 'green';
+        case 'Em andamento':
+          return 'lightblue';
+        default:
+          return 'black';
+      }
+    }
+
+    function getStatusIcon(status) {
+      switch (status) {
+        case 'Agendado':
+          return <EventIcon />;
+        case 'Finalizada':
+          return <EventAvailableIcon />;
+        case 'Em andamento':
+          return <PendingActionsIcon />;
+        default:
+          return null;
+      }
+    }
+
+    return (
+      <>
+        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+          <TableCell>
+            <Tooltip title="Detalhes" arrow>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={handleCollapseToggle}
+              >
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </Tooltip>
+          </TableCell>
+          <TableCell size='small' component="th" scope="row">
+            {visualizacao.id}
+          </TableCell>
+          <TableCell size='small' align="center">{visualizacao.agenda_id}</TableCell>
+          <TableCell size='small' align="center">{visualizacao.numero_visualizacao}</TableCell>
+          <TableCell size='small' align="center">
+            <Link to={'./' + visualizacao.id}>
+              <IconButton aria-label="Editar">
+                <EditIcon />
+              </IconButton>
+            </Link>
+          </TableCell>
+          <TableCell align="right">
+            <IconButton aria-label="Excluir" onClick={() => onDelete(visualizacao.id)}>
+              <DeleteForeverIcon color="error" />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Typography sx={{ fontWeight: 'bolder' }} variant="h6" gutterBottom component="div" color='primary'>
+                  <u>Agendas</u>
+                </Typography>
+                <Table size="small" aria-label="Agendas">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell size='small' align="center">Agenda ID</TableCell>
+                      <TableCell size='small' align="center">Título</TableCell>
+                      <TableCell size='small' align="center">ID - Nome Do Jogo</TableCell>
+                      <TableCell size='small' align="center">Início</TableCell>
+                      <TableCell size='small' align="center">Fim</TableCell>
+                      <TableCell size='small' align="center">Status</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {agendas.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <Typography style={{ color: 'GrayText' }}>Agenda vazia</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      agendas.map((agendaItem) => (
+                        <TableRow key={agendaItem.id}>
+                          <TableCell size='small' align="center">{agendaItem.id}</TableCell>
+                          <TableCell size='small' align="center">{agendaItem.titulo_agenda}</TableCell>
+                          <TableCell size='small' align="center">
+                            {agendaItem.jogo_id} - {jogos[0]?.nome}
+                          </TableCell>
+                          <TableCell size='small' align="center">
+                            {format(parseISO(agendaItem.data_horario_inicio), 'dd/MM/yyyy - HH:mm')}
+                          </TableCell>
+                          <TableCell size='small' align="center">
+                            {format(parseISO(agendaItem.data_horario_fim), 'dd/MM/yyyy - HH:mm')}
+                          </TableCell>
+                          <TableCell size='small' align="center" style={{ color: getStatusColor(agendaItem.status) }}>
+                            {getStatusIcon(agendaItem.status)} {agendaItem.status}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </>
+    );
+  }
+
   return (
     <>
       <Backdrop
@@ -284,13 +270,12 @@ export default function CollapsibleTable() {
         {notif.message}
       </Notification>
 
-      <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', 
-        background: 'whitesmoke', overflow: 'auto', maxHeight: '70vh'}} component={Paper}> 
-        <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Visualizações</u> </Typography>
+      <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', background: 'whitesmoke', overflow: 'auto', maxHeight: '70vh' }} component={Paper}>
+        <Typography sx={{ marginLeft: '20px', mt: '10px', fontWeight: 'bolder' }} variant="h6" color='secondary'> <u>Visualizações</u> </Typography>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
-              <TableCell/>
+              <TableCell />
               <TableCell size='small'>ID Visualização</TableCell>
               <TableCell size='small' align="center">ID Agenda</TableCell>
               <TableCell size='small' align="center">Qtde De Visualizações</TableCell>
@@ -299,14 +284,13 @@ export default function CollapsibleTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {visualizacoes.length === 0 ? ( // Verifica se não há jogos
+            {visualizacoes.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={9} align="center">
-                  <Typography style={{color: 'GrayText'}}>Tabela vazia, crie uma nova visualização</Typography> 
+                  <Typography style={{ color: 'GrayText' }}>Tabela vazia, crie uma nova visualização</Typography>
                 </TableCell>
               </TableRow>
             ) : (
-              // Renderiza as linhas da tabela
               visualizacoes.map((visualizacao) => (
                 <Row key={visualizacao.id} visualizacao={visualizacao} onDelete={handleDelete} />
               ))

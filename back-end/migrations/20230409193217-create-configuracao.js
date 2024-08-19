@@ -13,19 +13,24 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      config: {
-        type: Sequelize.JSON,
+      confirmar_auto_ini: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      confirmar_auto_fim: {
+        type: Sequelize.BOOLEAN,
         allowNull: true,
-        defaultValue: {
-          confirmar_auto_ini: false,
-          confirmar_auto_fim: false,
-          notificar_hora_antes_inicio: true, // Padrão: notificar 1 hora antes da inicialização
-          notif_trinta_min_antes_inicio: false, 
-          notif_no_inicio: false, 
-          notificar_no_fim: true, // Padrão: notificar na hora exata finalização
-          notificar_hora_antes_fim: false,
-          notif_trinta_min_antes_fim: false, 
-        }
+        defaultValue: false
+      },
+      horario_notif_inicio: {
+        type: Sequelize.ENUM('1 Hora Antes (Padrão)', '30 minutos antes', 'No Início'),
+        allowNull: false,
+
+      },
+      horario_notif_fim: {
+        type: Sequelize.ENUM('1 Hora Antes', '30 minutos antes', 'No Fim (Padrão)'),
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

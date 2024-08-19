@@ -1,5 +1,7 @@
 // Importa os modelos correspondentes ao controller
-const { Agenda, Usuario, Jogo, Visualizacao } = require('../models');
+const { Agenda, Usuario, Jogo, Visualizacao, Configuracao } = require('../models');
+const cron = require('node-cron');
+const { Op, where } = require('sequelize');
 
 /*
     metodos CRUD do controller
@@ -21,6 +23,7 @@ const controller = {};
 controller.create = async (req, res) => {
     // Adiciona o id do usuário ao corpo da requisição
     req.body.usuario_id = req.authUser.id;
+    req.body.config_id = req.authUser.id
 
     try {
         // Cria a agenda no banco de dados
@@ -125,5 +128,161 @@ controller.delete = async (req, res) => {
         console.error(error);
     }
 };
+
+controller.updateAgendaStatusAuto = async (req, res) => {
+    try {
+        let atualizacoesFeitas = 0;
+        const now = new Date();
+        console.log(`Iniciando atualização de status em ${now}`);
+
+        // Verificando as agendas que já inicializaram
+        const agendasInicializadas = await Agenda.findAll({
+            where: {
+                data_horario_inicio: { [Op.lte]: now },
+                confirmacao_presenca: false
+            },
+            include: ['usuario']
+        });
+
+        console.log(`Agendas inicializadas encontradas: ${agendasInicializadas.length}`);
+        agendasInicializadas.forEach(agenda => {
+            console.log(`Agenda ID: ${agenda.id}, Data Início: ${agenda.data_horario_inicio}, Data Fim: ${agenda.data_horario_fim}`);
+        });
+
+        // Atualizando o status das agendas que já inicializaram
+        for (const agenda of agendasInicializadas) {
+            if (agenda) {
+                const configuracao = await Configuracao.findOne({
+                    where: { usuario_id: agenda.usuario_id }
+                });
+
+                if (configuracao) {
+                    const novoStatus = configuracao.confirmar_auto_ini ? 'Em andamento' : 'Inicialização Pendente';
+                    if (agenda.status !== 'Inicialização Pendente' && agenda.status !== 'Em andamento'){
+                        await Agenda.update({ status: novoStatus }, {
+                            where: { id: agenda.id }
+                        });
+                        atualizacoesFeitas++;
+                    }
+                    console.log(`Agenda ID ${agenda.id} atualizada para status ${novoStatus}`);
+                } else {
+                    console.log(`Configuração não encontrada para usuario_id ${agenda.usuario_id}`);
+                }
+            }
+        }
+
+        // Verificando as agendas que já finalizaram
+        const agendasTerminadas = await Agenda.findAll({
+            where: {
+                data_horario_fim: { [Op.lte]: now },
+                confirmacao_finalizacao: false
+            }
+        });
+
+        console.log(`Agendas terminadas encontradas: ${agendasTerminadas.length}`);
+        agendasTerminadas.forEach(agenda => {
+            console.log(`Agenda ID: ${agenda.id}, Data Início: ${agenda.data_horario_inicio}, Data Fim: ${agenda.data_horario_fim}`);
+        });
+
+        // Atualizando o status das agendas que já finalizaram
+        for (const agenda of agendasTerminadas) {
+            if (agenda) {
+                const configuracao = await Configuracao.findOne({
+                    where: { usuario_id: agenda.usuario_id }
+                });
+
+                if (configuracao) {
+                    const novoStatus = configuracao.confirmar_auto_fim ? 'Finalizada' : 'Finalização Pendente';
+                    if (agenda.status !== 'Finalização Pendente' && agenda.status !== 'Finalizada'){
+                        await Agenda.update({ status: novoStatus }, {
+                            where: { id: agenda.id }
+                        });
+                        atualizacoesFeitas++;
+                    }
+                    console.log(`Agenda ID ${agenda.id} atualizada para status ${novoStatus}`);
+                } else {
+                    console.log(`Configuração não encontrada para usuario_id ${agenda.usuario_id}`);
+                }
+            }
+        }
+
+        const mensagem = `Status das agendas atualizado com sucesso. Total de atualizações: ${atualizacoesFeitas}`;
+        console.log(mensagem);
+
+        if (res) {
+            res.status(200).send(mensagem);
+        }
+    } catch (error) {
+        console.error(error);
+        if (res) {
+            res.status(500).send('Erro ao atualizar o status das agendas.');
+        }
+    }
+};
+
+// Agendamento com cron job
+cron.schedule('*/1 * * * *', () => controller.updateAgendaStatusAuto(null, null));
+
+controller.updateAgendaConfirmations = async (req, res) => {
+    try {
+        // Busca a agenda que será atualizada
+        const agenda = await Agenda.findOne({
+            where: { id: req.params.id, usuario_id: req.authUser.id }
+        });
+
+        if (!agenda) {
+            return res.status(404).end(); // Retorna 404 se a agenda não for encontrada
+        }
+
+        // Extrai os valores recebidos no corpo da requisição
+        const { confirmacao_presenca, confirmacao_finalizacao } = req.body;
+
+        // Calcula as datas e horários
+        const dataAtual = new Date();
+        const dataInicial = new Date(agenda.data_horario_inicio);
+        const dataFinal = new Date(agenda.data_horario_fim);
+        
+        let statusAgenda = "Agendado";
+        
+        // Verifica o status com base no horário atual e nas datas de início e fim
+        if (dataAtual >= dataInicial) {
+            if (confirmacao_presenca) {
+                statusAgenda = "Inicialização Confirmada";
+            } else {
+                statusAgenda = "Inicialização Pendente";
+            }
+        } else if (dataAtual >= dataFinal) {
+            if (confirmacao_finalizacao) {
+                statusAgenda = "Finalização Confirmada";
+            } else {
+                statusAgenda = "Finalização Pendente";
+            }
+        }
+
+        // Garantir que confirmacao_presenca seja true se confirmacao_finalizacao for true
+        const confirmacaoPresencaFinal = confirmacao_finalizacao && !confirmacao_presenca ? true : confirmacao_presenca;
+
+        // Atualiza os campos no banco de dados diretamente
+        const response = await Agenda.update(
+            {
+                confirmacao_presenca: confirmacaoPresencaFinal,
+                confirmacao_finalizacao,
+                status: statusAgenda
+            },
+            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pela agenda do usuário autenticado
+        );
+
+        // Retorna HTTP 204: No Content se a atualização for bem-sucedida
+        if (response[0] > 0) {
+            res.status(204).end();
+        } else {
+            res.status(404).end();
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro ao atualizar a agenda.');
+    }
+};
+
 
 module.exports = controller; // Exporta o controlador

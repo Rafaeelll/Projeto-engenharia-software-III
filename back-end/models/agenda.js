@@ -50,6 +50,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: 'id',           // Campo da tabela local 
         as: 'notificacoes'         // Nome do campo de associação (plural)
       });
+      this.belongsTo(models.Configuracao, {
+        foreignKey: 'config_id',
+        targetKey: 'id',
+        as: 'configuracao'
+      })
     }
   }
 
@@ -66,6 +71,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     jogo_id:{
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    config_id: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
@@ -94,8 +103,17 @@ module.exports = (sequelize, DataTypes) => {
     descricao:{
       type: DataTypes.TEXT,
     },
+    confirmacao_presenca: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    confirmacao_finalizacao: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+
+    },
     status:{
-      type: DataTypes.ENUM('Agendado', 'Em andamento', 'Finalização Pendente', 'Finalizada'),
+      type: DataTypes.ENUM('Agendado', 'Inicialização Pendente', 'Inicialização Confirmada', 'Em andamento', 'Finalizada', 'Finalização Pendente', 'Finalização Confirmada'),
       defaultValue: 'Agendado'
     },
   }, {
@@ -113,15 +131,16 @@ module.exports = (sequelize, DataTypes) => {
         let statusAgenda = "Agendado";
 
         if (dataAtual >= dataInicial && dataAtual <= dataFinal) {
-          statusAgenda = "Em andamento";
+          statusAgenda = "Inicialização Pendente";
         } else if (dataAtual > dataFinal) {
-          statusAgenda = "Finalizada";
+          statusAgenda = "Finalização Pendente";
         }
 
         // Definir o status da agenda
         agenda.status = statusAgenda;    
       },
-      beforeUpdate: (agenda, options) =>{
+      beforeUpdate: (agenda, options) => {
+        // Determinar o status da agenda com base na data e hora atual
         const dataAtual = new Date();
         const dataInicial = new Date(agenda.data_horario_inicio);
         const dataFinal = new Date(agenda.data_horario_fim);
@@ -129,15 +148,14 @@ module.exports = (sequelize, DataTypes) => {
         let statusAgenda = "Agendado";
 
         if (dataAtual >= dataInicial && dataAtual <= dataFinal) {
-          statusAgenda = "Em andamento";
+          statusAgenda = "Inicialização Pendente";
         } else if (dataAtual > dataFinal) {
-          statusAgenda = "Finalizada";
+          statusAgenda = "Finalização Pendente";
         }
 
         // Definir o status da agenda
-        agenda.status = statusAgenda;  
-      }
-
+        agenda.status = statusAgenda;    
+      },
     }
 });
   

@@ -233,7 +233,7 @@ export default function PerfilForm() {
 
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
               <DatePicker sx={{marginTop: '12px'}}
-                label='Data de aquisição'
+                label='Data de nascimento'
                 value={perfils.data_nasc}
                 onChange={value => handleFormFieldChange({
                   target: {name:'data_nasc', value}

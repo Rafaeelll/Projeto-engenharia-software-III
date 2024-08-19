@@ -39,6 +39,18 @@ module.exports = {
       onDelete: 'CASCADE', // Não permite apagar um jogo em uso nas agendas
       onUpdate: 'CASCADE'   // Atualiza jogo_id nas agendas se id do jogo mudar
     });
+
+    await queryInterface.addConstraint('agendas', {
+      fields: ['config_id'], // Campo(s) da tabela de origem
+      type: 'foreign key',
+      name: 'agenda_config_fk', // Nome da chave estrangeira (deve ser único do BD)
+      references:{
+        table: 'configuracoes', // Tabela estrangeira
+        field: 'id'      // Campo da tabela estrangeira
+      },
+      onDelete: 'CASCADE', // Não permite apagar um jogo em uso nas agendas
+      onUpdate: 'CASCADE'   // Atualiza jogo_id nas agendas se id do jogo mudar
+    });
   },
 
   /**
@@ -46,6 +58,8 @@ module.exports = {
    * Remove as restrições de chave estrangeira da tabela 'agendas'.
    */
   async down(queryInterface, Sequelize) {
+    // Remove a restrição de chave estrangeira para o campo 'jogo_id'
+    await queryInterface.removeConstraint('agendas', 'agenda_config_fk');
     // Remove a restrição de chave estrangeira para o campo 'jogo_id'
     await queryInterface.removeConstraint('agendas', 'agenda_jogos_fk');
     // Remove a restrição de chave estrangeira para o campo 'usuario_id'

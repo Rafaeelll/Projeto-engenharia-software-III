@@ -5,6 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useLocation } from 'react-router-dom'
 import Divider from '@mui/material/Divider'
+import CircularProgress from '@mui/material/CircularProgress'
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import HomeIcon from '@mui/icons-material/Home';
 import GamesIcon from '@mui/icons-material/Games';
@@ -36,12 +37,12 @@ export default function MainMenu() {
 
   const API_PATH = '/notificacoes/contagem';
   const [notificacoes, setNotificacoes] = React.useState(0);
+  const [showWaiting, setShowWaiting] = React.useState(false)
 
   async function fetchData(){
     try{
       const response  = await myfetch.get(API_PATH);
-      const result = response;
-      setNotificacoes(result);
+      setNotificacoes(response.contagem);
     } catch (error) {
       console.error('Erro ao buscar contagem de notificações:', error);
     }
@@ -62,9 +63,21 @@ export default function MainMenu() {
     },
   }));
 
-  function handleBadgeNotifClick(event){
-    setNotificacoes(0)
-}
+  async function handleBadgeNotifClick(event){
+    if (event){
+      setShowWaiting(true)
+      try {
+        await myfetch.post('/notificacoes/atualizar_notif')
+        setNotificacoes(0)
+      }
+      catch (error){
+        console.log(error)
+      }
+      finally {
+        setShowWaiting(false)
+      }
+    }
+  }
 
   
   return (
@@ -232,7 +245,7 @@ export default function MainMenu() {
             size='small'
             onClick={handleBadgeNotifClick}
           >
-            <Badge badgeContent={notificacoes.count} color="error" max={99}
+            <Badge badgeContent={notificacoes} color="error" max={99}
               anchorOrigin={{
                 vertical: 'top',
                 horizontal: 'left',
@@ -242,6 +255,17 @@ export default function MainMenu() {
             </Badge>
           </IconButton>
           <Typography style={{marginLeft: '5px'}}> Notificações </Typography>
+
+          {showWaiting && (
+            <CircularProgress 
+              color="secondary"
+              size={18}
+              sx={{
+                position: 'absolute'
+              }}
+              />
+          )}
+
         </MenuItem>
 
         <MenuItem 

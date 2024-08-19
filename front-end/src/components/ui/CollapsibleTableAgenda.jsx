@@ -22,244 +22,30 @@ import myfetch from '../../utils/myfetch';
 import Notification from './Notification';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import '../../pages/main_pages/styles/main-pages-styles.css';
 import Tooltip from '@mui/material/Tooltip';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventIcon from '@mui/icons-material/Event';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import ConfirmFilterDialog from '../ui/ConfirmFilterDialog'
+import ConfirmFilterDialog from '../ui/ConfirmFilterDialog';
 import { MenuItem, Select } from '@mui/material';
-import InputLabel from '@mui/material/InputLabel'
+import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import { FaTwitch } from "react-icons/fa";
 import { RiKickFill } from "react-icons/ri";
 
-
-function Row({ agenda, onDelete }) {
-  const API_PATH_VS = '/visualizacoes';
-
-  const [open, setOpen] = React.useState(false);
-  const [visualizacoes, setVisualizacoes] = React.useState([]);
-
-  const handleDeleteClick = () => {
-    onDelete(agenda.id);
-  };
-
-  const fetchVisualizacao = async () => {
-    try {
-      const result = await myfetch.get(`${API_PATH_VS}`);
-      const agendaResult = await myfetch.get('/agendas'); // Buscar informações de agendas
-
-      // Filtrar apenas o visualização relacionado a uma agenda específica
-      const visualizacaoRelacionado = result.filter(item => item.agenda_id === agenda.id);
-      // Incluir o titulo da agenda correspondente nos itens de visualizações
-      visualizacaoRelacionado.forEach(item => {
-        const agendaCorrespondente = agendaResult.find(agenda => agenda.id === item.agenda_id);
-        if (agendaCorrespondente) {
-          item.agenda_title = agendaCorrespondente.titulo_agenda;
-        }
-      });
-      setVisualizacoes(visualizacaoRelacionado);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchVisualizacao();
-  }, []);
-
-  const handleCollapseToggle = () => {
-    setOpen(!open);
-    if (!open) {
-      fetchVisualizacao();
-    }
-  };
-
-  function getStatusColor(status){
-    switch (status){
-      case 'Agendado':
-        return 'red';
-      case 'Finalizada':
-        return 'green';
-      case 'Em andamento':
-        return 'lightblue';
-      default:
-        return 'black';
-    }
-  }
-
-  function getStatusIcon(status){
-    switch (status){
-      case 'Agendado':
-        return <EventIcon />;
-      case 'Finalizada':
-        return <EventAvailableIcon/>;
-      case 'Em andamento':
-        return <PendingActionsIcon/>;
-      default:
-        return 'black';
-    }
-  }
-
-  function getPlatformIcon(plt_transm){
-    switch (plt_transm){
-      case 'Facebook':
-        return <FacebookIcon color='primary'/>
-      case 'Youtube':
-        return <YouTubeIcon color='error'/>
-      case 'Kick':
-        return <RiKickFill color='green' size={18}/> 
-      case 'Twitch':
-        return <FaTwitch color='purple' size={16}/>
-    }
-  }
-
-  function getPlataformColor(plt_transm){
-    switch (plt_transm){
-      case 'Facebook':
-        return 'navy';
-      case 'Youtube':
-        return 'red';
-      case 'Kick':
-        return 'green';
-      case 'Twitch':
-        return 'purple'
-      default:
-        return 'black';
-    }
-  }
-
-  return (
-    <>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <Tooltip title="Detalhes" arrow>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={handleCollapseToggle}
-            >
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </Tooltip>
-        </TableCell>
-        <TableCell size='small' component="th" scope="row">
-          {agenda.titulo_agenda}
-        </TableCell>
-        <TableCell size='small' align="center">{agenda.id}</TableCell>
-        <TableCell size='small' align="center">{agenda.jogo_id} - {agenda.gameDetails.nome}</TableCell>
-        <TableCell size='small' align="center">
-          {format(parseISO(agenda.data_horario_inicio), 'dd/MM/yyyy - HH:mm')}
-        </TableCell>
-        <TableCell size='small' align="center">
-          {format(parseISO(agenda.data_horario_fim), 'dd/MM/yyyy - HH:mm')}
-        </TableCell>
-        <TableCell size='small' align="center">
-          {agenda.p_data_horario_inicio ? 
-            format(parseISO(agenda.p_data_horario_inicio), 'dd/MM/yyyy - HH:mm') :
-            'Nulo'
-          }
-        </TableCell>
-        <TableCell size='small' align="center">
-          {agenda.p_data_horario_fim ? 
-            format(parseISO(agenda.p_data_horario_fim), 'dd/MM/yyyy - HH:mm') :
-            'Nulo'
-          }
-        </TableCell>
-        <TableCell size='small' align="center">
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {getPlatformIcon(agenda.plt_transm)}
-            <Typography variant="body1" sx={{ml: '4px', color: getPlataformColor(agenda.plt_transm), fontWeight: 'bold'}}>
-              {agenda.plt_transm ? agenda.plt_transm : 'Nulo'}
-            </Typography>
-          </div>
-        </TableCell>
-
-        <TableCell size='small' align="center">
-          {agenda.descricao ? agenda.descricao : 'Nulo'}
-        </TableCell>      
-        <TableCell size='small' align="center" style={{ color: getStatusColor(agenda.status)}}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {getStatusIcon(agenda.status)}
-            <Typography variant="body2" sx={{ml:'2px', fontWeight: 'bold'}}>
-              {agenda.status}
-            </Typography>
-          </div>
-        </TableCell>
-        <TableCell size='small' align="center">
-          <Link to={'./' + agenda.id}>
-            <IconButton aria-label="Editar">
-              <EditIcon />
-            </IconButton>
-          </Link>
-        </TableCell>
-        <TableCell align="right">
-          <IconButton aria-label="Excluir" onClick={handleDeleteClick}>
-            <DeleteForeverIcon color="error" />
-          </IconButton>
-        </TableCell>
-      </TableRow>
-
-
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-            <Typography 
-              sx={{fontWeight: 'bolder'}} variant="h6" gutterBottom component="div" color='primary'> 
-              <u>Visualizações</u> 
-            </Typography>
-              <Table size="small" aria-label="Visualizações">
-                <TableHead>
-                  <TableRow>
-                    <TableCell size='small' align="center">Visualização ID</TableCell>
-                    <TableCell size='small' align="center">ID - Título da agenda</TableCell>
-                    <TableCell size='small' align="center">
-                      Número de Visualizações
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {visualizacoes.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} align="center">
-                        <Typography style={{ color: 'GrayText' }}>Visualização vazia</Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    visualizacoes.map((visualizacaoItem) => (
-                    <TableRow key={visualizacaoItem.id}>
-                      <TableCell size='small' align="center">{visualizacaoItem.id}</TableCell>
-                      <TableCell size='small' align="center">{visualizacaoItem.agenda_id} - {visualizacaoItem.agenda_title}</TableCell>
-                      <TableCell size='small' align="center"> 
-                        {visualizacaoItem.numero_visualizacao}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
-  );
-}
-
 export default function CollapsibleTable() {
   const API_PATH_AG = '/agendas';
+  const API_PATH_VS = '/visualizacoes';
 
   const [agendas, setAgendas] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
   const [showDialog, setShowDialog] = React.useState(false);
   const [filterStatus, setFilterStatus] = React.useState('');
   const [deleteId, setDeleteId] = React.useState(null);
-  const [openFilter, setOpenFilter] = React.useState(false)
+  const [openFilter, setOpenFilter] = React.useState(false);
   const [notif, setNotif] = React.useState({
     show: false,
     message: '',
@@ -280,11 +66,10 @@ export default function CollapsibleTable() {
       const result = await myfetch.get(apiUrl);
       const agendasWithGameDetails = await Promise.all(
         result.map(async (agenda) => {
-          // Buscar detalhes do jogo com base no ID do jogo associado
           const gameDetails = await myfetch.get(`/jogos/${agenda.jogo_id}`);
           return {
             ...agenda,
-            gameDetails: gameDetails // Aqui você pode ajustar para corresponder ao formato real dos detalhes do jogo
+            gameDetails: gameDetails
           };
         })
       );
@@ -295,11 +80,10 @@ export default function CollapsibleTable() {
       setShowWaiting(false);
     }
   };
-  
-  
+
   React.useEffect(() => {
     fetchData();
-  }, []);
+  }, [filterStatus]);
 
   const handleDelete = async (id) => {
     setShowDialog(true);
@@ -338,12 +122,11 @@ export default function CollapsibleTable() {
   const handleFilterDialogClose = async (answer) => {
     setOpenFilter(false);
     if (answer && filterStatus !== '') {
-      fetchData(); // A função fetchData já foi modificada para incluir o filtro de status
+      fetchData();
     } else {
-      fetchData(); // Se nenhum status foi selecionado, carregue todas as agendas novamente
+      fetchData();
     }
   };
-  
 
   const handleNotifClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -351,6 +134,219 @@ export default function CollapsibleTable() {
     }
     setNotif({ ...notif, show: false });
   };
+
+  function Row({ agenda, onDelete }) {
+    const [open, setOpen] = React.useState(false);
+    const [visualizacoes, setVisualizacoes] = React.useState([]);
+
+    const handleDeleteClick = () => {
+      onDelete(agenda.id);
+    };
+
+    const fetchVisualizacao = async () => {
+      try {
+        const result = await myfetch.get(`${API_PATH_VS}`);
+        const agendaResult = await myfetch.get('/agendas');
+        const visualizacaoRelacionado = result.filter(item => item.agenda_id === agenda.id);
+        visualizacaoRelacionado.forEach(item => {
+          const agendaCorrespondente = agendaResult.find(agenda => agenda.id === item.agenda_id);
+          if (agendaCorrespondente) {
+            item.agenda_title = agendaCorrespondente.titulo_agenda;
+          }
+        });
+        setVisualizacoes(visualizacaoRelacionado);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    React.useEffect(() => {
+      fetchVisualizacao();
+    }, []);
+
+    const handleCollapseToggle = () => {
+      setOpen(!open);
+      if (!open) {
+        fetchVisualizacao();
+      }
+    };
+
+    function getStatusColor(status){
+      switch (status){
+        case 'Agendado':
+        case 'Inicialização Confirmada':
+          return 'red';
+        case 'Finalizada':
+        case 'Finalização Confirmada':
+          return 'green';
+        case 'Em andamento':
+          return 'lightblue';
+        default:
+          return null;
+      }
+    }
+
+    function getStatusIcon(status){
+      switch (status){
+        case 'Agendado':
+        case 'Inicialização Confirmada':
+          return <EventIcon />;
+        case 'Finalizada':
+        case 'Finalização Confirmada':
+          return <EventAvailableIcon />;
+        case 'Em andamento':
+          return <PendingActionsIcon />;
+        default:
+          return null;
+      }
+    }
+
+    function getPlatformIcon(plt_transm){
+      switch (plt_transm){
+        case 'Facebook':
+          return <FacebookIcon color='primary' />;
+        case 'Youtube':
+          return <YouTubeIcon color='error' />;
+        case 'Kick':
+          return <RiKickFill color='green' size={18} />;
+        case 'Twitch':
+          return <FaTwitch color='purple' size={16} />;
+        default:
+          return null;
+      }
+    }
+
+    function getPlataformColor(plt_transm){
+      switch (plt_transm){
+        case 'Facebook':
+          return 'navy';
+        case 'Youtube':
+          return 'red';
+        case 'Kick':
+          return 'green';
+        case 'Twitch':
+          return 'purple';
+        default:
+          return null;
+      }
+    }
+
+    return (
+      <>
+        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+          <TableCell>
+            <Tooltip title="Detalhes" arrow>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={handleCollapseToggle}
+              >
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </Tooltip>
+          </TableCell>
+          <TableCell size='small' component="th" scope="row">
+            {agenda.titulo_agenda}
+          </TableCell>
+          <TableCell size='small' align="center">{agenda.id}</TableCell>
+          <TableCell size='small' align="center">{agenda.jogo_id} - {agenda.gameDetails.nome}</TableCell>
+          <TableCell size='small' align="center">
+            {format(parseISO(agenda.data_horario_inicio), 'dd/MM/yyyy - HH:mm')}
+          </TableCell>
+          <TableCell size='small' align="center">
+            {format(parseISO(agenda.data_horario_fim), 'dd/MM/yyyy - HH:mm')}
+          </TableCell>
+          <TableCell size='small' align="center">
+            {agenda.p_data_horario_inicio ? 
+              format(parseISO(agenda.p_data_horario_inicio), 'dd/MM/yyyy - HH:mm') :
+              'Nulo'
+            }
+          </TableCell>
+          <TableCell size='small' align="center">
+            {agenda.p_data_horario_fim ? 
+              format(parseISO(agenda.p_data_horario_fim), 'dd/MM/yyyy - HH:mm') :
+              'Nulo'
+            }
+          </TableCell>
+          <TableCell size='small' align="center">
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {getPlatformIcon(agenda.plt_transm)}
+              <Typography variant="body1" sx={{ml: '4px', color: getPlataformColor(agenda.plt_transm), fontWeight: 'bold'}}>
+                {agenda.plt_transm ? agenda.plt_transm : 'Nulo'}
+              </Typography>
+            </div>
+          </TableCell>
+
+          <TableCell size='small' align="center">
+            {agenda.descricao ? agenda.descricao : 'Nulo'}
+          </TableCell>      
+          <TableCell size='small' align="center" style={{ color: getStatusColor(agenda.status)}}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {getStatusIcon(agenda.status)}
+              <Typography variant="body2" sx={{ml:'2px', fontWeight: 'bold'}}>
+                {agenda.status}
+              </Typography>
+            </div>
+          </TableCell>
+          <TableCell size='small' align="center">
+            <Link to={'./' + agenda.id}>
+              <IconButton aria-label="Editar">
+                <EditIcon />
+              </IconButton>
+            </Link>
+          </TableCell>
+          <TableCell align="right">
+            <IconButton aria-label="Excluir" onClick={handleDeleteClick}>
+              <DeleteForeverIcon color="error" />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Typography 
+                  sx={{fontWeight: 'bolder'}} variant="h6" gutterBottom component="div" color='primary'> 
+                  <u>Visualizações</u> 
+                </Typography>
+                <Table size="small" aria-label="Visualizações">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell size='small' align="center">Visualização ID</TableCell>
+                      <TableCell size='small' align="center">ID - Título da agenda</TableCell>
+                      <TableCell size='small' align="center">
+                        Número de Visualizações
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {visualizacoes.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <Typography style={{ color: 'GrayText' }}>Visualização vazia</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      visualizacoes.map((visualizacaoItem) => (
+                        <TableRow key={visualizacaoItem.id}>
+                          <TableCell size='small' align="center">{visualizacaoItem.id}</TableCell>
+                          <TableCell size='small' align="center">{visualizacaoItem.agenda_id} - {visualizacaoItem.agenda_title}</TableCell>
+                          <TableCell size='small' align="center"> 
+                            {visualizacaoItem.numero_visualizacao}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </>
+    );
+  }
 
   return (
     <>
@@ -384,7 +380,7 @@ export default function CollapsibleTable() {
             value={filterStatus}
             onChange={handleFilterChange}
           >
-            <MenuItem value ="" disabled >
+            <MenuItem value="" disabled >
               Filtrar agendas por:
             </MenuItem>
             <MenuItem value="Agendado">Status "Agendado"</MenuItem>
@@ -393,7 +389,6 @@ export default function CollapsibleTable() {
           </Select>
         </FormControl>
       </ConfirmFilterDialog>
-
 
       <Notification
         show={notif.show}
@@ -408,10 +403,13 @@ export default function CollapsibleTable() {
         <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Agendas</u> </Typography>
 
         <Tooltip title="Filtrar">
-          <IconButton size='small' sx={{ml: '10px'}} onClick={handleFilterClick}>
-            <FilterListIcon/>
-          </IconButton>
+          {agendas.length === 0 ? null : (
+            <IconButton size='small' sx={{ ml: '10px' }} onClick={handleFilterClick}>
+              <FilterListIcon />
+            </IconButton>
+          )}
         </Tooltip>
+
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
@@ -431,14 +429,13 @@ export default function CollapsibleTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {agendas.length === 0 ? ( // Verifica se não há jogos
+            {agendas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} align="center">
+                <TableCell colSpan={13} align="center">
                   <Typography style={{color: 'GrayText'}}>Tabela vazia, crie uma nova agenda</Typography> 
                 </TableCell>
               </TableRow>
             ) : (
-              // Renderiza as linhas da tabela
               agendas.map((agenda) => (
                 <Row key={agenda.id} agenda={agenda} onDelete={handleDelete} />
               ))

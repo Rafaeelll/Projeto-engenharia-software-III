@@ -30,6 +30,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
+      config_id:{
+        type: Sequelize.INTEGER,
+        allowNull: false
+
+      },
       data_horario_inicio:{ // Data e horario do inicio da agenda
         type: Sequelize.DATE,
         allowNull: false
@@ -55,8 +60,17 @@ module.exports = {
       descricao:{
         type: Sequelize.TEXT,
       },
+      confirmacao_presenca: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+
+      },
+      confirmacao_finalizacao: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       status:{
-        type: Sequelize.ENUM('Agendado', 'Em andamento', 'Finalização Pendente', 'Finalizada',),
+        type: Sequelize.ENUM('Agendado', 'Inicialização Pendente', 'Inicialização Confirmada', 'Em andamento', 'Finalizada', 'Finalização Pendente', 'Finalização Confirmada'),
         defaultValue: 'Agendado'
       },
       createdAt: {

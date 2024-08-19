@@ -29,19 +29,9 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
-      confirmacao_presenca: {
-        type: Sequelize.BOOLEAN,
-      },
-      confirmacao_finalizacao: {
-        type: Sequelize.BOOLEAN,
-      },
       contagem:{
         type: Sequelize.INTEGER,
         defaultValue: 0
-      },
-      notif_view:{
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
       },
       createdAt: {
         allowNull: false,

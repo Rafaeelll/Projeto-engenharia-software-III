@@ -12,6 +12,7 @@ const controller = require('../controllers/agenda');
 
 // Define as rotas para as operações CRUD da agenda
 router.post('/', controller.create);
+router.put('/update-status', controller.updateAgendaStatusAuto); // Usar PUT para atualizações
 router.get('/', controller.retrieve);
 router.get('/:id', controller.retrieveOne);
 router.put('/:id', controller.update);

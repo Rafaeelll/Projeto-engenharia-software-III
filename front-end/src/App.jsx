@@ -9,6 +9,8 @@ import About from './pages/home/About';
 import Contact from './pages/home/Contact';
 import PaginaInicial from './pages/main_pages/PaginaInicial';
 import CriarAgendas from './pages/main_pages/forms/AgendaForm';
+import AgendaConfirmarPresenca from './pages/main_pages/forms/AgendaConfirmarPresenca';
+import AgendaConfirmarFinalizacao from './pages/main_pages/forms/AgendaConfirmarFinalizacao';
 import VerificarAgendas from './pages/main_pages/VerificarAgendas';
 import SearchResult from './pages/main_pages/SearchResult'
 import Perfil from './pages/main_pages/Perfil';
@@ -20,8 +22,6 @@ import HistoricoJogosForm from './pages/main_pages/forms/HistoricoJogosForm'
 import Visualizacoes from './pages/main_pages/Visualizacoes';
 import VisualizacaoForm from './pages/main_pages/forms/VisualizacaoForm';
 import Notificacoes from './pages/main_pages/Notificacoes'
-import NotiConfirmStart from './pages/main_pages/forms/NotiConfirmStart'
-import NotiConfirmFinish from './pages/main_pages/forms/NotiConfirmFinish';
 import MyAccountForm from './pages/main_pages/forms/MyAccountForm';
 import PerfilImgForm from './pages/main_pages/forms/PerfilImgForm';
 import MyAccountStatusForm from './pages/main_pages/forms/MyAccountStatusForm'
@@ -29,9 +29,28 @@ import Configuracao from './pages/main_pages/Configuracao';
 import ConfigForm from './pages/main_pages/forms/ConfigForm';
 import HeaderBar from './components/ui/HeaderBar';
 import FooterBar from './components/ui/FooterBar';
+import api from '../services/api';
 
 
 navigator.serviceWorker.register('service-worker.js')
+  .then(async serviceWorker => {
+    let subscription = await serviceWorker.pushManager.getSubscription()
+    const API_PATH = '/notificacoes/push/public_key'
+    const API_PATH2 = '/notificacoes/push/register'
+
+    if (!subscription) {
+
+      const publicKeyResponse = await api.get(API_PATH)
+
+      subscription = await serviceWorker.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: publicKeyResponse.data.publicKey,
+      })
+    }
+    await api.post(API_PATH2, {
+      subscription,
+    })
+})
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
@@ -69,6 +88,8 @@ function App() {
           <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
           <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
           <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+          <Route path= "/agenda/confirmar-presenca/:id" element={<AuthGuard> <AgendaConfirmarPresenca/> </AuthGuard>}/>
+          <Route path= "/agenda/confirmar-finalizacao/:id" element={<AuthGuard> <AgendaConfirmarFinalizacao/> </AuthGuard>}/>
           <Route path= "/usuario" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
           <Route path= "/usuario/profile/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
           <Route path= "/usuario/image/:id" element={<AuthGuard> <PerfilImgForm/> </AuthGuard>}/>
@@ -84,8 +105,6 @@ function App() {
           <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
           <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
           <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
-          <Route path= "/notificacao/confirmar-presenca/:id" element={<AuthGuard> <NotiConfirmStart/> </AuthGuard>}/>
-          <Route path= "/notificacao/confirmar-finalizacao/:id" element={<AuthGuard> <NotiConfirmFinish/> </AuthGuard>}/>
           <Route path= "/configuracao" element={<AuthGuard> <Configuracao/> </AuthGuard>}/>
           <Route path= "/configuracao/:id" element={<AuthGuard> <ConfigForm/> </AuthGuard>}/>
         </Routes>

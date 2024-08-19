@@ -8,25 +8,26 @@ import CircularProgress from '@mui/material/CircularProgress'
 import Backdrop from '@mui/material/Backdrop'
 import TextField from '@mui/material/TextField';
 import FormTitle from '../../../components/ui/FormTitle';
-import Typography  from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 
-
-
-export default function NotiConfirmFinish() {
-    const API_PATH = '/notificacoes';
+export default function AgendaConfirmarPresenca() {
+    const API_PATH = '/agendas';
     const params = useParams();
     const navigate = useNavigate();
+    const [loadingAgendaStatus, setLoadingAgendaStatus] = React.useState(false);
+
 
     const [state, setState] = useState({
-        notificacoes: {
-          agenda_id: '',
-          mensagem: '',
-          confirmacao_finalizacao: ''
+        agendas: {
+          id: '',
+          titulo_agenda: '',
+          confirmacao_presenca: '',
+          confirmacao_finalizacao: '',
+          status: ''
         },
         showWaiting: false,
         notif: {
@@ -35,16 +36,39 @@ export default function NotiConfirmFinish() {
           severity: 'success'
         }
       }); 
-      const { notificacoes, showWaiting, notif } = state;
+      const { agendas, showWaiting, notif } = state;
 
       function handleFormFieldChange(event) {
-        const NotificationsCopy = { ...notificacoes };
-        NotificationsCopy[event.target.name] = event.target.value;
-    
-    
-        setState({ ...state, notificacoes: NotificationsCopy });
+        const AgendasCopy = { ...agendas };
+        AgendasCopy[event.target.name] = event.target.value;
+        setLoadingAgendaStatus(true); // Exibe o CircularProgress
+
+
+        // Adicionar a lógica para mudança automática do status
+        const dataAtual = new Date();
+        const dataInicial = new Date(agendas.data_horario_inicio);
+        
+        let statusAgenda = "Agendado";
+
+        if (dataAtual >= dataInicial) {
+          if (AgendasCopy.confirmacao_presenca === true) {
+              statusAgenda = "Inicialização Confirmada";
+          } else {
+              statusAgenda = "Inicialização Pendente";
+          }
+        }
+
+        // Atualiza o status com a lógica aplicada
+        AgendasCopy.status = statusAgenda;
+
+        setState({ ...state, agendas: AgendasCopy });
+
+        setTimeout(() => {
+          setLoadingAgendaStatus(false); // Esconde o CircularProgress
+          setState({ ...state, agendas: AgendasCopy });
+        }, 500); // Aqui, 500ms é o tempo de simulação do atraso
       }
-    
+      
       async function handleFormSubmit(event) {
         event.preventDefault();
         sendData();
@@ -60,7 +84,7 @@ export default function NotiConfirmFinish() {
             const result = await myfetch.get(`${API_PATH}/${params.id}`);
             setState({
             ...state,
-            notificacoes: result,
+            agendas: result,
             showWaiting: false,
           });
         } catch (error) {
@@ -79,8 +103,8 @@ export default function NotiConfirmFinish() {
       async function sendData() {
         setState({ ...state, showWaiting: true, errors: {} });
         try {
-          if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, notificacoes)
-          else await myfetch.post(API_PATH, notificacoes)
+          if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, agendas)
+          else await myfetch.post(API_PATH, agendas)
     
           setState({
             ...state,
@@ -139,7 +163,7 @@ export default function NotiConfirmFinish() {
         }}
       >
         <FormTitle
-          title={"Editar notificações"}
+          title={"Editar agendas"}
         />
           <form onSubmit={handleFormSubmit}>
               <TextField sx={{marginTop: '10px'}}
@@ -150,8 +174,8 @@ export default function NotiConfirmFinish() {
                 color='secondary'
                 required
                 fullWidth
-                name="agenda_id"
-                value={notificacoes.agenda_id}
+                name="id"
+                value={agendas.id}
                 onChange={handleFormFieldChange}
                 disabled
               />
@@ -159,22 +183,22 @@ export default function NotiConfirmFinish() {
               <TextField sx={{marginTop: '12px'}}
                 required
                 type="text"
-                label='Mensagem'
-                name="mensagem"
+                label='Titulo da Agenda'
+                name="titulo_agenda"
                 fullWidth
-                value={notificacoes.mensagem}
+                value={agendas.titulo_agenda}
                 onChange={handleFormFieldChange}
                 disabled
               />
               <Box sx={{ minWidth: 120, marginTop: '12px'}}>
                 <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Confirmar finalização</InputLabel>
+                  <InputLabel id="demo-simple-select-label">Confirmar Presença</InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      value={notificacoes.confirmacao_finalizacao}
-                      label="Confirmar finalização"
-                      name='confirmacao_finalizacao'
+                      value={agendas.confirmacao_presenca}
+                      label="Confirmar Presença"
+                      name='confirmacao_presenca'
                       onChange={handleFormFieldChange}
                       required
                     >
@@ -183,6 +207,32 @@ export default function NotiConfirmFinish() {
                   </Select>
               </FormControl>
             </Box>
+
+            <Box sx={{ minWidth: 120, marginTop: '12px', position: 'relative' }}>
+              <TextField
+                required
+                type="text"
+                label='Status da Agenda'
+                name="status"
+                fullWidth
+                value={agendas.status}
+                onChange={handleFormFieldChange}
+                disabled
+              />
+              {loadingAgendaStatus && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: '-12px',
+                    marginLeft: '-12px',
+                  }}
+                />
+              )}
+            </Box>
+
             <div className='agenda-form-btn' style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
               <Button
                 sx={{
@@ -214,7 +264,7 @@ export default function NotiConfirmFinish() {
                 }}
                 color="secondary"
                 variant='contained'
-                onClick={() => navigate('/criar_agenda/' + notificacoes.agenda_id)}
+                onClick={() => navigate('/agenda/' + agendas.id)}
               >
                 Adiar agenda
               </Button>

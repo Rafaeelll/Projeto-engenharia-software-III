@@ -61,37 +61,34 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    confirmacao_presenca: {
-      type: DataTypes.BOOLEAN,
-    },
-    confirmacao_finalizacao: {
-      type: DataTypes.BOOLEAN,
-    },
     contagem:{
       type: DataTypes.INTEGER,
       defaultValue: 0
     },
-    notif_view:{
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-    
   }, {
     sequelize,
     modelName: 'Notificacao',
     tableName: 'notificacoes',
   
     hooks: {
-      beforeCreate: (notificacao, options) => {
-        notificacao.contagem++; // Incrementa a contagem toda vez que uma notificação for criada
-      },
-      
-      beforeUpdate: (notificacao, options) => {
-        const confirmacao_finalizacao = notificacao.confirmacao_finalizacao;
-        if (confirmacao_finalizacao === true) {
-          notificacao.confirmacao_presenca = true
+      afterCreate: async (notificacao, options) => {
+        if (notificacao && notificacao.contagem !== undefined) {
+          try {
+            const transaction = await sequelize.transaction();
+            const count = notificacao.contagem + 1;
+            
+            await Notificacao.update(
+              { contagem: count },
+              { where: { usuario_id: notificacao.usuario_id }, transaction }
+            );
+    
+            await transaction.commit();
+          } catch (error) {
+            await transaction.rollback();
+            console.error(error);
+          }
         }
-      }
+      },
     }
   });
   

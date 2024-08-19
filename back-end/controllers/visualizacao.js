@@ -28,7 +28,7 @@ controller.create = async (req, res) => {
         const verifyAgendaStatus = await Agenda.findOne({
             where: {id: req.body.agenda_id}
         })
-        if (verifyAgendaStatus.status !== 'Finalizada'){
+        if (verifyAgendaStatus.status !== 'Finalizada' && verifyAgendaStatus.status !== 'Finalização Confirmada'){
             return res.status(409).send("A agenda informada não foi finalizada ainda.");
         }
         const existingVisualizacao = await Visualizacao.findOne({

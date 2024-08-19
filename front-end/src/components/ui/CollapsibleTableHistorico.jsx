@@ -26,139 +26,12 @@ import '../../pages/main_pages/styles/main-pages-styles.css';
 import { Rating } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 
-function Row({ historicoJogo, onDelete }) {
-  const API_PATH_JG = '/jogos';
-
-  const [open, setOpen] = React.useState(false);
-  const [jogos, setJogos] = React.useState([]);
-
-  const handleDeleteClick = () => {
-    onDelete(historicoJogo.id);
-  };
-
-  const fetchJogo = async () => {
-    try {
-      const result = await myfetch.get(`${API_PATH_JG}`);
-
-      // Filtrar apenas o jogo relacionado ao histórico específico
-      const jogoRelacionado = result.find(item => item.id === historicoJogo.jogo_id);
-
-      if (jogoRelacionado) {
-        // Adicionar o nome do jogo diretamente ao objeto historicoJogo
-        historicoJogo.nome_do_jogo = jogoRelacionado.nome;
-        setJogos([jogoRelacionado]);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchJogo();
-  }, []);
-
-  const handleCollapseToggle = () => {
-    setOpen(!open);
-    if (!open) {
-      fetchJogo();
-    }
-  };
-
-  return (
-    <>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <Tooltip title='Detalhes' arrow>
-            <IconButton
-              aria-label="expand row"
-              size="small"
-              onClick={handleCollapseToggle}
-            >
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          </Tooltip>
-        </TableCell>
-        <TableCell align="center" size='small' component="th" scope="row">
-          {historicoJogo.id}
-        </TableCell>
-        <TableCell size='small' align="center">{historicoJogo.jogo_id}</TableCell>
-        <TableCell size='small' align="center">{historicoJogo.nivel}</TableCell>
-        <TableCell size='small' align="center">{historicoJogo.jogo_status}</TableCell>
-        <TableCell size='small' align="center">
-          <Rating size='small' readOnly value={historicoJogo.avaliacao} />
-        </TableCell>        
-        <TableCell size='small' align="center"> {historicoJogo.comentario_usuario}</TableCell>
-        <TableCell size='small' align="center">
-          <Link to={'./' + historicoJogo.id}>
-            <IconButton aria-label="Editar">
-              <EditIcon />
-            </IconButton>
-          </Link>
-        </TableCell>
-        <TableCell align="right">
-          <IconButton aria-label="Excluir" onClick={handleDeleteClick}>
-            <DeleteForeverIcon color="error" />
-          </IconButton>
-        </TableCell>
-      </TableRow>
-
-
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-            <Typography 
-              sx={{fontWeight: 'bolder'}} variant="h6" gutterBottom component="div" color='primary'> 
-              <u>Jogo</u> 
-            </Typography>
-              <Table size="small" aria-label="Jogos">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">Jogo ID</TableCell>
-                    <TableCell align="center">Nome do Jogo</TableCell>
-                    <TableCell align="center">Plataforma</TableCell>
-                    <TableCell align="center">Categoria</TableCell>
-                    <TableCell align="center">Preço</TableCell>
-                    <TableCell align="center">Data de Aquisição</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {jogos.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} align="center">
-                        <Typography style={{ color: 'GrayText' }}>Tabela de jogo vazio</Typography>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    jogos.map((jogoItem) => (
-                    <TableRow key={jogoItem.id}>
-                      <TableCell align="center">{jogoItem.id}</TableCell>
-                      <TableCell align="center">{jogoItem.nome}</TableCell>
-                      <TableCell align="center">{jogoItem.plataforma_jogo}</TableCell>
-                      <TableCell align="center">{jogoItem.categoria}</TableCell>
-                      <TableCell align="center">
-                        {Number(jogoItem.preco_jogo).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </TableCell>                      
-                      <TableCell align="center">
-                          {format(parseISO(jogoItem.data_aquisicao), 'dd/MM/yyyy')}
-                        </TableCell>
-                      </TableRow>
-                  ))
-                )}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
-  );
-}
-
 export default function CollapsibleTable() {
   const API_PATH_HT = '/historico_jogos';
+  const API_PATH_JG = '/jogos';
 
   const [historicoJogos, setHistoricoJogos] = React.useState([]);
+  const [jogos, setJogos] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
   const [showDialog, setShowDialog] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState(null);
@@ -177,6 +50,18 @@ export default function CollapsibleTable() {
       console.error(error);
     } finally {
       setShowWaiting(false);
+    }
+  };
+
+  const fetchJogo = async (jogo_id) => {
+    try {
+      const result = await myfetch.get(`${API_PATH_JG}`);
+      const jogoRelacionado = result.find(item => item.id === jogo_id);
+      if (jogoRelacionado) {
+        setJogos([jogoRelacionado]);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -221,6 +106,110 @@ export default function CollapsibleTable() {
     setNotif({ ...notif, show: false });
   };
 
+  function Row({ historicoJogo, onDelete }) {
+    const [open, setOpen] = React.useState(false);
+
+    const handleDeleteClick = () => {
+      onDelete(historicoJogo.id);
+    };
+
+    const handleCollapseToggle = () => {
+      setOpen(!open);
+      if (!open) {
+        fetchJogo(historicoJogo.jogo_id);
+      }
+    };
+
+    return (
+      <>
+        <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+          <TableCell>
+            <Tooltip title='Detalhes' arrow>
+              <IconButton
+                aria-label="expand row"
+                size="small"
+                onClick={handleCollapseToggle}
+              >
+                {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            </Tooltip>
+          </TableCell>
+          <TableCell align="center" size='small' component="th" scope="row">
+            {historicoJogo.id}
+          </TableCell>
+          <TableCell size='small' align="center">{historicoJogo.jogo_id}</TableCell>
+          <TableCell size='small' align="center">{historicoJogo.nivel}</TableCell>
+          <TableCell size='small' align="center">{historicoJogo.jogo_status}</TableCell>
+          <TableCell size='small' align="center">
+            <Rating size='small' readOnly value={historicoJogo.avaliacao} />
+          </TableCell>        
+          <TableCell size='small' align="center"> {historicoJogo.comentario_usuario}</TableCell>
+          <TableCell size='small' align="center">
+            <Link to={'./' + historicoJogo.id}>
+              <IconButton aria-label="Editar">
+                <EditIcon />
+              </IconButton>
+            </Link>
+          </TableCell>
+          <TableCell align="right">
+            <IconButton aria-label="Excluir" onClick={handleDeleteClick}>
+              <DeleteForeverIcon color="error" />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={9}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1 }}>
+                <Typography 
+                  sx={{ fontWeight: 'bolder' }} variant="h6" gutterBottom component="div" color='primary'> 
+                  <u>Jogo</u> 
+                </Typography>
+                <Table size="small" aria-label="Jogos">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">Jogo ID</TableCell>
+                      <TableCell align="center">Nome do Jogo</TableCell>
+                      <TableCell align="center">Plataforma</TableCell>
+                      <TableCell align="center">Categoria</TableCell>
+                      <TableCell align="center">Preço</TableCell>
+                      <TableCell align="center">Data de Aquisição</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {jogos.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center">
+                          <Typography style={{ color: 'GrayText' }}>Tabela de jogo vazio</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      jogos.map((jogoItem) => (
+                        <TableRow key={jogoItem.id}>
+                          <TableCell align="center">{jogoItem.id}</TableCell>
+                          <TableCell align="center">{jogoItem.nome}</TableCell>
+                          <TableCell align="center">{jogoItem.plataforma_jogo}</TableCell>
+                          <TableCell align="center">{jogoItem.categoria}</TableCell>
+                          <TableCell align="center">
+                            {Number(jogoItem.preco_jogo).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                          </TableCell>                      
+                          <TableCell align="center">
+                            {format(parseISO(jogoItem.data_aquisicao), 'dd/MM/yyyy')}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </Box>
+            </Collapse>
+          </TableCell>
+        </TableRow>
+      </>
+    );
+  }
+
   return (
     <>
       <Backdrop
@@ -248,7 +237,7 @@ export default function CollapsibleTable() {
 
       <TableContainer sx={{ width: '70%', margin: '0 auto', marginTop: '50px', 
         background: 'whitesmoke', overflow: 'auto', maxHeight: '70vh' }} component={Paper}> 
-        <Typography sx={{marginLeft: '20px', mt:'10px', fontWeight: 'bolder'}} variant="h6" color='secondary'> <u>Históricos de Jogo</u> </Typography>
+        <Typography sx={{ marginLeft: '20px', mt:'10px', fontWeight: 'bolder' }} variant="h6" color='secondary'> <u>Históricos de Jogo</u> </Typography>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>
@@ -267,7 +256,7 @@ export default function CollapsibleTable() {
             {historicoJogos.length === 0 ? ( // Verifica se não há jogos
               <TableRow>
                 <TableCell colSpan={9} align="center">
-                  <Typography style={{color: 'GrayText'}}>Tabela vazia, crie um novo histórico</Typography> 
+                  <Typography style={{ color: 'GrayText' }}>Tabela vazia, crie um novo histórico</Typography> 
                 </TableCell>
               </TableRow>
             ) : (
