@@ -1,68 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import myfetch from '../../utils/myfetch';
-import Backdrop from '@mui/material/Backdrop'
-import CircularProgress from '@mui/material/CircularProgress'
-import Notification from '../../components/ui/Notification'
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import Notification from '../../components/ui/Notification';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
-import Box from '@mui/material/Box';
-import CollapsibleTableJogo from '../../components/ui/CollapsibleTableJogo'; // Importe o componente CollapsibleTableJogo
-import './styles/main-pages-styles.css';
+import CollapsibleTableAgenda from '../../components/ui/CollapsibleTableAgenda';
+import CollapsibleTableJogo from '../../components/ui/CollapsibleTableJogo';
+import CollapsibleTableHistorico from '../../components/ui/CollapsibleTableHistorico';
+import CollapsibleTableVisualizacao from '../../components/ui/CollapsibleTableVisualizacao';
+import CollapsibleTableNotificacao from '../../components/ui/CollapsibleTableNotificacao';
 
 function SearchResult() {
   const { opcao, id } = useParams();
-  const [detalhes, setDetalhes] = useState([]);
+  const [data, setData] = useState(null);
   const [state, setState] = useState({
     showDialog: false,
     showWaiting: false,
     deleteId: null,
   });
-  const { showDialog, showWaiting, deleteId } = state;
+  const { showDialog, showWaiting } = state;
 
   const [notif, setNotif] = useState({
     show: false,
     message: '',
-    severity: 'success', // ou 'error'
+    severity: 'success',
   });
 
-  async function fetchDetalhes() {
+  const tableComponents = {
+    agendas: CollapsibleTableAgenda,
+    jogos: CollapsibleTableJogo,
+    historico_jogos: CollapsibleTableHistorico,
+    visualizacoes: CollapsibleTableVisualizacao,
+    notificacoes: CollapsibleTableNotificacao
+  };
+
+  const TableComponent = tableComponents[opcao] || null;
+
+  async function fetchData() {
     try {
-      const response = await myfetch.get(`/${opcao}/${id}`);
-      setDetalhes(response);
-      setState({
-        ...state,
-        showWaiting: false,
-        showDialog: false,
-      });
+      setState({ ...state, showWaiting: true });
+
+      let response;
+      if (id) {
+        response = await myfetch.get(`/${opcao}/${id}`);
+      } else {
+        return 'ID não digitado ou opção não selecionada'
+      }
+
+      setData(Array.isArray(response) ? response : [response]);
+      setState({ ...state, showWaiting: false });
     } catch (error) {
-      console.error('Erro ao buscar detalhes:', error);
+      console.error('Erro ao buscar data:', error);
       setNotif({
         show: true,
-        message: error.message,
+        message: 'Erro ao buscar data',
         severity: 'error',
       });
-      setState({
-        ...state,
-        showWaiting: false,
-        showDialog: false,
-      });
-    } finally {
-      setState({
-        ...state,
-        showWaiting: false,
-        showDialog: false,
-      });
+      setState({ ...state, showWaiting: false });
     }
   }
 
   useEffect(() => {
-    fetchDetalhes();
-  }, [opcao, id]);
+    fetchData();
+  }, [id, opcao]);
 
   function handleNotifClose(event, reason) {
-    if (reason === 'clickaway') {
-      return;
-    }
+    if (reason === 'clickaway') return;
     setNotif({ show: false });
   }
 
@@ -76,7 +80,7 @@ function SearchResult() {
           message: 'Item excluído com sucesso',
           severity: 'success',
         });
-        fetchDetalhes();
+        fetchData();
       } catch (error) {
         console.error(error);
         setNotif({
@@ -99,13 +103,19 @@ function SearchResult() {
       >
         Deseja realmente excluir este item?
       </ConfirmDialog>
-
-
-      {detalhes.length > 0 ? (
-        <CollapsibleTableJogo
-          jogoId={detalhes} // Passe os dados de detalhes para o componente
-          onDelete={handleDialogClose} // Passe a função para o componente
-        />
+      
+      {data ? (
+        TableComponent ? (
+          <TableComponent data={data} onDelete={handleDialogClose} />
+        ) : (
+          <Notification
+            show={true}
+            onClose={handleNotifClose}
+            severity="error"
+          >
+            Componente não encontrado para a opção selecionada.
+          </Notification>
+        )
       ) : (
         <>
           <Backdrop
@@ -113,7 +123,6 @@ function SearchResult() {
             open={showWaiting}
           >
             <CircularProgress color="secondary" />
-            Por favor, aguarde.
           </Backdrop>
 
           <Notification

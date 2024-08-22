@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ConfirmDialog from './ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import myfetch from '../../utils/myfetch';
@@ -32,6 +32,7 @@ import { FaTwitch } from 'react-icons/fa';
 import { RiKickFill } from 'react-icons/ri';
 
 export default function CollapsibleTableNotificacao() {
+  const {id} = useParams()
   const API_PATH_NS = '/notificacoes';
   const API_PATH_AG = '/agendas';
 
@@ -48,8 +49,14 @@ export default function CollapsibleTableNotificacao() {
   const fetchData = async () => {
     setShowWaiting(true);
     try {
-      const result = await myfetch.get(API_PATH_NS);
-      setNotificacoes(result);
+      if (id) {
+        const result = await myfetch.get(`${API_PATH_NS}/${id}`);
+        setNotificacoes([result]);
+      }
+      else {
+        const result = await myfetch.get(API_PATH_NS);
+        setNotificacoes(result);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -59,7 +66,7 @@ export default function CollapsibleTableNotificacao() {
 
   React.useEffect(() => {
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleDelete = async (id) => {
     setShowDialog(true);

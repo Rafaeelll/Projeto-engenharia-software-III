@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ConfirmDialog from './ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import myfetch from '../../utils/myfetch';
@@ -28,6 +28,7 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventIcon from '@mui/icons-material/Event';
 
 export default function CollapsibleTableVisualizacao() {
+  const {id} = useParams()
   const API_PATH_VS = '/visualizacoes';
   const API_PATH_AG = '/agendas';
   const API_PATH_JG = '/jogos';
@@ -45,8 +46,13 @@ export default function CollapsibleTableVisualizacao() {
   const fetchData = async () => {
     setShowWaiting(true);
     try {
-      const result = await myfetch.get(API_PATH_VS);
-      setVisualizacoes(result);
+      if (id) {
+        const result = await myfetch.get(`${API_PATH_VS}/${id}`);
+        setVisualizacoes([result]);
+      } else {
+        const result = await myfetch.get(API_PATH_VS);
+        setVisualizacoes(result);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -56,7 +62,7 @@ export default function CollapsibleTableVisualizacao() {
 
   React.useEffect(() => {
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleDelete = async (id) => {
     setShowDialog(true);
@@ -177,7 +183,7 @@ export default function CollapsibleTableVisualizacao() {
           <TableCell size='small' align="center">{visualizacao.agenda_id}</TableCell>
           <TableCell size='small' align="center">{visualizacao.numero_visualizacao}</TableCell>
           <TableCell size='small' align="center">
-            <Link to={'./' + visualizacao.id}>
+            <Link to={`/visualizacao/${visualizacao.id}`}>
               <IconButton aria-label="Editar">
                 <EditIcon />
               </IconButton>

@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ConfirmDialog from './ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import myfetch from '../../utils/myfetch';
@@ -37,6 +37,7 @@ import { FaTwitch } from "react-icons/fa";
 import { RiKickFill } from "react-icons/ri";
 
 export default function CollapsibleTable() {
+  const { id } = useParams();  // Obtenha o ID da URL
   const API_PATH_AG = '/agendas';
   const API_PATH_VS = '/visualizacoes';
 
@@ -59,13 +60,24 @@ export default function CollapsibleTable() {
   const fetchData = async () => {
     setShowWaiting(true);
     try {
+      // Adicionando o filtro no URL se estiver presente
       let apiUrl = API_PATH_AG;
       if (filterStatus) {
         apiUrl += `?status=${filterStatus}`;
       }
-      const result = await myfetch.get(apiUrl);
+      
+      let result;
+      if (id) {
+        result = await myfetch.get(`${apiUrl}/${id}`);
+      } else {
+        result = await myfetch.get(apiUrl);
+      }
+      
+      // Verifique se result é um array, caso contrário, transforme-o em um array de um item
+      const agendasList = Array.isArray(result) ? result : [result];
+  
       const agendasWithGameDetails = await Promise.all(
-        result.map(async (agenda) => {
+        agendasList.map(async (agenda) => {
           const gameDetails = await myfetch.get(`/jogos/${agenda.jogo_id}`);
           return {
             ...agenda,
@@ -80,10 +92,11 @@ export default function CollapsibleTable() {
       setShowWaiting(false);
     }
   };
+  
 
   React.useEffect(() => {
     fetchData();
-  }, [filterStatus]);
+  }, [filterStatus], [id]);
 
   const handleDelete = async (id) => {
     setShowDialog(true);
@@ -289,9 +302,9 @@ export default function CollapsibleTable() {
             </div>
           </TableCell>
           <TableCell size='small' align="center">
-            <Link to={'./' + agenda.id}>
+            <Link to={`/agenda/${agenda.id}`}>
               <IconButton aria-label="Editar">
-                <EditIcon />
+                <EditIcon /> 
               </IconButton>
             </Link>
           </TableCell>

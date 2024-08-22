@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ConfirmDialog from './ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import myfetch from '../../utils/myfetch';
@@ -27,6 +27,7 @@ import { Rating } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 
 export default function CollapsibleTable() {
+  const { id } = useParams();  // Obtenha o ID da URL
   const API_PATH_HT = '/historico_jogos';
   const API_PATH_JG = '/jogos';
 
@@ -44,8 +45,14 @@ export default function CollapsibleTable() {
   const fetchData = async () => {
     setShowWaiting(true);
     try {
-      const result = await myfetch.get(API_PATH_HT);
-      setHistoricoJogos(result);
+      if (id) {
+        const result = await myfetch.get(`${API_PATH_HT}/${id}`);
+        setHistoricoJogos([result]);
+      }
+      else{
+        const result = await myfetch.get(API_PATH_HT);
+        setHistoricoJogos(result);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -67,7 +74,7 @@ export default function CollapsibleTable() {
 
   React.useEffect(() => {
     fetchData();
-  }, []);
+  }, [id]);
 
   const handleDelete = async (id) => {
     setShowDialog(true);
@@ -145,7 +152,7 @@ export default function CollapsibleTable() {
           </TableCell>        
           <TableCell size='small' align="center"> {historicoJogo.comentario_usuario}</TableCell>
           <TableCell size='small' align="center">
-            <Link to={'./' + historicoJogo.id}>
+          <Link to={`/historico_jogo/${historicoJogo.id}`}>
               <IconButton aria-label="Editar">
                 <EditIcon />
               </IconButton>

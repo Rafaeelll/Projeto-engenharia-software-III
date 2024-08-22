@@ -158,7 +158,7 @@ controller.updateAgendaStatusAuto = async (req, res) => {
 
                 if (configuracao) {
                     const novoStatus = configuracao.confirmar_auto_ini ? 'Em andamento' : 'Inicialização Pendente';
-                    if (agenda.status !== 'Inicialização Pendente' && agenda.status !== 'Em andamento'){
+                    if (agenda.status !== 'Inicialização Pendente' && agenda.status !== 'Em andamento' && agenda.status !== 'Finalização Pendente'){
                         await Agenda.update({ status: novoStatus }, {
                             where: { id: agenda.id }
                         });

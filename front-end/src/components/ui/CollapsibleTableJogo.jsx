@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ConfirmDialog from './ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import myfetch from '../../utils/myfetch';
@@ -26,6 +26,7 @@ import { Rating } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 
 export default function CollapsibleTableJogo() {
+  const { id } = useParams();  // Obtenha o ID da URL
   const API_PATH_JG = '/jogos';
   const API_PATH_HT = '/historico_jogos';
 
@@ -39,11 +40,17 @@ export default function CollapsibleTableJogo() {
     severity: 'success'
   });
 
+  // Função para buscar os dados, seja um item específico ou todos
   const fetchData = async () => {
     setShowWaiting(true);
     try {
-      const result = await myfetch.get(API_PATH_JG);
-      setJogos(result);
+      if (id) {  // Se um ID específico foi fornecido, busque apenas esse item
+        const result = await myfetch.get(`${API_PATH_JG}/${id}`);
+        setJogos([result]);  // Coloque o resultado em um array para facilitar a renderização
+      } else {  // Se nenhum ID foi fornecido, busque todos os itens
+        const result = await myfetch.get(API_PATH_JG);
+        setJogos(result);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -52,8 +59,8 @@ export default function CollapsibleTableJogo() {
   };
 
   React.useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData();  // Buscar os dados ao montar o componente ou quando o ID mudar
+  }, [id]);
 
   const handleDelete = async (id) => {
     setShowDialog(true);
@@ -71,7 +78,7 @@ export default function CollapsibleTableJogo() {
           message: 'Item excluído com sucesso',
           severity: 'success'
         });
-        fetchData();
+        fetchData();  // Recarregue os dados após a exclusão
       } catch (error) {
         console.error(error);
         setNotif({
@@ -155,8 +162,8 @@ export default function CollapsibleTableJogo() {
             {format(parseISO(jogo.data_aquisicao), 'dd/MM/yyyy')}
           </TableCell>
           <TableCell size='small' align="center">
-            <Link to={'./' + jogo.id}>
-              <IconButton aria-label="Editar">
+          <Link to={`/jogo/${jogo.id}`}>
+          <IconButton aria-label="Editar">
                 <EditIcon />
               </IconButton>
             </Link>
