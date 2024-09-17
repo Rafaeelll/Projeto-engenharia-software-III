@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import myfetch from '../../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop';
@@ -10,26 +10,24 @@ import Visualizacao from '../../../../models/Visualizacao'
 import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import FormTitle from '../../../components/ui/FormTitle';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import { Typography } from '@mui/material';
+
 
 
 
 export default function VisualizacaoForm() {
   const API_PATH = '/visualizacoes';
   const params = useParams()
+  const [searchParams] = useSearchParams(); // Hook para capturar os parâmetros da URL
   const navigate = useNavigate();
-
+  const agendaIdFromUrl = searchParams.get('agenda_id'); // Captura o agenda_id da URL
   const [showWaiting, setShowWaiting] = React.useState(false)
   const [agendaTitle, setAgendaTitle] = React.useState('')
   const [loadingAgendaTitle, setLoadingAgendaTitle] = React.useState(false);
+
   const [state, setState] = React.useState({
     visualizacoes: {
-      agenda_id: '',
+      agenda_id: agendaIdFromUrl || '', // Inicializa com o agenda_id da URL, se existir
       numero_visualizacao: ''
     },
     errors: {},
@@ -76,12 +74,14 @@ export default function VisualizacaoForm() {
     // Envia os dados para o back-end
     sendData();
   }
-    React.useEffect(() => {
-    // Se houver parâmetro id na rota, devemos carregar um registro
-    // existente para edição
-    if(params.id) fetchData()
-  }, [])
 
+  React.useEffect(() => {
+    if (agendaIdFromUrl) {
+      fetchAgendaTitle(agendaIdFromUrl); // Busca o título se o `agenda_id` estiver na URL
+    }
+    if (params.id) fetchData(); // Se estiver editando uma visualização existente, carrega os dados
+  }, [agendaIdFromUrl, params.id]);
+    
   async function fetchData() {
     setState({...state, errors:{}})
     setShowWaiting(true)
@@ -101,7 +101,6 @@ export default function VisualizacaoForm() {
       console.error(error)
       setState({
         ...state, 
-        errors: errorMessages,
         notif: {
           severity: 'error',
           show: true,

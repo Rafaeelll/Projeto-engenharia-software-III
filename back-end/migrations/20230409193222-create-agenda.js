@@ -26,14 +26,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      jogo_id:{
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
       config_id:{
         type: Sequelize.INTEGER,
         allowNull: false
-
+      },
+      jogos_associados:{
+        type: Sequelize.JSON,
+        allowNull: true,
+        defaultValue: '[]'
       },
       data_horario_inicio:{ // Data e horario do inicio da agenda
         type: Sequelize.DATE,

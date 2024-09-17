@@ -32,9 +32,9 @@ module.exports = (sequelize, DataTypes) => {
       // relação N para N
       this.belongsToMany(models.Jogo, {
         through: 'agenda_jogos',
-        foreignKey: 'jogo_id',    // Nome do campo na tabela de ORIGEM
-        targetKey: 'id',           // Nome do campo na tabela de DESTINO
-        as: 'jogo'                 // Nome do atributo para exibição
+        foreignKey: 'agenda_id',    // Nome do campo na tabela de ORIGEM
+        otherKey: 'jogo_id',           // Nome do campo na tabela de DESTINO
+        as: 'jogos'                 // Nome do atributo para exibição
       });
 
       // Cada agenda pode ter uma visualização
@@ -70,13 +70,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    jogo_id:{
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     config_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    jogos_associados:{
+      type: DataTypes.JSON,
+      allowNull: true,
+      defaultValue: '[]'
+
     },
     data_horario_inicio:{ // Data e horario do inicio da agenda
       type: DataTypes.DATE,

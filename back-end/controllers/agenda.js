@@ -1,5 +1,5 @@
 // Importa os modelos correspondentes ao controller
-const { Agenda, Usuario, Jogo, Visualizacao, Configuracao } = require('../models');
+const { Agenda, Usuario, Jogo, Visualizacao, Configuracao, AgendaJogo, sequelize } = require('../models');
 const cron = require('node-cron');
 const { Op, where } = require('sequelize');
 
@@ -19,21 +19,48 @@ const { Op, where } = require('sequelize');
 // Objeto controlador para os métodos CRUD
 const controller = {};
 
-// Método para criar um novo registro de agenda
 controller.create = async (req, res) => {
-    // Adiciona o id do usuário ao corpo da requisição
-    req.body.usuario_id = req.authUser.id;
-    req.body.config_id = req.authUser.id
-
+    const transaction = await sequelize.transaction();
+  
     try {
-        // Cria a agenda no banco de dados
-        await Agenda.create(req.body);
-        // HTTP 201: Created
-        res.status(201).end();
-    } catch(error) {
-        console.error(error);
+      // Cria a agenda
+      const agenda = await Agenda.create({
+        usuario_id: req.authUser.id,
+        config_id: req.authUser.id,
+        jogos_associados: req.body.jogos_associados,
+        data_horario_inicio: req.body.data_horario_inicio,
+        data_horario_fim: req.body.data_horario_fim,
+        p_data_horario_inicio: req.body.p_data_horario_inicio,
+        p_data_horario_fim: req.body.p_data_horario_fim,
+        titulo_agenda: req.body.titulo_agenda,
+        plt_transm: req.body.plt_transm,
+        descricao: req.body.descricao,
+        confirmacao_presenca: req.body.confirmacao_presenca,
+        confirmacao_finalizacao: req.body.confirmacao_finalizacao,
+        status: req.body.status,
+      }, { transaction });
+  
+      // Itera sobre os jogo_ids e insere na tabela intermediária
+      const jogoIds = req.body.jogo_id;
+      for (const jogo_id of jogoIds) {
+        await AgendaJogo.create({
+          agenda_id: agenda.id,
+          jogo_id: jogo_id
+        }, { transaction });
+      }
+  
+      // Commit da transação
+      await transaction.commit();
+  
+      res.status(201).json(agenda);
+    } catch (error) {
+      // Rollback da transação em caso de erro
+      await transaction.rollback();
+      console.error(error);
+      res.status(500).json({ error: 'Erro ao criar agenda' });
     }
-};
+  }
+
 
 // Método para recuperar todas as agendas de um usuário
 controller.retrieve = async (req, res) => {
@@ -43,8 +70,9 @@ controller.retrieve = async (req, res) => {
             where: { usuario_id: req.authUser.id }, // Filtra apenas as agendas do usuário autenticado
             include: [
                 { model: Usuario, as: 'usuario' },
-                { model: Jogo, as: 'jogo' },
-                { model: Visualizacao, as: 'visualizacoes' }
+                { model: Visualizacao, as: 'visualizacoes' },
+                { model: Jogo, as: 'jogos'}
+
             ]
         });
         res.send(data);
@@ -61,7 +89,7 @@ controller.retrieveOne = async (req, res) => {
             where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela agenda do usuário autenticado
             include: [
                 { model: Usuario, as: 'usuario' },
-                { model: Jogo, as: 'jogo' },
+                { model: Jogo, as: 'jogos' },
                 { model: Visualizacao, as: 'visualizacoes' }
             ]
         });
@@ -75,14 +103,14 @@ controller.retrieveOne = async (req, res) => {
 
 // Método para recuperar agendas filtradas por status
 controller.retrieveByStatus = async (req, res) => {
-    const { status } = req.query; // Obtenha o status do parâmetro de consulta
+    const { status } = req.params; // Obtenha o status do parâmetro de consulta
     try {
         // Busca todas as agendas do usuário autenticado filtradas pelo status fornecido
         const data = await Agenda.findAll({
-            where: { usuario_id: req.authUser.id, status }, // Filtra agendas pelo usuário autenticado e pelo status
+            where: { usuario_id: req.authUser.id, status: status }, // Filtra agendas pelo usuário autenticado e pelo status
             include: [
                 { model: Usuario, as: 'usuario' },
-                { model: Jogo, as: 'jogo' },
+                { model: Jogo, as: 'jogos' },
                 { model: Visualizacao, as: 'visualizacoes' }
             ]
         });
@@ -158,8 +186,9 @@ controller.updateAgendaStatusAuto = async (req, res) => {
 
                 if (configuracao) {
                     const novoStatus = configuracao.confirmar_auto_ini ? 'Em andamento' : 'Inicialização Pendente';
-                    if (agenda.status !== 'Inicialização Pendente' && agenda.status !== 'Em andamento' && agenda.status !== 'Finalização Pendente'){
-                        await Agenda.update({ status: novoStatus }, {
+                    const novaConfirmPresenca = configuracao.confirmar_auto_ini ? true : false
+                    if (agenda.status !== 'Inicialização Pendente' && agenda.status !== 'Em andamento' && agenda.status !== 'Finalização Pendente' && agenda.status !== 'Finalização Confirmada'){
+                        await Agenda.update({ status: novoStatus, confirmacao_presenca: novaConfirmPresenca}, {
                             where: { id: agenda.id }
                         });
                         atualizacoesFeitas++;
@@ -193,8 +222,9 @@ controller.updateAgendaStatusAuto = async (req, res) => {
 
                 if (configuracao) {
                     const novoStatus = configuracao.confirmar_auto_fim ? 'Finalizada' : 'Finalização Pendente';
+                    const novaConfirmFinalizacao = configuracao.confirmar_auto_ini ? true : false
                     if (agenda.status !== 'Finalização Pendente' && agenda.status !== 'Finalizada'){
-                        await Agenda.update({ status: novoStatus }, {
+                        await Agenda.update({ status: novoStatus, confirmacao_finalizacao: novaConfirmFinalizacao}, {
                             where: { id: agenda.id }
                         });
                         atualizacoesFeitas++;

@@ -85,6 +85,21 @@ module.exports = (sequelize, DataTypes) => {
           historicoJogo.jogo_iniciado = true;
           historicoJogo.jogo_zerado = true;
         }
+      },
+
+      beforeUpdate: (historicoJogo, options) => {
+        const status = historicoJogo.jogo_status;
+    
+        if (status === 'Não iniciado') {
+          historicoJogo.jogo_iniciado = false;
+          historicoJogo.jogo_zerado = false;
+        } else if (status === 'Em progresso') {
+          historicoJogo.jogo_iniciado = true;
+          historicoJogo.jogo_zerado = false;
+        } else {
+          historicoJogo.jogo_iniciado = true;
+          historicoJogo.jogo_zerado = true;
+        }
       }
     }
   });

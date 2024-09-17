@@ -79,4 +79,7 @@ app.use('/visualizacoes', visualizacoes);
 const configuracoes = require('../routes/configuracoes');
 app.use('/configuracoes', configuracoes);
 
+const agendaJogos = require('../routes/agenda_jogos');
+app.use('/agenda_jogos', agendaJogos)
+
 module.exports = app;

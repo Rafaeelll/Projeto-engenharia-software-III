@@ -26,6 +26,7 @@ import MyAccountForm from './pages/main_pages/forms/MyAccountForm';
 import PerfilImgForm from './pages/main_pages/forms/PerfilImgForm';
 import MyAccountStatusForm from './pages/main_pages/forms/MyAccountStatusForm'
 import Configuracao from './pages/main_pages/Configuracao';
+import FilterAgendasStatusResult from './pages/main_pages/FilterAgendasStatusResult';
 import ConfigForm from './pages/main_pages/forms/ConfigForm';
 import HeaderBar from './components/ui/HeaderBar';
 import FooterBar from './components/ui/FooterBar';
@@ -86,6 +87,7 @@ function App() {
           <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
           <Route path= "/agendas/status" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
           <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
+          <Route path= "/agenda/:statusOption" element={<AuthGuard> <FilterAgendasStatusResult/> </AuthGuard>}/>
           <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
           <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
           <Route path= "/agenda/confirmar-presenca/:id" element={<AuthGuard> <AgendaConfirmarPresenca/> </AuthGuard>}/>

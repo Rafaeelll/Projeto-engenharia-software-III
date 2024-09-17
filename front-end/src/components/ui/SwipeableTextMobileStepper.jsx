@@ -95,13 +95,12 @@ function SwipeableTextMobileStepper() {
 
                     <CardActions style={{display: 'flex', justifyContent: 'start', alignItems: 'center'}}>
                       <Button className='cadastrar-se-LP-btn'
-                        sx={{borderRadius: 40}}
+                        sx={{borderRadius: 40, background: '#000'}}
                         component={Link} 
                         startIcon={<HowToRegIcon className='cadastrar-se-icon-btn'/>}
                         Cadastrar-se
                         to="/cadastro" 
-                        color='secondary' 
-                        variant='contained' 
+                        variant='contained'
                         size='large'
                       > 
                         Cadastrar-se

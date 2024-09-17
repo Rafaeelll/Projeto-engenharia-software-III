@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     confirmar_auto_fim: {
       type: DataTypes.BOOLEAN,
-      allowNull: true,
+      allowNull: false,
       defaultValue: false
     },
     horario_notif_inicio: {

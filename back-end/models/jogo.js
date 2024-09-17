@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsToMany(models.Agenda, {
         through: 'agenda_jogos',
         foreignKey: 'jogo_id',    // Chave estrangeira na tabela de Agenda
-        sourceKey: 'id',          // Chave local na tabela de Jogo
+        otherKey: 'agenda_id',          // Chave local na tabela de Jogo
         as: 'agendas'             // Nome do atributo para exibição (plural)
       });
 

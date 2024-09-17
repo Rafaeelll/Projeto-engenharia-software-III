@@ -20,10 +20,6 @@
 .cadastrar-se-LP-btn{
     border: none;
     color:#fff;        
-    background: -webkit-linear-gradient(to left, #21d4fd, #b721ff);
-    background: -o-linear-gradient(to left, #21d4fd, #b721ff);
-    background: -moz-linear-gradient(to left, #21d4fd, #b721ff);
-    background: linear-gradient(to left, #21d4fd, #b721ff);
 }
 .entrar-LP-btn{
     border: none;
@@ -43,6 +39,10 @@
     transition: box-shadow 0.5s ease;
     font-weight: 700;
     box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.4);
+    background: -webkit-linear-gradient(to left, #21d4fd, #b721ff);
+    background: -o-linear-gradient(to left, #21d4fd, #b721ff);
+    background: -moz-linear-gradient(to left, #21d4fd, #b721ff);
+    background: linear-gradient(to left, #21d4fd, #b721ff);
 }
 
 .cadastrar-se-icon-btn, .entrar-icon-btn{

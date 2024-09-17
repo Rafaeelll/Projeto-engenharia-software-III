@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Notification from '../../../components/ui/Notification';
 import Button from '@mui/material/Button';
 import myfetch from '../../../utils/myfetch';
@@ -107,14 +107,19 @@ export default function AgendaConfirmarFinalizacao() {
         try {
           if (params.id) await myfetch.put(`${API_PATH}/${params.id}`, agendas)
           else await myfetch.post(API_PATH, agendas)
-    
+  
           setState({
             ...state,
             showWaiting: false,
             notif: {
               severity: 'success',
               show: true,
-              message: 'Item salvo com sucesso'
+              message: agendas.confirmacao_finalizacao ? (
+                <>
+                  Finalização confirmada com sucesso. Se deseja informar a quantidade de visualizações para essa agenda,{' '}
+                  <Link to={`/visualizacao/new?agenda_id=${agendas.id}`}>clique aqui</Link>.
+                </>
+              ) : 'Item salvo com sucesso.'
             }
           });
         } catch (error) {
@@ -122,7 +127,6 @@ export default function AgendaConfirmarFinalizacao() {
           setState({
             ...state,
             showWaiting: false,
-            errors: errorMessages,
             notif: {
               severity: 'error',
               message: 'ERRO: ' + error.message
@@ -148,7 +152,7 @@ export default function AgendaConfirmarFinalizacao() {
         Por favor, aguarde.
       </Backdrop>
 
-      <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose}>
+      <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose} duration={8000}>
         {notif.message}
       </Notification>
 

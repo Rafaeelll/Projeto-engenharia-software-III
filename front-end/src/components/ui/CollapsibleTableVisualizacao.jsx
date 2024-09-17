@@ -31,7 +31,6 @@ export default function CollapsibleTableVisualizacao() {
   const {id} = useParams()
   const API_PATH_VS = '/visualizacoes';
   const API_PATH_AG = '/agendas';
-  const API_PATH_JG = '/jogos';
 
   const [visualizacoes, setVisualizacoes] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
@@ -104,7 +103,6 @@ export default function CollapsibleTableVisualizacao() {
   function Row({ visualizacao, onDelete }) {
     const [open, setOpen] = React.useState(false);
     const [agendas, setAgendas] = React.useState([]);
-    const [jogos, setJogos] = React.useState([]);
 
     const fetchAgenda = async () => {
       try {
@@ -115,9 +113,6 @@ export default function CollapsibleTableVisualizacao() {
           visualizacao.agenda_title = agendaRelacionada.titulo_agenda;
           setAgendas([agendaRelacionada]);
 
-          const resultJogos = await myfetch.get(API_PATH_JG);
-          const jogoRelacionado = resultJogos.find(jogo => jogo.id === agendaRelacionada.jogo_id);
-          setJogos([jogoRelacionado]);
         }
       } catch (error) {
         console.error(error);
@@ -208,7 +203,7 @@ export default function CollapsibleTableVisualizacao() {
                     <TableRow>
                       <TableCell size='small' align="center">Agenda ID</TableCell>
                       <TableCell size='small' align="center">Título</TableCell>
-                      <TableCell size='small' align="center">ID - Nome Do Jogo</TableCell>
+                      <TableCell size='small' align="center">Jogos Associados</TableCell>
                       <TableCell size='small' align="center">Início</TableCell>
                       <TableCell size='small' align="center">Fim</TableCell>
                       <TableCell size='small' align="center">Status</TableCell>
@@ -227,7 +222,7 @@ export default function CollapsibleTableVisualizacao() {
                           <TableCell size='small' align="center">{agendaItem.id}</TableCell>
                           <TableCell size='small' align="center">{agendaItem.titulo_agenda}</TableCell>
                           <TableCell size='small' align="center">
-                            {agendaItem.jogo_id} - {jogos[0]?.nome}
+                            {agendaItem.jogos_associados + ' '}
                           </TableCell>
                           <TableCell size='small' align="center">
                             {format(parseISO(agendaItem.data_horario_inicio), 'dd/MM/yyyy - HH:mm')}

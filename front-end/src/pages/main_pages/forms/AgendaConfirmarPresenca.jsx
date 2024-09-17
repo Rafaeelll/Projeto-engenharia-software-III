@@ -47,6 +47,7 @@ export default function AgendaConfirmarPresenca() {
         // Adicionar a lógica para mudança automática do status
         const dataAtual = new Date();
         const dataInicial = new Date(agendas.data_horario_inicio);
+        const UmaHoraAntesDataIni = dataInicial.setHours(dataInicial.getHours() - 1)
         
         let statusAgenda = "Agendado";
 
@@ -56,6 +57,12 @@ export default function AgendaConfirmarPresenca() {
           } else {
               statusAgenda = "Inicialização Pendente";
           }
+        } else if (dataAtual >= UmaHoraAntesDataIni){
+          if (AgendasCopy.confirmacao_presenca === true) {
+            statusAgenda = "Inicialização Confirmada";
+        } else {
+            statusAgenda = "Agendado";
+        }
         }
 
         // Atualiza o status com a lógica aplicada

@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ConfirmDialog from './ConfirmDialog';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
 import myfetch from '../../utils/myfetch';
@@ -37,14 +37,17 @@ import { FaTwitch } from "react-icons/fa";
 import { RiKickFill } from "react-icons/ri";
 
 export default function CollapsibleTable() {
-  const { id } = useParams();  // Obtenha o ID da URL
+
+  const { id, filterStatus: paramFilterStatus } = useParams();  // Obtenha o ID e filterStatus da URL
+  const [filterStatus, setFilterStatus] = React.useState(paramFilterStatus || ''); // Inicialize o estado com filterStatus da URL
   const API_PATH_AG = '/agendas';
+  const API_PATH_AG_FILTER = '/agendas/status'
   const API_PATH_VS = '/visualizacoes';
+  const navigate = useNavigate()
 
   const [agendas, setAgendas] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
   const [showDialog, setShowDialog] = React.useState(false);
-  const [filterStatus, setFilterStatus] = React.useState('');
   const [deleteId, setDeleteId] = React.useState(null);
   const [openFilter, setOpenFilter] = React.useState(false);
   const [notif, setNotif] = React.useState({
@@ -62,30 +65,23 @@ export default function CollapsibleTable() {
     try {
       // Adicionando o filtro no URL se estiver presente
       let apiUrl = API_PATH_AG;
+      let apiUrlFilter = API_PATH_AG_FILTER
+      let result;
+
       if (filterStatus) {
-        apiUrl += `?status=${filterStatus}`;
+        result = await myfetch.get(`${apiUrlFilter}/${filterStatus}`)
+        setAgendas(result);
       }
       
-      let result;
       if (id) {
         result = await myfetch.get(`${apiUrl}/${id}`);
+        setAgendas([result]);
+
       } else {
         result = await myfetch.get(apiUrl);
+        setAgendas(result)
       }
       
-      // Verifique se result é um array, caso contrário, transforme-o em um array de um item
-      const agendasList = Array.isArray(result) ? result : [result];
-  
-      const agendasWithGameDetails = await Promise.all(
-        agendasList.map(async (agenda) => {
-          const gameDetails = await myfetch.get(`/jogos/${agenda.jogo_id}`);
-          return {
-            ...agenda,
-            gameDetails: gameDetails
-          };
-        })
-      );
-      setAgendas(agendasWithGameDetails);
     } catch (error) {
       console.error(error);
     } finally {
@@ -135,11 +131,29 @@ export default function CollapsibleTable() {
   const handleFilterDialogClose = async (answer) => {
     setOpenFilter(false);
     if (answer && filterStatus !== '') {
-      fetchData();
+      try {
+        await fetchData();  // Continue buscando os dados para atualizar a tabela
+        navigate(`/agenda/${filterStatus}`);  // Navegue para a página de resultado filtrado
+  
+        // Exibe a notificação de sucesso
+        setNotif({
+          show: true,
+          message: 'Filtragem realizada com sucesso',
+          severity: 'success'
+        });
+      } catch (error) {
+        // Exibe a notificação de erro em caso de falha
+        setNotif({
+          show: true,
+          message: 'ERRO: ' + error.message,
+          severity: 'error'
+        });
+      }
     } else {
-      fetchData();
+      fetchData();  // Caso o filtro não seja aplicado, apenas recarregue os dados
     }
   };
+  
 
   const handleNotifClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -261,8 +275,8 @@ export default function CollapsibleTable() {
           <TableCell size='small' component="th" scope="row">
             {agenda.titulo_agenda}
           </TableCell>
-          <TableCell size='small' align="center">{agenda.id}</TableCell>
-          <TableCell size='small' align="center">{agenda.jogo_id} - {agenda.gameDetails.nome}</TableCell>
+          <TableCell size='small' align="center">{agenda.id}</TableCell> 
+          <TableCell size='small' align="center">{agenda.jogos_associados + ''}</TableCell>   
           <TableCell size='small' align="center">
             {format(parseISO(agenda.data_horario_inicio), 'dd/MM/yyyy - HH:mm')}
           </TableCell>
@@ -384,10 +398,10 @@ export default function CollapsibleTable() {
         onClose={handleFilterDialogClose}
       >
         <FormControl fullWidth sx={{mt: '10px'}}>
-          <InputLabel id="demo-simple-select-label">Filtragem</InputLabel>
+          <InputLabel id="demo-simple-select-label">Filtro de Status</InputLabel>
           <Select
             variant='outlined'
-            label="Filtragem"
+            label="Filtro de Status"
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             value={filterStatus}
@@ -396,9 +410,13 @@ export default function CollapsibleTable() {
             <MenuItem value="" disabled >
               Filtrar agendas por:
             </MenuItem>
-            <MenuItem value="Agendado">Status "Agendado"</MenuItem>
-            <MenuItem value="Em andamento">Status "Em Andamento"</MenuItem>
-            <MenuItem value="Finalizada">Status "Finalizada"</MenuItem>
+            <MenuItem value="Agendado">Agendado</MenuItem>
+            <MenuItem value="Inicialização Pendente">Inicialização Pendente</MenuItem>
+            <MenuItem value="Inicialização Confirmada">Inicialização Confirmada</MenuItem>
+            <MenuItem value="Em andamento">Em andamento</MenuItem>
+            <MenuItem value="Finalizada">Finalizada</MenuItem>
+            <MenuItem value="Finalização Pendente">Finalização Pendente</MenuItem>
+            <MenuItem value="Finalização Confirmada">Finalização Confirmada</MenuItem>
           </Select>
         </FormControl>
       </ConfirmFilterDialog>
@@ -429,7 +447,7 @@ export default function CollapsibleTable() {
               <TableCell/>
               <TableCell size='small'>Título da Agenda</TableCell>
               <TableCell size='small' align="center">Agenda ID</TableCell>
-              <TableCell size='small' align="center">Jogo ID</TableCell>
+              <TableCell size='small' align="center">Jogos Associados</TableCell>
               <TableCell size='small' align="center">Início</TableCell>
               <TableCell size='small' align="center">Fim</TableCell>
               <TableCell size='small' align="center">Pausa Início</TableCell>

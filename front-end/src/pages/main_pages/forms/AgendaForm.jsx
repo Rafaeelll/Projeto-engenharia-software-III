@@ -28,14 +28,16 @@ export default function CriarAgendas() {
   const navigate = useNavigate();
   const [showWaiting, setShowWaiting] = React.useState(false)
   const [definirPausa, setDefinir] = React.useState(false)
+  const [jogos, setJogos] = React.useState([]);
   const [jogoName, setJogoName] = React.useState('')
   const [loadingJogoName, setLoadingJogoName] = React.useState(false);
   const [state, setState] = React.useState({
     criarAgendas: {
       titulo_agenda: '',
       plt_transm: '',
-      jogo_id: '',
+      jogo_id: [],
       descricao: '',
+      jogos_associados: [],
       data_horario_inicio: null,
       data_horario_fim: null,
       p_data_horario_inicio: null,
@@ -53,14 +55,21 @@ export default function CriarAgendas() {
 
   function handleFormFieldChange(event) {
     const criarAgendasCopy = { ...criarAgendas };
-    criarAgendasCopy[event.target.name] = event.target.value;
-    setState({ ...state, criarAgendas: criarAgendasCopy });
-  
     if (event.target.name === 'jogo_id') {
-      fetchJogoName(event.target.value);
+      const selectedIds = event.target.value;
+      criarAgendasCopy[event.target.name] = selectedIds;
+      fetchJogoNames(selectedIds); // Fetch names for selected games
+    } else {
+      criarAgendasCopy[event.target.name] = event.target.value;
     }
+    setState({
+      ...state,
+      criarAgendas: {
+        ...criarAgendasCopy,
+        jogos_associados: jogoName, // Ensure jogos_associados is updated
+      },
+    });
   }
-  
   
 
   // Função para calcular a duração da agenda
@@ -87,19 +96,18 @@ export default function CriarAgendas() {
     });
   };
 
-  async function fetchJogoName(jogoId) {
-    if (!jogoId) {
-      setJogoName('');
-      return;
-    }
-  
+  async function fetchJogoNames(jogoIds) {
     setLoadingJogoName(true);
     try {
-      const result = await myfetch.get(`/jogos/${jogoId}`);
-      setJogoName(result.nome);
+      const names = [];
+      for (const id of jogoIds) {
+        const result = await myfetch.get(`/jogos/${id}`);
+        names.push(result.nome);
+      }
+      setJogoName(names);
     } catch (error) {
       console.error(error);
-      setJogoName('O jogo não foi encontrado, digite um ID valído!');
+      setJogoName([]);
     } finally {
       setLoadingJogoName(false);
     }
@@ -154,6 +162,19 @@ export default function CriarAgendas() {
   }
 
   React.useEffect(() => {
+    async function fetchJogos() {
+      try {
+        const result = await myfetch.get('/jogos'); // Supondo que a rota retorne todos os jogos
+        setJogos(result); // Supondo que o resultado seja uma lista de objetos com IDs e outros dados dos jogos
+      } catch (error) {
+        console.error("Erro ao buscar jogos:", error);
+      }
+    }
+  
+    fetchJogos();
+  }, []);
+
+  React.useEffect(() => {
     if (params.id) fetchData();
   }, []);
 
@@ -170,7 +191,7 @@ export default function CriarAgendas() {
       }); 
       
       if (result.jogo_id) {
-        await fetchJogoName(result.jogo_id);
+        await fetchJogoNames(result.jogo_id);
       }
       
       setShowWaiting(false)
@@ -310,31 +331,36 @@ export default function CriarAgendas() {
             />
 
             <Box sx={{ minWidth: 120, marginTop: '12px' }}>
-              <TextField
-                id="standard-basic"
-                label="ID Jogo"
-                type="number"
-                variant="outlined"
-                color="secondary"
-                required
-                fullWidth
-                name="jogo_id"
-                value={criarAgendas.jogo_id}
-                onChange={handleFormFieldChange}
-                error={errors?.jogo_id}
-                helperText={errors?.jogo_id}
-              />
+              <FormControl fullWidth>
+                <InputLabel id="jogo-ids-label">ID Jogo</InputLabel>
+                <Select 
+                  id="standard-basic"
+                  label="ID Jogo"
+                  color="secondary"
+                  multiple
+                  name="jogo_id"
+                  value={criarAgendas.jogo_id}
+                  onChange={handleFormFieldChange}
+                  renderValue={(selected) => selected.join(', ')} // Para mostrar IDs selecionados
+                >
+                  {jogos.map((jogo) => (
+                    <MenuItem key={jogo.id} value={jogo.id}>
+                      {jogo.id}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
 
             <Box sx={{ minWidth: 120, marginTop: '12px', position: 'relative' }}>
               <TextField
                 id="standard-basic"
-                label="Nome do Jogo"
+                label="Nome dos Jogos"
                 type="text"
                 variant="outlined"
                 color="secondary"
                 fullWidth
-                value={jogoName}
+                value={Array.isArray(jogoName) ? jogoName.join(', ') : ''} // Verificação antes de usar join
                 InputProps={{
                   disabled: true,
                 }}
@@ -352,6 +378,7 @@ export default function CriarAgendas() {
                 />
               )}
             </Box>
+
 
             <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
               <MobileDateTimePicker

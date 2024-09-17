@@ -7,7 +7,7 @@ const cron = require('node-cron');
 const crypto = require('crypto')
 const mailer = require('../modules/mailer')
 require('dotenv').config(); // Carregar variáveis de ambiente
-
+const path = require('path');
 
 const controller = {}   // Objeto vazio
 
@@ -46,8 +46,16 @@ controller.cadastro = async (req, res) => {
       // Se encontrou o usuário com o email, retorna um erro de conflito
       return res.status(409).send('O e-mail informado já está em uso.');
     }
+
     // Criptografar a senha
     const hashedPassword = await bcrypt.hash(senha_acesso, 12);
+
+// Aqui você define o caminho completo da imagem padrão
+  const imagemPadraoPath = path.resolve(__dirname, "..", "tmp", "uploads", "defaultprofile.png");
+  // E aqui você extrai apenas o nome do arquivo
+  const imagemPadraoNome = path.basename(imagemPadraoPath);    
+  
+  const imagePath = req.file ? req.file.filename : imagemPadraoNome;
 
     // Criar usuário
     const novoUsuario = await Usuario.create({
@@ -56,26 +64,26 @@ controller.cadastro = async (req, res) => {
       email,
       senha_acesso: hashedPassword,
       telefone,
-      image: req.file.filename
+      image: imagePath
     });
 
     // Criar configuração associada ao novo usuário
     await Configuracao.create({
-      usuario_id: novoUsuario.id, // Atribuir o ID do novo usuário
-      confirmar_auto_ini: false, // Confirmar na notificação a inicialização da agenda automaticamente
-      confirmar_auto_fim: false, // Confirmar na notificação a finalização da agenda automaticamente
-      horario_notif_inicio: '1 Hora Antes (Padrão)', // Padrão: notificar 1 hora antes da inicialização
-      horario_notif_fim: 'No Fim (Padrão)', // Padrão: notificar na hora exata finalização
-
+      usuario_id: novoUsuario.id,
+      confirmar_auto_ini: false,
+      confirmar_auto_fim: false,
+      horario_notif_inicio: '1 Hora Antes (Padrão)',
+      horario_notif_fim: 'No Fim (Padrão)',
     });
 
     // HTTP 201: Created
-    return res.status(201).json(novoUsuario); // HTTP 201: Created
+    return res.status(201).json(novoUsuario);
   } catch (error) {
     console.error(error);
     // Tratar erros aqui
+    return res.status(500).send('Erro ao criar o usuário.');
   }
-}
+};
 
 controller.retrieve = async (req, res) => {
   try {
@@ -240,8 +248,16 @@ controller.updateMyAccount = async (req, res) => {
 
 controller.updateUserImg = async (req, res) => {
   try {
+
+    //Aqui você define o caminho completo da imagem padrão
+    const imagemPadraoPath = path.resolve(__dirname, "..", "tmp", "uploads", "defaultprofile.png");
+    // E aqui você extrai apenas o nome do arquivo
+    const imagemPadraoNome = path.basename(imagemPadraoPath);    
+    
+    const imagePath = req.file ? req.file.filename : imagemPadraoNome;
+
     const response = await Usuario.update({
-      image: req.file.filename,
+      image: imagePath,
     },
 
     {
@@ -349,7 +365,7 @@ controller.logout = (req, res) => {
 controller.deleteInactiveUsers = async (req, res) => {
   try {
     const cutoffDate = new Date();
-    cutoffDate.setMinutes(cutoffDate.getMinutes() - 1); // Alterado para 1 minuto
+    cutoffDate.setMinutes(cutoffDate.getMinutes() - 30);
 
     const inactiveUsers = await Usuario.findAll({
       where: {
@@ -375,8 +391,8 @@ controller.deleteInactiveUsers = async (req, res) => {
 };
 
 
-// Agendar a execução da função deleteInactiveUsers a cada minuto
-cron.schedule('*/20 * * * *', controller.deleteInactiveUsers);
+// Agendar a execução da função deleteInactiveUsers a cada 30 dias
+cron.schedule('0 0 */30 * *', controller.deleteInactiveUsers);
 
 controller.esqueciSenha = async (req, res) => {
   try{

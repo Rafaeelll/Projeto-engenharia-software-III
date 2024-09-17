@@ -411,7 +411,7 @@ async function sendData() {
                 <IconButton onClick={handleImagePreviewClick}> 
                   <Avatar src={selectedFile} alt="Foto selecionada" sx={{ marginRight: '8px', width: '50px', height: '50px'}}/> 
                 </IconButton>}
-                {selectedFileName ? selectedFileName : 'Adicione uma Foto de perfil'}
+                {selectedFileName ? selectedFileName : <Typography variant='caption'> Clique aqui para adicionar uma foto de perfil caso desejar </Typography>}
                 {selectedFile && <CloseIcon onClick={clearSelection} style={{ marginLeft: '8px', cursor: 'pointer' }} />}
                 <VisuallyHiddenInput
                   type="file"

@@ -120,12 +120,16 @@ export default function CollapsibleTable() {
       onDelete(historicoJogo.id);
     };
 
+    React.useEffect(() => {
+      if (open) {
+        fetchJogo();
+      }
+    }, [open]);
+
     const handleCollapseToggle = () => {
       setOpen(!open);
-      if (!open) {
-        fetchJogo(historicoJogo.jogo_id);
-      }
     };
+
 
     return (
       <>

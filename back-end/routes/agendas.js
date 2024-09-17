@@ -17,7 +17,7 @@ router.get('/', controller.retrieve);
 router.get('/:id', controller.retrieveOne);
 router.put('/:id', controller.update);
 router.delete('/:id', controller.delete);
-router.get('/status', controller.retrieveByStatus);
+router.get('/status/:status', controller.retrieveByStatus);
 
 
 module.exports = router;

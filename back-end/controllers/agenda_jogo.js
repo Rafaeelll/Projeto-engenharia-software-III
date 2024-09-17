@@ -40,24 +40,26 @@ controller.retrieve = async (req, res)=>{
         console.error(error)
     }
 }
-controller.retrieveOne = async (req, res)=>{
-    try{
-        const data = await AgendaJogo.findByPk({
-            where: { id: req.params.id, usuario_id: req.authUser.id }, // Filtra pela agenda do usuário autenticado
+controller.retrieveOne = async (req, res) => {
+    try {
+        // Use findOne em vez de findByPk
+        const data = await AgendaJogo.findOne({
+            where: { 
+                id: req.params.id, 
+            },
             include: [
-                {model: Agenda, as: 'agenda'},
-                {model: Jogo, as: 'jogo'}
+                { model: Agenda, as: 'agenda' },
+                { model: Jogo, as: 'jogo' }
             ]
-        })
+        });
 
-        if(data) res.send(data)
-        
-        else res.status(404).end()
+        if (data) res.send(data);
+        else res.status(404).end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Internal Server Error' });
     }
-    catch(error){
-        console.error(error)
-    }
-}
+};
 controller.update = async(req, res) =>{
     try{
         const response = await AgendaJogo.update(

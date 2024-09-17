@@ -1,10 +1,10 @@
 import Joi, { required } from 'joi'
 
 const Agenda = Joi.object({
-    jogo_id: Joi.number()
-        .min(1)
-        .required()
-        .messages({'*': 'O id é obrigatorio ser igual ou maior que 1.'}),
+    // jogo_id: Joi.number()
+    //     .min(1)
+    //     .required()
+    //     .messages({'*': 'O id é obrigatorio ser igual ou maior que 1.'}),
     titulo_agenda: Joi.string()
         .min(2)
         .max(200)
