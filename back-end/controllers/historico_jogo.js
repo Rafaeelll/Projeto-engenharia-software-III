@@ -1,5 +1,6 @@
 // Importa os modelos necessários para o controller: HistoricoJogo, Usuario e Jogo
 const { HistoricoJogo, Usuario, Jogo } = require('../models');
+const { Op, where } = require('sequelize');
 
 // Cria um objeto vazio para o controlador
 const controller = {};
@@ -26,7 +27,7 @@ controller.create = async (req, res) => {
 
         // Se já existe um registro de histórico para o jogo, retorna um erro
         if (existingHistorico) {
-            return res.status(409).send("Já existe um registro de histórico para este jogo.");
+            return res.status(418).send("Já existe um registro de histórico para este jogo.");
         }
 
         // Cria um novo registro de histórico de jogo no banco de dados
@@ -76,14 +77,29 @@ controller.retrieveOne = async (req, res) => {
     }
 };
 
-// Método para atualizar um registro específico de histórico de jogo do usuário autenticado
 controller.update = async (req, res) => {
     try {
+        const { jogo_id } = req.body; // ID do jogo a ser atualizado
+        const { id: historicoId } = req.params; // ID do histórico que está sendo atualizado
+
+        // Verifica se já existe um registro de histórico para o jogo fornecido,
+        // exceto se for o registro que está sendo atualizado
+        const existingHistorico = await HistoricoJogo.findOne({
+            where: {
+                jogo_id: jogo_id,
+                id: { [Op.ne]: historicoId } // Ignora o histórico atual
+            }
+        });
+
+        // Se já existe um registro de histórico para o jogo, retorna um erro
+        if (existingHistorico) {
+            return res.status(418).send("Já existe um registro de histórico para este jogo.");
+        }
 
         // Atualiza um registro específico de histórico de jogo do usuário autenticado pelo id
         const response = await HistoricoJogo.update(
             req.body,
-            { where: { id: req.params.id, usuario_id: req.authUser.id } } // Filtra pelo id do jogo e do usuário autenticado
+            { where: { id: historicoId, usuario_id: req.authUser.id } } // Filtra pelo id do histórico e do usuário autenticado
         );
 
         // Se a atualização for bem-sucedida, retorna HTTP 204: No Content, caso contrário, retorna HTTP 404: Not Found
@@ -94,8 +110,10 @@ controller.update = async (req, res) => {
         }
     } catch (error) {
         console.error(error);
+        res.status(500).json({ error: 'Erro ao atualizar histórico de jogo.' });
     }
 };
+
 
 
 // Método para deletar um registro específico de histórico de jogo do usuário autenticado

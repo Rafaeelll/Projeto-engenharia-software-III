@@ -1,5 +1,6 @@
 // Importa os modelos necessários para o controlador
 const { Jogo, Agenda, Usuario, HistoricoJogo } = require('../models');
+const { Op, where } = require('sequelize');
 
 // Objeto controlador para os métodos CRUD
 const controller = {};
@@ -33,7 +34,7 @@ controller.create = async (req, res) => {
 
         if (existingGame) {
             // Se já existir um jogo com o mesmo nome para o usuário atual, retorna um erro
-            return res.status(409).send({ error: 'Você já possui um jogo com esse nome.' });
+            return res.status(410).send({ error: 'Você já possui um jogo com esse nome.' });
         }
         req.body.preco_jogo = parseFloat(req.body.preco_jogo);
 
@@ -93,6 +94,19 @@ controller.retrieveOne = async (req, res) => {
 // Método para atualizar um registro de jogo específico associado ao usuário autenticado
 controller.update = async (req, res) => {
     try {
+        const {id: jogoId} = req.params
+        // Verifica se já existe um jogo com o mesmo nome para o usuário atual
+        const existingGame = await Jogo.findOne({
+            where: {
+                nome: req.body.nome,
+                id: {[Op.ne]: jogoId}
+            }
+        });
+
+        if (existingGame && existingGame.id !== req.params.id) {
+            // Se já existir um jogo com o mesmo nome para o usuário atual, retorna um erro
+            return res.status(410).send({ error: 'Você já possui um jogo com esse nome.' });
+        }
         // Converte o preço para decimal antes de atualizar
         if (req.body.preco_jogo !== undefined) {
             req.body.preco_jogo = parseFloat(req.body.preco_jogo);

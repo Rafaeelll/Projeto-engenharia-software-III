@@ -23,7 +23,7 @@ import ConfirmImgPreviewDialog from '../../../components/ui/ConfirmImgPreviewDia
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import  Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
+import Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
 import Toolbar from '@mui/material/Toolbar'
 import AppBar from '@mui/material/AppBar'
 
@@ -172,33 +172,18 @@ async function sendData() {
       });
   } catch (error) {
     const { validationError, errorMessages } = getValidationMessages(error);
-
     console.error(error);
 
-    // Verifica se o erro é de conflito (status 409)
-    if (error.response && error.response.status === 409) {
-      setState({
-        ...state,
-        showWaiting: false,
-        notif: {
-          severity: 'error',
-          show: true,
-          message: 'O e-mail informado já está cadastrado.',
-        },
-      });
-    } else {
-      // Erro de validação ou outro erro
-      setState({
-        ...state,
-        showWaiting: false,
-        errors: errorMessages,
-        notif: {
-          severity: 'error',
-          show: !validationError,
-          message: error.message,
-        },
-      });
-    }
+    setState({
+      ...state,
+      showWaiting: false,
+      errors: errorMessages,
+      notif: {
+        severity: 'error',
+        show: !validationError,
+        message: error.message,
+      },
+    });
   }
 }
 

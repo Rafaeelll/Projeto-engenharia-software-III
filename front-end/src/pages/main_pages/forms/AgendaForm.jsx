@@ -112,51 +112,10 @@ export default function CriarAgendas() {
       setLoadingJogoName(false);
     }
   }
-  
 
-  async function verifyAgendaExists(usuarioId, dataHorarioInicio, dataHorarioFim) {
-    try {
-      const result = await myfetch.get(`/agendas?usuario_id=${usuarioId}`);
-      const agendas = result || [];
-
-      const inicio = new Date(dataHorarioInicio);
-      const fim = new Date(dataHorarioFim);
-
-      for (const agenda of agendas) {
-        const agendaInicio = new Date(agenda.data_horario_inicio);
-        const agendaFim = new Date(agenda.data_horario_fim);
-
-        // Verifica se o intervalo informado colide com alguma agenda existente
-        if (inicio < agendaFim && fim > agendaInicio) {
-          return true; // Já existe uma agenda no intervalo informado
-        }
-      }
-
-      return false; // Não há colisão de intervalos
-    } catch (error) {
-      return false; // Retorna false em caso de erro
-    }
-  }
 
   async function handleFormSubmit(event) {
     event.preventDefault();
-
-    const agendaExists = await verifyAgendaExists(
-      criarAgendas.usuario_id,
-      criarAgendas.data_horario_inicio,
-      criarAgendas.data_horario_fim
-    );
-    if (agendaExists) {
-      setState({
-        ...state,
-        notif: {
-          severity: 'error',
-          show: true,
-          message: 'Já existe uma agenda programada nesse intervalo de horário para o usuário informado!',
-        },
-      });
-      return;
-    }
 
     sendData();
   }
@@ -185,6 +144,11 @@ export default function CriarAgendas() {
       const result = await myfetch.get(`${API_PATH}/${params.id}`);
       result.data_horario_inicio = parseISO(result.data_horario_inicio)
       result.data_horario_fim = parseISO(result.data_horario_fim)
+      result.p_data_horario_inicio = parseISO(result.p_data_horario_inicio)
+      result.p_data_horario_fim = parseISO(result.p_data_horario_fim)
+
+     
+
       setState({
         ...state,
         criarAgendas: result,
@@ -213,20 +177,6 @@ export default function CriarAgendas() {
     setState({ ...state, errors: {} });
     setShowWaiting(true)
     try {
-      console.log(criarAgendas);
-      const jogoExists = await verifyJogoExists(criarAgendas.jogo_id);
-      if (!jogoExists) {
-        setState({
-          ...state,
-          notif: {
-            severity: 'error',
-            show: true,
-            message: 'ID do jogo não encontrado! Crie um jogo ou informe um ID válido.',
-          },
-        });
-        setShowWaiting(false)
-        return;
-      }
 
       await Agenda.validateAsync(criarAgendas, { abortEarly: false });
 
@@ -259,15 +209,6 @@ export default function CriarAgendas() {
     }
   }
 
-  async function verifyJogoExists(jogoId) {
-    try {
-      const result = await myfetch.get(`/jogos/${jogoId}`);
-      return !!result;
-    } catch (error) {
-      return false;
-    }
-  }
-
   function handleNotifClose(event, reason) {
     if (reason === 'clickaway') {
       return;
@@ -292,7 +233,7 @@ export default function CriarAgendas() {
         Por favor, aguarde.
       </Backdrop>
 
-      <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose}>
+      <Notification show={notif.show} severity={notif.severity} onClose={handleNotifClose} duration={8000}>
         {notif.message}
       </Notification>
 

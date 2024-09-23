@@ -92,7 +92,11 @@ export default function CollapsibleTable() {
 
   React.useEffect(() => {
     fetchData();
-  }, [filterStatus], [id]);
+  }, [filterStatus]);
+
+  React.useEffect(() => {
+    fetchData();
+  }, [id]);
 
   const handleDelete = async (id) => {
     setShowDialog(true);
@@ -316,7 +320,7 @@ export default function CollapsibleTable() {
             </div>
           </TableCell>
           <TableCell size='small' align="center">
-            <Link to={`/agenda/${agenda.id}`}>
+            <Link to={`/agenda/editar/${agenda.id}`}>
               <IconButton aria-label="Editar">
                 <EditIcon /> 
               </IconButton>

@@ -28,9 +28,21 @@ function getErrorDescription(response) {
 
     case 404: // Not found
       return 'ERRO: ID não foi encontrado!'
+    case 409: // 
+      return 'Já existe uma agenda nesse intervalo de tempo!'
+    case 410: // 
+      return 'Você já possui um jogo com esse nome!'
+    case 411: // 
+      return 'A agenda informada não foi finalizada ainda!'
+    case 412: // 
+      return 'Já existe um registro de visualização para esta agenda!'
+    case 418: // 
+      return 'Já existe um registro de histórico para este jogo!'
+    case 422: // 
+      return 'Para agendas com mais de 3 horas, é obrigatório informar o horário de início e fim da pausa.'
 
     default:
-      return `ERRO: HTTP ${response.status}: ${response.statusText}`
+      return `HTTP ${response.status}: ${response.statusText}`
   }
 }
 

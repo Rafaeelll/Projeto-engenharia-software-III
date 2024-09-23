@@ -1,6 +1,6 @@
 // Importar o model correspondente ao controller
 const {Visualizacao, Usuario, Agenda} = require('../models'); // Importa os modelos necessários para o controlador
-const agenda = require('../models/agenda');
+const { Op, where } = require('sequelize');
 
 const controller = {} // Objeto vazio para o controlador
 
@@ -29,14 +29,14 @@ controller.create = async (req, res) => {
             where: {id: req.body.agenda_id}
         })
         if (verifyAgendaStatus.status !== 'Finalizada' && verifyAgendaStatus.status !== 'Finalização Confirmada'){
-            return res.status(409).send("A agenda informada não foi finalizada ainda.");
+            return res.status(411).send("A agenda informada não foi finalizada ainda.");
         }
         const existingVisualizacao = await Visualizacao.findOne({
             where: { agenda_id: req.body.agenda_id } // Filtra pelo id do jogo
 
         })
         if (existingVisualizacao){
-            return res.status(409).send("Já existe um registro de visualização para esta agenda.");
+            return res.status(412).send("Já existe um registro de visualização para esta agenda.");
         }
         await Visualizacao.create(req.body); // Cria uma nova visualização no banco de dados
         // HTTP 201: Created
@@ -82,13 +82,25 @@ controller.retrieveOne = async (req, res) => {
 // Método para atualizar uma visualização específica do usuário autenticado
 controller.update = async (req, res) => {
     try {
+        const {id: viewsId} = req.params
+
+        const verifyAgendaStatus = await Agenda.findOne({
+            where: {id: req.body.agenda_id}
+        })
+        if (verifyAgendaStatus.status !== 'Finalizada' && verifyAgendaStatus.status !== 'Finalização Confirmada'){
+            return res.status(411).send("A agenda informada não foi finalizada ainda.");
+        }
+
         const existingRecord = await Visualizacao.findOne({
-            where: { agenda_id: req.body.agenda_id } // Filtra pelo id do jogo
+            where: { 
+                agenda_id: req.body.agenda_id,
+                id: {[Op.ne]: viewsId} // Ignora a visualização atual
+            }
 
         });
-        // Se já existe um registro associado a este jogo, retorna um erro 409 Conflict
-        if (existingRecord && existingRecord.id !== req.params.id) {
-            return res.status(409).json({ error: 'Já existe um registro de visualização para este jogo.' });
+        // Se já existe um registro associado a esta agenda, retorna um erro 412
+        if (existingRecord) {
+            return res.status(412).json({ error: 'Já existe um registro de visualização para esta agenda.' });
         }
 
         const response = await Visualizacao.update(

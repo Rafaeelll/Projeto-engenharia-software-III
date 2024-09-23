@@ -112,6 +112,10 @@ module.exports = (sequelize, DataTypes) => {
     passwordResetExpires: {
       type: DataTypes.DATE,
     },
+    pushSubscription: {  // Adicionando o campo pushSubscription
+      type: DataTypes.JSON,
+      allowNull: true,
+    },
   }, {
     sequelize,
     modelName: 'Usuario',      // Nome do modelo

@@ -33,27 +33,33 @@ import FooterBar from './components/ui/FooterBar';
 import api from '../services/api';
 
 
-navigator.serviceWorker.register('service-worker.js')
-  .then(async serviceWorker => {
-    let subscription = await serviceWorker.pushManager.getSubscription()
-    const API_PATH = '/notificacoes/push/public_key'
-    const API_PATH2 = '/notificacoes/push/register'
-
-    if (!subscription) {
-
-      const publicKeyResponse = await api.get(API_PATH)
-
-      subscription = await serviceWorker.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: publicKeyResponse.data.publicKey,
-      })
-    }
-    await api.post(API_PATH2, {
-      subscription,
-    })
-})
 
 function App() {
+
+  React.useEffect(() => {
+    const registerServiceWorker = async () => {
+      if ('serviceWorker' in navigator) {
+        const serviceWorker = await navigator.serviceWorker.register('service-worker.js');
+        let subscription = await serviceWorker.pushManager.getSubscription();
+
+        const API_PATH = '/notificacoes/push/public_key';
+        const API_PATH2 = '/notificacoes/push/register';
+
+        if (!subscription) {
+          const publicKeyResponse = await api.get(API_PATH);
+          subscription = await serviceWorker.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: publicKeyResponse.publicKey,
+          });
+        }
+
+        await api.post(API_PATH2, { subscription });
+      }
+    };
+
+    registerServiceWorker();
+  }, []); // Dependência vazia para rodar apenas uma vez
+
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
 
   function AuthGuard({ children }) {
@@ -85,11 +91,10 @@ function App() {
           <Route path= "/recuperar_senha" element={<RecuperarSenha/>}/>
           <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
           <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
-          <Route path= "/agendas/status" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
           <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
           <Route path= "/agenda/:statusOption" element={<AuthGuard> <FilterAgendasStatusResult/> </AuthGuard>}/>
           <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-          <Route path= "/agenda/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+          <Route path= "/agenda/editar/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
           <Route path= "/agenda/confirmar-presenca/:id" element={<AuthGuard> <AgendaConfirmarPresenca/> </AuthGuard>}/>
           <Route path= "/agenda/confirmar-finalizacao/:id" element={<AuthGuard> <AgendaConfirmarFinalizacao/> </AuthGuard>}/>
           <Route path= "/usuario" element={<AuthGuard> <Perfil/> </AuthGuard>}/>

@@ -1,7 +1,6 @@
 import React from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
-import myfetch from '../../../utils/myfetch';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import Notification from '../../../components/ui/Notification';
@@ -107,14 +106,10 @@ export default function MyAccountForm() {
 
       await MyAccount.validateAsync(myAccountDatas, { abortEarly: false });
       if (id) {
-        await myfetch.put(`${API_PATH_MC}/${id}`, myAccountDatas);
+        await api.put(`${API_PATH_MC}/${id}`, myAccountDatas);
   
       } else {
-        await myfetch.post(API_PATH_MC, myAccountDatas);
-      }
-      if (myAccountDatas.ativo === false) {
-        // Se o campo ativo foi definido como false, limpe o cookie AUTH
-        document.cookie = 'AUTH=; Max-Age=-99999999;'; // Define um tempo de vida negativo para excluir o cookie
+        await api.post(API_PATH_MC, myAccountDatas);
       }
       setState({
         ...state,
@@ -129,31 +124,17 @@ export default function MyAccountForm() {
       const { validationError, errorMessages } = getValidationMessages(error);
   
       console.error(error);
-  
-      // Verifica se o erro é de conflito (status 409)
-      if (error.response && error.response.status === 409) {
-        setState({
-          ...state,
-          showWaiting: false,
-          notif: {
-            severity: 'error',
-            show: true,
-            message: 'O e-mail informado já está cadastrado.',
-          },
-        });
-      } else {
-        // Erro de validação ou outro erro
-        setState({
-          ...state,
-          showWaiting: false,
-          errors: errorMessages,
-          notif: {
-            severity: 'error',
-            show: !validationError,
-            message: error.message,
-          },
-        });
-      }
+      // Erro de validação ou outro erro
+      setState({
+        ...state,
+        showWaiting: false,
+        errors: errorMessages,
+        notif: {
+          severity: 'error',
+          show: !validationError,
+          message: error.message,
+        },
+      });
     }
   }
 

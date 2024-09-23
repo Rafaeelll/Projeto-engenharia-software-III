@@ -75,6 +75,10 @@ module.exports = {
         type: Sequelize.DATE,
         select: false,
       },
+      pushSubscription: {  // Adicionando o campo pushSubscription
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

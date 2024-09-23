@@ -485,23 +485,50 @@ controller.delete = async (req, res) => {
     }
 };
 
-controller.publicKey = function () {
-  return {
-    publicKey
+controller.publicKey = function (request, reply) {
+  return reply.status(200).send({ publicKey });
+};
+
+controller.register = async function (request, reply) {
+  const { subscription } = request.body;
+  const usuarioId = req.authUser.id // Supondo que o usuário já esteja autenticado
+
+  try {
+    // Atualizar o usuário com a assinatura push
+    await Usuario.update(
+      { pushSubscription: subscription },
+      { where: { id: usuarioId } }
+    );
+
+    return reply.status(201).send({ message: 'Inscrição para WebPush registrada com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao registrar inscrição:', error);
+    return reply.status(500).send({ message: 'Erro ao registrar inscrição para WebPush' });
   }
-}
+};
 
-controller.register = function (request, reply) {
-  console.log(request.body)
 
-  return reply.status(201).send()
-}
 
-controller.send = async  (request, reply) => {
-  console.log(request.body)
+controller.send = async (request, reply) => {
+  const { usuarioId, message } = request.body;
 
-  return reply.status(201).send()
-}
+  try {
+    // Recuperar a assinatura do usuário
+    const usuario = await Usuario.findByPk(usuarioId);
+    if (!usuario || !usuario.pushSubscription) {
+      return reply.status(404).send({ message: 'Usuário ou assinatura não encontrada' });
+    }
+
+    // Enviar notificação
+    await WebPush.sendNotification(usuario.pushSubscription, JSON.stringify({ message }));
+
+    return reply.status(201).send({ message: 'Notificação enviada com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao enviar notificação:', error);
+    return reply.status(500).send({ message: 'Erro ao enviar notificação' });
+  }
+};
+
 
 // Exporta o controlador
 module.exports = controller;  
