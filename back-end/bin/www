@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var app = require('../src/app');
-var debug = require('debug')('ps-mat-2023-1:server');
+var debug = require('debug')('Stream-Advisor:server');
 var fs = require('fs');
 const path = require('path');
 var https = require('https'); // Mude de http para https

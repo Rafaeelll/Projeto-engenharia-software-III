@@ -63,9 +63,25 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
+      firstLogin:{
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       status:{
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: false
+      },
+      confirmationToken: {
+        type: Sequelize.STRING(200),
+        allowNull: true,
+      },
+      confirmationTokenExpires: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
+      registerConfirmed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       passwordResetToken: {
         type: Sequelize.STRING(200),

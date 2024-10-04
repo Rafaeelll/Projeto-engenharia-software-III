@@ -41,21 +41,20 @@ controller.cadastro = async (req, res) => {
   const user = await Usuario.findOne({ where: { email } });
 
   try {
-    // Verificação do e-mail antes de criar o usuário
     if (user) {
-      // Se encontrou o usuário com o email, retorna um erro de conflito
       return res.status(409).send('O e-mail informado já está em uso.');
     }
 
-    // Criptografar a senha
     const hashedPassword = await bcrypt.hash(senha_acesso, 12);
 
-// Aqui você define o caminho completo da imagem padrão
-  const imagemPadraoPath = path.resolve(__dirname, "..", "tmp", "uploads", "defaultprofile.png");
-  // E aqui você extrai apenas o nome do arquivo
-  const imagemPadraoNome = path.basename(imagemPadraoPath);    
-  
-  const imagePath = req.file ? req.file.filename : imagemPadraoNome;
+    const imagemPadraoPath = path.resolve(__dirname, "..", "tmp", "uploads", "defaultprofile.png");
+    const imagemPadraoNome = path.basename(imagemPadraoPath);
+    const imagePath = req.file ? req.file.filename : imagemPadraoNome;
+
+    // Gerar um token de confirmação
+    const confirmationToken = crypto.randomBytes(20).toString('hex');
+    const tokenExpires = new Date();
+    tokenExpires.setHours(tokenExpires.getHours() + 1); // Expira em 1 hora
 
     // Criar usuário
     const novoUsuario = await Usuario.create({
@@ -64,7 +63,9 @@ controller.cadastro = async (req, res) => {
       email,
       senha_acesso: hashedPassword,
       telefone,
-      image: imagePath
+      image: imagePath,
+      confirmationToken,
+      confirmationTokenExpires: tokenExpires
     });
 
     // Criar configuração associada ao novo usuário
@@ -76,12 +77,82 @@ controller.cadastro = async (req, res) => {
       horario_notif_fim: 'No Fim (Padrão)',
     });
 
-    // HTTP 201: Created
+    // Enviar o e-mail de confirmação
+    mailer.sendMail({
+      to: email,
+      from: process.env.EMAIL_USER,
+      template: 'auth/confirmacao_cadastro',
+      context: { token: confirmationToken, nome: nome},
+    }, (error) => {
+      if (error) {
+        console.log(error);
+        return res.status(400).send({ error: 'Erro ao enviar o e-mail de confirmação.' });
+      }
+    });
+
     return res.status(201).json(novoUsuario);
   } catch (error) {
     console.error(error);
-    // Tratar erros aqui
     return res.status(500).send('Erro ao criar o usuário.');
+  }
+};
+
+
+controller.confirmarCadastro = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    // Verificar se o token é válido e não expirado
+    let user = await Usuario.findOne({ 
+      where: { confirmationToken: token }
+    });
+
+    // Se o token estiver expirado ou for inválido
+    if (!user || user.confirmationTokenExpires < new Date()) {
+      if (user) {
+        // Gerar um novo token de confirmação
+        const newToken = crypto.randomBytes(20).toString('hex');
+        const newTokenExpires = new Date();
+        newTokenExpires.setHours(newTokenExpires.getHours() + 1); // Expira em 1 hora
+
+        // Atualizar o token e a data de expiração no banco de dados
+        user.confirmationToken = newToken;
+        user.confirmationTokenExpires = newTokenExpires;
+
+        await user.save();
+
+        // Reenviar o e-mail de confirmação com o novo token
+        mailer.sendMail({
+          to: user.email,
+          from: process.env.EMAIL_USER,
+          template: 'auth/confirmacao_cadastro',
+          context: { token: newToken, nome: user.nome },
+        }, (error) => {
+          if (error) {
+            console.log(error);
+            return res.status(400).send({ error: 'Erro ao enviar o e-mail de confirmação.' });
+          }
+        });
+
+        return res.status(400).send({ 
+          message: 'Token expirado. Um novo token foi enviado para o seu e-mail.'
+        });
+      }
+
+      return res.status(400).send({ error: 'Token inválido ou expirado.' });
+    }
+
+    // Se o token for válido, confirmar o cadastro
+    user.confirmationToken = null;
+    user.confirmationTokenExpires = null;
+    user.registerConfirmed = true; // Ativando a conta
+
+    await user.save();
+
+    return res.status(200).send('Cadastro confirmado com sucesso!');
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('Erro ao confirmar o cadastro.');
   }
 };
 
@@ -267,15 +338,19 @@ controller.updateUserImg = async (req, res) => {
     
     // Verifica se a atualização foi bem-sucedida e retorna a resposta apropriada
     if (response[0] > 0) {
-        // HTTP 204: No Content
-        res.status(204).end();
+      // HTTP 204: No Content
+      res.status(204).end();
     } else {
-        // HTTP 404: Not Found
-        res.status(404).end();
+      // HTTP 404: Not Found
+      res.status(404).end();
     }
     } catch (error) {
-        console.error(error);
+      console.error(error);
+    // Verifica se o erro é relacionado ao tamanho do arquivo
+    if (error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).send('O arquivo enviado é muito grande. O tamanho máximo permitido é 5MB.');
     }
+  }
 }
 
 controller.delete = async (req, res) => {
@@ -302,6 +377,11 @@ controller.login = async (req, res) => {
     // Usuário não encontrado ~> HTTP 401: Unauthorized
     if(!usuario) return res.status(401).end()
 
+    // Verifica se o cadastro foi confirmado
+    if (!usuario.registerConfirmed) {
+      return res.status(430).send('Por favor, confirme seu cadastro antes de fazer login.');
+    }
+
     const pwMatches = await bcrypt.compare(req.body.senha_acesso, usuario.senha_acesso)
 
     if(pwMatches) {
@@ -309,12 +389,16 @@ controller.login = async (req, res) => {
 
       //contagem de acessos apos o usuário efetuar o login
       const contagem = usuario.contagem_acesso + 1
-
-      // Aqui atualizamos a contagem de acesso no objeto do usuário
-      usuario.contagem_acesso = contagem;
-
+      usuario.contagem_acesso = contagem; // Aqui atualizamos a contagem de acesso no objeto do usuário
       // Agora salvamos a atualização no banco de dados
       await usuario.save();
+
+      if (usuario.contagem_acesso > 1){
+        const primeiro_login = false
+        usuario.firstLogin = primeiro_login // Aqui atualizamos o campo que confere se é o primeiro login do usuario
+        // Agora salvamos a atualização no banco de dados
+        await usuario.save();
+      }
 
       const token = jwt.sign({
           id: usuario.id,

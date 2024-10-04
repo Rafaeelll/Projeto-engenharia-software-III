@@ -26,7 +26,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Tooltip, {tooltipClasses} from '@mui/material/Tooltip'
 import Toolbar from '@mui/material/Toolbar'
 import AppBar from '@mui/material/AppBar'
-
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 
 function Register(){
@@ -37,6 +38,7 @@ function Register(){
   const [selectedFile, setSelectedFile] = React.useState(null);
   const [showDialog, setShowDialog] = React.useState(false);
 
+  
   const [state, setState] = React.useState({
     usuario: {
       nome: '',
@@ -54,6 +56,13 @@ function Register(){
       show: false,
       message: '',
       severity: 'success' // ou 'error'
+    },
+    passwordChecks: {
+      hasNumber: false,
+      hasLetter: false,
+      hasSymbol: false,
+      isLengthValid: false
+      
     }
   })
   const {
@@ -61,7 +70,8 @@ function Register(){
     mostrarSenha,
     errors,
     showWaiting,
-    notif
+    notif,
+    passwordChecks
   } = state
 
   const VisuallyHiddenInput = styled('input')({
@@ -112,26 +122,33 @@ function Register(){
   const handleMouseDownPassword = (event) => {
     event.preventDefault()
   }
-  
-  function handleFormFieldChange(event) {
-    const { name, value } = event.target;
-  
-    let updatadedValue = value;
-    if (name === 'telefone') {
-    // Remove qualquer caractere que não seja dígito
-    const cleanedValue = value.replace(/\D/g, '');
-    // Formata o valor
-    const formattedValue = cleanedValue.replace(
-      /(\d{2})(\d{4,5})(\d{4})/,
-      '($1) $2-$3'
-    )
-    updatadedValue = formattedValue
-    }
-    
-    const usuariosCopy = {...usuario, [name]: updatadedValue};
 
-    setState({...state, usuario: usuariosCopy})
-} 
+  const handleFormFieldChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === 'senha_acesso') {
+      // Verificar os requisitos de senha
+      setState({
+        ...state,
+        passwordChecks: {
+          hasNumber: /\d/.test(value),
+          hasLetter: /[a-zA-Z]/.test(value),
+          hasSymbol: /[^a-zA-Z0-9]/.test(value),
+          isLengthValid: value.length >= 5 && value.length <= 10 // Verifica o comprimento
+
+        },
+        usuario: { ...usuario, [name]: value }
+      });
+    } else {
+      let updatadedValue = value;
+      // Atualiza o campo de telefone
+      if (name === 'telefone') {
+        const cleanedValue = value.replace(/\D/g, '');
+        updatadedValue = cleanedValue.replace(/(\d{2})(\d{4,5})(\d{4})/, '($1) $2-$3');
+      }
+      setState({ ...state, usuario: { ...usuario, [name]: updatadedValue } });
+    }
+  };
 
 function handleFormSubmit(event) {
   event.preventDefault()    // Evita que a página seja recarregada
@@ -156,7 +173,7 @@ async function sendData() {
 
     const headers = {
       'headers':{
-        'Content-Type': 'mulitpart/form-data'
+        'Content-Type': 'multipart/form-data'
       }
     }
     await api.post(API_PATH, formData, headers)
@@ -193,7 +210,7 @@ async function sendData() {
     }
     
     // Se o item foi salvo com sucesso, retorna à página de listagem
-    if(notif.severity === 'success') navigate(-1)
+    if(notif.severity === 'success') navigate('/confirmar_cadastro')
 
     setState({ ...state, notif: { ...notif, show: false } })
   }
@@ -333,6 +350,44 @@ async function sendData() {
                   </InputAdornment>
                 }}
             />
+          </div>
+
+           {/* Indicadores visuais dos requisitos de senha */}
+          <div className="wrap-input2">
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              {passwordChecks.hasNumber ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Pelo menos um número</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              {passwordChecks.hasLetter ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Pelo menos uma letra</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {passwordChecks.hasSymbol ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Pelo menos um símbolo</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+              {passwordChecks.isLengthValid ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Entre 5 e 10 caracteres</span>
+            </div>
           </div>
 
           <div className="wrap-input2">

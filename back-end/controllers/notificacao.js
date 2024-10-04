@@ -485,11 +485,31 @@ controller.delete = async (req, res) => {
     }
 };
 
-controller.publicKey = function (request, reply) {
-  return reply.status(200).send({ publicKey });
+controller.publicKey = async function (req, res) {
+  try {
+    // Tenta encontrar a notificação associada ao usuário autenticado
+    let result = await Usuario.findOne({ where: { usuario_id: req.authUser.id } });
+
+    // Verifica se a notificação foi encontrada
+    if (!result) {
+      res.status(404).send({ error: 'Public key not found' });
+    }
+
+    // Obtém a chave pública do resultado
+    const publicKey = result.pushSubscription;
+
+    // Envia a chave pública como resposta
+    res.status(200).send(publicKey);
+
+  } catch (error) {
+    // Log do erro e resposta com erro 500
+    console.error(error);
+    res.status(500).send({ error: 'Internal Server Error' });
+  }
 };
 
-controller.register = async function (request, reply) {
+
+controller.register = async function (request, res) {
   const { subscription } = request.body;
   const usuarioId = req.authUser.id // Supondo que o usuário já esteja autenticado
 
@@ -500,32 +520,32 @@ controller.register = async function (request, reply) {
       { where: { id: usuarioId } }
     );
 
-    return reply.status(201).send({ message: 'Inscrição para WebPush registrada com sucesso!' });
+    res.status(201).send({ message: 'Inscrição para WebPush registrada com sucesso!' });
   } catch (error) {
     console.error('Erro ao registrar inscrição:', error);
-    return reply.status(500).send({ message: 'Erro ao registrar inscrição para WebPush' });
+    res.status(500).send({ message: 'Erro ao registrar inscrição para WebPush' });
   }
 };
 
 
 
-controller.send = async (request, reply) => {
+controller.send = async (request, res) => {
   const { usuarioId, message } = request.body;
 
   try {
     // Recuperar a assinatura do usuário
     const usuario = await Usuario.findByPk(usuarioId);
     if (!usuario || !usuario.pushSubscription) {
-      return reply.status(404).send({ message: 'Usuário ou assinatura não encontrada' });
+      res.status(404).send({ message: 'Usuário ou assinatura não encontrada' });
     }
 
     // Enviar notificação
     await WebPush.sendNotification(usuario.pushSubscription, JSON.stringify({ message }));
 
-    return reply.status(201).send({ message: 'Notificação enviada com sucesso!' });
+    res.status(201).send({ message: 'Notificação enviada com sucesso!' });
   } catch (error) {
     console.error('Erro ao enviar notificação:', error);
-    return reply.status(500).send({ message: 'Erro ao enviar notificação' });
+    res.status(500).send({ message: 'Erro ao enviar notificação' });
   }
 };
 

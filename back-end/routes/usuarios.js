@@ -26,6 +26,8 @@ router.post('/logout2', controller.logout2);
 // Rota para cadastrar um novo usuário
 router.post('/cadastro', multerConfig.single('image'), controller.cadastro);
 
+router.post('/confirmar_cadastro', controller.confirmarCadastro);
+
 // Rota para recuperar todos os usuários (requer autenticação)
 router.get('/', controller.retrieve);
 

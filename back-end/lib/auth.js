@@ -8,8 +8,7 @@ module.exports = (req, res, next) => {
     { url: '/usuarios/cadastro', method: 'POST' },
     { url: '/usuarios/esqueci_senha', method: 'POST' },
     { url: '/usuarios/recuperar_senha', method: 'POST' },
-
-
+    { url: '/usuarios/confirmar_cadastro', method: 'POST' },
   ];
 
   for (let route of bypassRoutes) {

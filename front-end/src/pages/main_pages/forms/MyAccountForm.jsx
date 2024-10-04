@@ -16,7 +16,8 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
 import Box from '@mui/material/Box'
 import { Typography } from '@mui/material';
-
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 export default function MyAccountForm() {
 
@@ -40,14 +41,31 @@ export default function MyAccountForm() {
       show: false,
       message: '',
       severity: 'success' // ou 'error'
+    },
+    passwordChecks: {
+      hasNumber: false,
+      hasLetter: false,
+      hasSymbol: false,
+      isLengthValid: false
+      
     }
   });
-  const { myAccountDatas, mostrarSenha, errors, showWaiting, notif } = state;
+  const { myAccountDatas, mostrarSenha, errors, showWaiting, notif, passwordChecks } = state;
   
   function handleFormFieldChange(event) {
-    const MyAccountCopy = {...myAccountDatas}
-    MyAccountCopy[event.target.name] = event.target.value
-    setState({...state, myAccountDatas: MyAccountCopy})
+    const {name, value} = event.target;
+    if (name === 'senha_acesso') {
+      setState({
+        ...state,
+        passwordChecks: {
+          hasNumber: /\d/.test(value),
+          hasLetter: /[a-zA-Z]/.test(value),
+          hasSymbol: /[^a-zA-Z0-9]/.test(value),
+          isLengthValid: value.length >= 5 && value.length <= 10
+        },
+        myAccountDatas: {...myAccountDatas, [name]: value}
+      })
+    }
   }
 
   const handleClickShowPassword = () => setState({...state, mostrarSenha: !mostrarSenha})
@@ -247,6 +265,43 @@ export default function MyAccountForm() {
                 </InputAdornment>
               }}
           />
+            <Box sx={{mt: '12px'}}>
+            {/* Indicadores visuais dos requisitos de senha */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              {passwordChecks.hasNumber ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Pelo menos um número</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+              {passwordChecks.hasLetter ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Pelo menos uma letra</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              {passwordChecks.hasSymbol ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Pelo menos um símbolo</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', marginTop: '8px' }}>
+              {passwordChecks.isLengthValid ? (
+                <CheckCircleIcon sx={{ fontSize: '16px', color: 'green', marginRight: '4px' }} />
+              ) : (
+                <CancelIcon sx={{ fontSize: '16px', color: 'red', marginRight: '4px' }} />
+              )}
+              <span>Entre 5 e 10 caracteres</span>
+            </div>
+            </Box>
 
             <TextField sx={{marginTop: '15px'}}
               label='Confirme a nova Senha'

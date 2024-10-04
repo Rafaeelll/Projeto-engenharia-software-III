@@ -26,6 +26,8 @@ api.interceptors.response.use(response => {
         throw new Error('usuário ou senha incorretos');
     } else if (error.response && error.response.status === 409) {
         throw new Error('O e-mail informado já esta cadastrado');
+    } else if (error.response && error.response.status === 500) {
+        throw new Error('Erro interno, possivel motivo: O arquivo enviado é muito grande. O tamanho máximo permitido é 2MB.' );
     } else {
         throw new Error(`${error.message}`);
     }

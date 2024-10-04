@@ -7,11 +7,19 @@ const MyAccount = Joi.object({
         .max(200)
         .required()
         .messages({'*': 'O email é obrigatório e deve ser válido.'}),
-    senha_acesso: Joi.string()
+        senha_acesso: Joi.string()
         .min(5)
         .max(10)
+        .regex(/[0-9]/, 'número')  // Deve conter pelo menos um número
+        .regex(/[a-zA-Z]/, 'letra') // Deve conter pelo menos uma letra
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, 'símbolo') // Deve conter pelo menos um símbolo
         .required()
-        .messages({'*': 'A senha é obrigatória e deve ter entre 5 e 200 caracteres.'}),
+        .messages({
+            'string.min': 'A senha deve ter no mínimo 5 caracteres.',
+            'string.max': 'A senha deve ter no máximo 10 caracteres.',
+            'string.pattern.name': 'A senha deve conter pelo menos um {#name}.',
+            '*': 'A senha é obrigatória e deve ter entre 5 e 10 caracteres.'
+        }),
     confirmar_senha: Joi.string()
         .valid(Joi.ref('senha_acesso'))
         .required()

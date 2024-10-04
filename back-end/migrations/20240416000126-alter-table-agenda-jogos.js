@@ -23,7 +23,7 @@ module.exports = {
         table: 'agendas', // Tabela estrangeira
         field: 'id'      // Campo da tabela estrangeira
       },
-      onDelete: 'RESTRICT', // Não permite apagar um usuário em uso nas agendas
+      onDelete: 'CASCADE', // Não permite apagar um usuário em uso nas agendas
       onUpdate: 'CASCADE'   // Atualiza usuario_id nas agendas se id do usuário mudar
     });
 

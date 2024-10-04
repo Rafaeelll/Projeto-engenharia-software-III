@@ -142,18 +142,17 @@ export default function CriarAgendas() {
     setShowWaiting(true)
     try {
       const result = await myfetch.get(`${API_PATH}/${params.id}`);
-      result.data_horario_inicio = parseISO(result.data_horario_inicio)
-      result.data_horario_fim = parseISO(result.data_horario_fim)
-      result.p_data_horario_inicio = parseISO(result.p_data_horario_inicio)
-      result.p_data_horario_fim = parseISO(result.p_data_horario_fim)
-
-     
-
+  
+      result.data_horario_inicio = result.data_horario_inicio ? parseISO(result.data_horario_inicio) : null;
+      result.data_horario_fim = result.data_horario_fim ? parseISO(result.data_horario_fim) : null;
+      result.p_data_horario_inicio = result.p_data_horario_inicio ? parseISO(result.p_data_horario_inicio) : null;
+      result.p_data_horario_fim = result.p_data_horario_fim ? parseISO(result.p_data_horario_fim) : null;
+  
       setState({
         ...state,
         criarAgendas: result,
-      }); 
-      
+      });
+  
       if (result.jogo_id) {
         await fetchJogoNames(result.jogo_id);
       }

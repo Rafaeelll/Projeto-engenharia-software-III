@@ -5,6 +5,7 @@ import Login from './pages/login/register/Login';
 import Register from './pages/login/register/Register';
 import EsqueciSenha from './pages/login/esqueci_senha/EsqueciSenha';
 import RecuperarSenha from './pages/login/recuper_senha/RecuperarSenha';
+import ConfirmarCadastro from './pages/login/confirmar_cadastro/ConfirmarCadastro';
 import About from './pages/home/About';
 import Contact from './pages/home/Contact';
 import PaginaInicial from './pages/main_pages/PaginaInicial';
@@ -30,36 +31,8 @@ import FilterAgendasStatusResult from './pages/main_pages/FilterAgendasStatusRes
 import ConfigForm from './pages/main_pages/forms/ConfigForm';
 import HeaderBar from './components/ui/HeaderBar';
 import FooterBar from './components/ui/FooterBar';
-import api from '../services/api';
-
-
 
 function App() {
-
-  React.useEffect(() => {
-    const registerServiceWorker = async () => {
-      if ('serviceWorker' in navigator) {
-        const serviceWorker = await navigator.serviceWorker.register('service-worker.js');
-        let subscription = await serviceWorker.pushManager.getSubscription();
-
-        const API_PATH = '/notificacoes/push/public_key';
-        const API_PATH2 = '/notificacoes/push/register';
-
-        if (!subscription) {
-          const publicKeyResponse = await api.get(API_PATH);
-          subscription = await serviceWorker.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: publicKeyResponse.publicKey,
-          });
-        }
-
-        await api.post(API_PATH2, { subscription });
-      }
-    };
-
-    registerServiceWorker();
-  }, []); // Dependência vazia para rodar apenas uma vez
-
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
 
   function AuthGuard({ children }) {
@@ -89,6 +62,7 @@ function App() {
           <Route path= "/contato" element={<Contact/>}/>
           <Route path= "/esqueci_senha" element={<EsqueciSenha/>}/>
           <Route path= "/recuperar_senha" element={<RecuperarSenha/>}/>
+          <Route path= "/confirmar_cadastro" element={<ConfirmarCadastro/>}/>
           <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
           <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
           <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>

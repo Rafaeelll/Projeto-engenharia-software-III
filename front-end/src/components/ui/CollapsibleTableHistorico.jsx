@@ -32,7 +32,6 @@ export default function CollapsibleTable() {
   const API_PATH_JG = '/jogos';
 
   const [historicoJogos, setHistoricoJogos] = React.useState([]);
-  const [jogos, setJogos] = React.useState([]);
   const [showWaiting, setShowWaiting] = React.useState(false);
   const [showDialog, setShowDialog] = React.useState(false);
   const [deleteId, setDeleteId] = React.useState(null);
@@ -57,18 +56,6 @@ export default function CollapsibleTable() {
       console.error(error);
     } finally {
       setShowWaiting(false);
-    }
-  };
-
-  const fetchJogo = async (jogo_id) => {
-    try {
-      const result = await myfetch.get(`${API_PATH_JG}`);
-      const jogoRelacionado = result.find(item => item.id === jogo_id);
-      if (jogoRelacionado) {
-        setJogos([jogoRelacionado]);
-      }
-    } catch (error) {
-      console.error(error);
     }
   };
 
@@ -115,19 +102,30 @@ export default function CollapsibleTable() {
 
   function Row({ historicoJogo, onDelete }) {
     const [open, setOpen] = React.useState(false);
+    const [jogos, setJogos] = React.useState([]);
+
 
     const handleDeleteClick = () => {
       onDelete(historicoJogo.id);
     };
-
+  
+    // Buscar o jogo relacionado apenas quando a linha for expandida
     React.useEffect(() => {
       if (open) {
+        const fetchJogo = async () => {
+          try {
+            const result = await myfetch.get(`${API_PATH_JG}/${historicoJogo.jogo_id}`);
+            setJogos([result]);
+          } catch (error) {
+            console.error(error);
+          }
+        };
         fetchJogo();
       }
-    }, [open]);
-
+    }, [open, historicoJogo.jogo_id]);
+  
     const handleCollapseToggle = () => {
-      setOpen(!open);
+      setOpen((prevOpen) => !prevOpen);
     };
 
 

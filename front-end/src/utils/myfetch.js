@@ -25,7 +25,6 @@ function getErrorDescription(response) {
   switch(response.status) {
     case 401:   // Unauthorized
       return 'ERRO: usuário ou senha incorretos!'
-
     case 404: // Not found
       return 'ERRO: ID não foi encontrado!'
     case 409: // 
@@ -40,7 +39,8 @@ function getErrorDescription(response) {
       return 'Já existe um registro de histórico para este jogo!'
     case 422: // 
       return 'Para agendas com mais de 3 horas, é obrigatório informar o horário de início e fim da pausa.'
-
+    case 430: // 
+      return 'Por favor, confirme seu cadastro antes de fazer login.'
     default:
       return `HTTP ${response.status}: ${response.statusText}`
   }

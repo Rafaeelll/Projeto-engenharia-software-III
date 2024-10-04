@@ -102,9 +102,25 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       defaultValue: 0
     },
+    firstLogin:{
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     status:{
       type: DataTypes.BOOLEAN,
-      defaultValue: true
+      defaultValue: false
+    },
+    confirmationToken: {
+      type: DataTypes.STRING(200),
+      allowNull: true,
+    },
+    registerConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    confirmationTokenExpires: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
     passwordResetToken: {
       type: DataTypes.STRING(200),
@@ -116,6 +132,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSON,
       allowNull: true,
     },
+    
   }, {
     sequelize,
     modelName: 'Usuario',      // Nome do modelo
