@@ -65,7 +65,7 @@ module.exports = {
       },
       firstLogin:{
         type: Sequelize.BOOLEAN,
-        defaultValue: false
+        defaultValue: true
       },
       status:{
         type: Sequelize.BOOLEAN,

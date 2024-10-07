@@ -134,17 +134,18 @@ controller.confirmarCadastro = async (req, res) => {
           }
         });
 
-        return res.status(400).send({ 
+        return res.status(424).send({ 
           message: 'Token expirado. Um novo token foi enviado para o seu e-mail.'
         });
       }
 
-      return res.status(400).send({ error: 'Token inválido ou expirado.' });
+      return res.status(426).send({ error: 'Token inválido ou expirado.' });
     }
 
     // Se o token for válido, confirmar o cadastro
     user.confirmationToken = null;
     user.confirmationTokenExpires = null;
+    user.status = true;
     user.registerConfirmed = true; // Ativando a conta
 
     await user.save();

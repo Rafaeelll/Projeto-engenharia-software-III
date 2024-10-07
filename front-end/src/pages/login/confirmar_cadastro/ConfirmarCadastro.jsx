@@ -131,7 +131,7 @@ export default function ConfirmarCadastro() {
                 <div className="wrap-input2">
                   <TextField
                     className='input2'
-                    label='Token'
+                    label='Informe o Token enviado no seu e-mail:'
                     variant='filled'
                     type="text"
                     name='confirmationToken'

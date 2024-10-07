@@ -46,36 +46,61 @@ export default function RecuperarSenha() {
     }
 
     async function handleSubmit(event) {
-      event.preventDefault()      // Impede o recarregamento da página
-      setShowWaiting(true)        // Mostra o spinner de espera
-      try {
-        const result = await myfetch.post(`${API_PATH}`, {email, token, senha_acesso})
-        if (result) {
-          // Exibe o snackbar de sucesso
-          setNotif({
-              show: true,
-              message: 'Sua senha foi recuperada com sucesso!',
-              severity: 'success'
-          })        
-          setTimeout(()=>{
-              navigate('/login')
-          }, 3500)
-        }
+      event.preventDefault(); // Impede o recarregamento da página
+      setShowWaiting(true);   // Mostra o spinner de espera
+    
+      // Validação da nova senha
+      const senhaValida = validarSenha(senha_acesso);
+      if (!senhaValida) {
+        setShowWaiting(false); // Esconde o spinner de espera
+        setNotif({
+          show: true,
+          message: 'A nova senha não atende aos critérios de segurança.',
+          severity: 'error',
+        });
+        return;
       }
-      catch(error) {
-        console.error(error)
-  
-        // Exibe o snackbar de erro
+    
+      try {
+        const result = await myfetch.post(`${API_PATH}`, { email, token, senha_acesso });
+        if (result) {
+          setNotif({
+            show: true,
+            message: 'Sua senha foi recuperada com sucesso!',
+            severity: 'success',
+          });
+          setTimeout(() => {
+            navigate('/login');
+          }, 3500);
+        }
+      } catch (error) {
+        console.error(error);
         setNotif({
           show: true,
           message: error.message,
-          severity: 'error'
-        })
-      }
-      finally {
-        setShowWaiting(false)   // Esconde o spinner de espera
+          severity: 'error',
+        });
+      } finally {
+        setShowWaiting(false); // Esconde o spinner de espera
       }
     }
+    
+    function validarSenha(senha) {
+      const minLength = 5; 
+      const maxLength = 10;
+      const hasLowerCase = /[a-z]/.test(senha);
+      const hasNumbers = /\d/.test(senha);
+      const hasSpecialChars = /[!@#$%^&*]/.test(senha);
+    
+      return (
+        senha.length >= minLength && 
+        senha.length <= maxLength &&
+        hasLowerCase &&
+        hasNumbers &&
+        hasSpecialChars
+      );
+    }
+    
 
     function handleNotifClose(event, reason) {
       if (reason === 'clickaway') {
@@ -156,6 +181,7 @@ export default function RecuperarSenha() {
                     required
                     value={email}
                     onChange={e => setEmail(e.target.value)}
+                    
                   />
                 </div> 
 

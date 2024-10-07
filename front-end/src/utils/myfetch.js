@@ -39,6 +39,10 @@ function getErrorDescription(response) {
       return 'Já existe um registro de histórico para este jogo!'
     case 422: // 
       return 'Para agendas com mais de 3 horas, é obrigatório informar o horário de início e fim da pausa.'
+    case 424: // 
+      return 'Token expirado. Um novo token foi enviado para o seu e-mail.'
+    case 426: // 
+      return 'Token inválido ou expirado.'
     case 430: // 
       return 'Por favor, confirme seu cadastro antes de fazer login.'
     default:

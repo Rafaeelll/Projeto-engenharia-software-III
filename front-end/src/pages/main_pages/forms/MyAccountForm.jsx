@@ -15,7 +15,7 @@ import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import IconButton from '@mui/material/IconButton'
 import Box from '@mui/material/Box'
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
@@ -25,7 +25,6 @@ export default function MyAccountForm() {
   const API_PATH_MC =  '/usuarios/minha_conta'
   const { id } = useParams(); // Capturando o ID da URL
   const navigate = useNavigate()
-  // const [showDialog, setShowDialog] = React.useState(false)
 
   const [state, setState] = React.useState({
     myAccountDatas: {
