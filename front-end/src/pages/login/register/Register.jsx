@@ -159,7 +159,6 @@ function handleFormSubmit(event) {
 async function sendData() {
   setState({ ...state, showWaiting: true, errors: {} });
   try {
-    console.log('Dados a serem enviados:', usuario); // Adicione este console.log
     // Chama a validação da biblioteca Joi
     await Usuario.validateAsync(usuario, { abortEarly: false });
 

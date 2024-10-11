@@ -2,20 +2,13 @@
 
 var app = require('../src/app');
 var debug = require('debug')('Stream-Advisor:server');
-var fs = require('fs');
-const path = require('path');
-var https = require('https'); // Mude de http para https
+var http = require('http'); // Mantenha o http
 
 var port = normalizePort(process.env.PORT || '3333');
 app.set('port', port);
 
-// Leitura dos certificados SSL
-var options = {
-  key: fs.readFileSync('keys/code.key'),
-  cert: fs.readFileSync('keys/code.crt')
-};
-
-var server = https.createServer(options, app); // Use https.createServer
+// Cria o servidor HTTP sem SSL
+var server = http.createServer(app); // Remova o options
 
 server.listen(port);
 server.on('error', onError);

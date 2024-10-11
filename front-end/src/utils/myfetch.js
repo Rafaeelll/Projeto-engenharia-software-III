@@ -28,23 +28,23 @@ function getErrorDescription(response) {
     case 404: // Not found
       return 'ERRO: ID não foi encontrado!'
     case 409: // 
-      return 'Já existe uma agenda nesse intervalo de tempo!'
+      return 'ERRO: Já existe uma agenda nesse intervalo de tempo!'
     case 410: // 
-      return 'Você já possui um jogo com esse nome!'
+      return 'ERRO: Você já possui um jogo com esse nome!'
     case 411: // 
-      return 'A agenda informada não foi finalizada ainda!'
+      return 'ERRO: A agenda informada não foi finalizada ainda!'
     case 412: // 
-      return 'Já existe um registro de visualização para esta agenda!'
+      return 'ERRO: Já existe um registro de visualização para esta agenda!'
     case 418: // 
-      return 'Já existe um registro de histórico para este jogo!'
+      return 'ERRO: Já existe um registro de histórico para este jogo!'
     case 422: // 
-      return 'Para agendas com mais de 3 horas, é obrigatório informar o horário de início e fim da pausa.'
+      return 'ERRO: Para agendas com mais de 3 horas, é obrigatório informar o horário de início e fim da pausa.'
     case 424: // 
-      return 'Token expirado. Um novo token foi enviado para o seu e-mail.'
+      return 'ERRO: Token expirado. Um novo token foi enviado para o seu e-mail.'
     case 426: // 
-      return 'Token inválido ou expirado.'
+      return 'ERRO: Token inválido ou expirado.'
     case 430: // 
-      return 'Por favor, confirme seu cadastro antes de fazer login.'
+      return 'ERRO: Por favor, confirme seu cadastro antes de fazer login.'
     default:
       return `HTTP ${response.status}: ${response.statusText}`
   }

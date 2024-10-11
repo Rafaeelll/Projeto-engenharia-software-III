@@ -1,4 +1,6 @@
 const { Notificacao, Agenda, Usuario, Configuracao } = require('../models');
+const send = require('./pushNotification'); // Importa a função send
+
 const cron = require('node-cron');
 const { Op, where } = require('sequelize');
 
@@ -7,9 +9,14 @@ require('dotenv').config();
 
 const publicKey = process.env.PUBLIC_KEY
 const privateKey = process.env.PRIVATE_KEY
-const host = process.env.APP_URL
+const email = process.env.EMAIL_USER
+// const host = process.env.APP_URL
 
-WebPush.setVapidDetails(host, publicKey, privateKey)
+WebPush.setVapidDetails(
+  email,           // Use a variável de ambiente para o subject
+  publicKey, 
+  privateKey
+)
 
 
 const controller = {};
@@ -28,295 +35,344 @@ const controller = {};
     Além disso, há também a implementação de tarefas agendadas usando o módulo cron para enviar notificações 
     quando as agendasPrestesComecar estão prestes a comerçarem, terminar ou já terminaram.
 */
-
-controller.createAutomaticStartNotifications = async (req, res) => {
-  try {
-    const agendasPrestesComecar = await Agenda.findAll({
-      where: {
-        data_horario_inicio: { [Op.gte]: new Date() }
-      },
-      include: ['usuario']
-    });
-
-    const agendasInicializadas = await Agenda.findAll({
-      where: {
-        data_horario_inicio: { [Op.lte]: new Date() }
-      },
-      include: ['usuario']
-    });
-    console.log(`Agendas inicializadas encontradas: ${agendasInicializadas.length}`);
-
-
-    const configUmaHoraAntes = await Configuracao.findOne({
-      where: {
-        horario_notif_inicio: '1 Hora Antes (Padrão)'
-      },
-      include: ['usuario']
-    });
-
-    const configTrintaMinAntes = await Configuracao.findOne({
-      where: {
-        horario_notif_inicio: '30 minutos antes'
-      },
-      include: ['usuario']
-    });
-
-    const configNoInicio = await Configuracao.findOne({
-      where: {
-        horario_notif_inicio: 'No Início'
-      },
-      include: ['usuario']
-    });
-
-    const criarNotificacaoInicio = async (agenda, dataNotificacao, configId, mensagem) => {
-      await Notificacao.create({
-        agenda_id: agenda.id,
-        usuario_id: agenda.usuario_id,
-        config_id: configId,
-        data_notificacao: dataNotificacao,
-        mensagem: mensagem,
-      });
-
-    };
-
-    // Notificar 1 hora antes da agenda começar (Padrão)
-    if (configUmaHoraAntes) {
-      for (const agenda of agendasPrestesComecar) {
-        const umHoraAntesInicio = new Date(agenda.data_horario_inicio);
-        umHoraAntesInicio.setHours(umHoraAntesInicio.getHours() - 1);
-
-        const notificationExists = await Notificacao.findOne({
-          where: {
-            agenda_id: agenda.id,
-            data_notificacao: umHoraAntesInicio
-          }
-        });
-
-        if (!notificationExists) {
-          const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Confirme sua presença clicando no ícone "Editar".`;
-          await criarNotificacaoInicio(agenda, umHoraAntesInicio, configUmaHoraAntes.id, mensagem);
-        }
-      }
-    }
-
-    // Notificar 30 minutos antes da agenda começar
-    if (configTrintaMinAntes) {
-      for (const agenda of agendasPrestesComecar) {
-        const trintaMinAntesInicio = new Date(agenda.data_horario_inicio);
-        trintaMinAntesInicio.setMinutes(trintaMinAntesInicio.getMinutes() - 30);
-
-        const notificationExists = await Notificacao.findOne({
-          where: {
-            agenda_id: agenda.id,
-            data_notificacao: trintaMinAntesInicio
-          }
-        });
-
-        if (!notificationExists) {
-          const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`;
-          await criarNotificacaoInicio(agenda, trintaMinAntesInicio, configTrintaMinAntes.id, mensagem);
-        }
-      }
-    }
-
-    // Notificar somente quando a agenda começar
-    if (configNoInicio) {
-      for (const agenda of agendasInicializadas) {
-        const notificationExists = await Notificacao.findOne({
-          where: {
-            agenda_id: agenda.id,
-            data_notificacao: agenda.data_horario_inicio
-          }
-        });
-
-        if (!notificationExists) {
-          const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já começou. Confirme sua presença clicando no ícone "Editar".`;
-          await criarNotificacaoInicio(agenda, agenda.data_horario_inicio, configNoInicio.id, mensagem);
-        }
-      }
-    }
-  } catch (error) {
-    console.error(error);
-    // HTTP 500: Internal Server Error
-    res.status(500).send('Erro interno do servidor.');
-  }
-};
-
-
-controller.createAutomaticFinishNotifications = async (req, res) => {
-  try {
-    const agendasPrestesFin = await Agenda.findAll({
-      where: {
-        data_horario_fim: { [Op.gte]: new Date() }
-      },
-      include: ['usuario']
-    });
-
-    const agendaTerminadas = await Agenda.findAll({
-      where: {
-        data_horario_fim: { [Op.lte]: new Date() }
-      },
-      include: ['usuario']
-    });
-
-    const configUmaHoraAntesFin = await Configuracao.findOne({
-      where: {
-        horario_notif_fim: '1 Hora Antes'
-      },
-      include: ['usuario']
-    });
-
-    const configTrintaMinAntesFin = await Configuracao.findOne({
-      where: {
-        horario_notif_fim: '30 minutos antes'
-      },
-      include: ['usuario']
-    });
-
-    const configNoFim = await Configuracao.findOne({
-      where: {
-        horario_notif_fim: 'No Fim (Padrão)'
-      },
-      include: ['usuario']
-    });
-
-    const criarNotificacaoFinalizacao = async (agenda, dataNotificacao, configId, mensagem) => {
-      await Notificacao.create({
-        agenda_id: agenda.id,
-        usuario_id: agenda.usuario_id,
-        config_id: configId,
-        data_notificacao: dataNotificacao,
-        mensagem: mensagem,
-      });
-    };
-
-    // Notificar sobre o fim da agenda assim que a agenda finalizar (Padrão)
-    if (configNoFim) {
-      for (const agenda of agendaTerminadas) {
-        const notificationEndExists = await Notificacao.findOne({
-          where: {
-            agenda_id: agenda.id,
-            data_notificacao: agenda.data_horario_fim
-          }
-        });
-
-        if (!notificationEndExists) {
-          const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. Confirme a finalização clicando no ícone "Editar".`;
-          await criarNotificacaoFinalizacao(agenda, agenda.data_horario_fim, configNoFim.id, mensagem);
-        }
-      }
-    }
-
-    // Notificar sobre o fim da agenda uma hora antes da agenda finalizar
-    if (configUmaHoraAntesFin) {
-      for (const agenda of agendasPrestesFin) {
-        const umHoraAntesFim = new Date(agenda.data_horario_fim);
-        umHoraAntesFim.setHours(umHoraAntesFim.getHours() - 1);
-
-        const notificationEndExists = await Notificacao.findOne({
-          where: {
-            agenda_id: agenda.id,
-            data_notificacao: umHoraAntesFim
-          }
-        });
-
-        if (!notificationEndExists) {
-          const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 1 hora. Confirme a finalização clicando no ícone "Editar".`;
-          await criarNotificacaoFinalizacao(agenda, umHoraAntesFim, configUmaHoraAntesFin.id, mensagem);
-        }
-      }
-    }
-
-    // Notificar 30 minutos antes da agenda começar
-    if (configTrintaMinAntesFin) {
-      for (const agenda of agendasPrestesFin) {
-        const trintaMinAntesFim = new Date(agenda.data_horario_fim);
-        trintaMinAntesFim.setMinutes(trintaMinAntesFim.getMinutes() - 30);
-
-        const notificationEndExists = await Notificacao.findOne({
-          where: {
-            agenda_id: agenda.id,
-            data_notificacao: trintaMinAntesFim
-          }
-        });
-
-        if (!notificationEndExists) {
-          const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 30 minutos. Confirme a finalização clicando no ícone "Editar".`;
-          await criarNotificacaoFinalizacao(agenda, trintaMinAntesFim, configTrintaMinAntesFin.id, mensagem);
-        }
-      }
-    }
-
-  } catch (error) {
-    console.error(error);
-    // HTTP 500: Internal Server Error
-    res.status(500).send('Erro interno do servidor.');
-  }
-};
-
-
-
-controller.createAutoPauseStartNotifications = async (req, res) =>{
-  try{
-    const PausaInicializadas = await Agenda.findAll({
-      where: {
-        p_data_horario_inicio: {[Op.gte]: new Date()}
-      },
-      include: ['usuario']
-    })
-    for (const agenda of PausaInicializadas){
-      const notificationExists = await Notificacao.findOne({
+  
+  controller.createAutomaticStartNotifications = async (req, res) => {
+    try {
+      const agendasPrestesComecar = await Agenda.findAll({
         where: {
-          agenda_id: agenda.id,
-          data_notificacao: agenda.p_data_horario_inicio
-        }
-      })
-      if (!notificationExists) {
+          data_horario_inicio: { [Op.gte]: new Date() }
+        },
+        include: ['usuario']
+      });
+  
+      const agendasInicializadas = await Agenda.findAll({
+        where: {
+          data_horario_inicio: { [Op.lte]: new Date() }
+        },
+        include: ['usuario']
+      });
+      console.log(`Agendas inicializadas encontradas: ${agendasInicializadas.length}`);
+  
+      const configUmaHoraAntes = await Configuracao.findOne({
+        where: {
+          horario_notif_inicio: '1 Hora Antes (Padrão)'
+        },
+        include: ['usuario']
+      });
+  
+      const configTrintaMinAntes = await Configuracao.findOne({
+        where: {
+          horario_notif_inicio: '30 minutos antes'
+        },
+        include: ['usuario']
+      });
+  
+      const configNoInicio = await Configuracao.findOne({
+        where: {
+          horario_notif_inicio: 'No Início'
+        },
+        include: ['usuario']
+      });
+  
+      const criarNotificacaoInicio = async (agenda, dataNotificacao, configId, mensagem, usuarioId) => {
         await Notificacao.create({
           agenda_id: agenda.id,
           usuario_id: agenda.usuario_id,
-          config_id: agenda.usuario_id,
-          data_notificacao: agenda.p_data_horario_inicio,
-          mensagem: `Olá ${agenda.usuario.nome}, a pausa da sua agenda já iniciou!`
-        })
-      }
-    }
-  }
-  catch (error){
-    console.log(error)
-  }
-}
-
-controller.createAutoPauseFinishNotifications = async (req, res) =>{
-  try {
-    const PausaTerminadas = await Agenda.findAll({
-      where:{
-        p_data_horario_fim: { [Op.lte]: new Date() }
-      },
-      include: ['usuario']
-    })
-    for (const agenda of PausaTerminadas) {
-      const notificationEndExists = await Notificacao.findOne({
-        where: {
-          agenda_id: agenda.id,
-          data_notificacao: agenda.p_data_horario_fim
+          config_id: configId,
+          data_notificacao: dataNotificacao,
+          mensagem: mensagem,
+        });
+        const result = await send({ usuarioId: usuarioId, message: mensagem });
+        if (result.status !== 201) {
+          console.error(`Falha ao enviar notificação: ${result.message}`);
         }
-      })
-      if (!notificationEndExists){
+      };
+  
+      // Notificar 1 hora antes da agenda começar (Padrão)
+      if (configUmaHoraAntes) {
+        await Promise.all(agendasPrestesComecar.map(async (agenda) => {
+          if (agenda.usuario) { // Verifica se o usuário existe
+            const umHoraAntesInicio = new Date(agenda.data_horario_inicio);
+            umHoraAntesInicio.setHours(umHoraAntesInicio.getHours() - 1);
+  
+            const notificationExists = await Notificacao.findOne({
+              where: {
+                agenda_id: agenda.id,
+                data_notificacao: umHoraAntesInicio
+              }
+            });
+  
+            if (!notificationExists) {
+              const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 1 hora. Confirme sua presença clicando no ícone "Editar".`;
+              await criarNotificacaoInicio(agenda, umHoraAntesInicio, configUmaHoraAntes.id, mensagem, agenda.usuario.id);
+            }
+          } else {
+            console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+          }
+        }));
+      }
+  
+      // Notificar 30 minutos antes da agenda começar
+      if (configTrintaMinAntes) {
+        await Promise.all(agendasPrestesComecar.map(async (agenda) => {
+          if (agenda.usuario) { // Verifica se o usuário existe
+            const trintaMinAntesInicio = new Date(agenda.data_horario_inicio);
+            trintaMinAntesInicio.setMinutes(trintaMinAntesInicio.getMinutes() - 30);
+  
+            const notificationExists = await Notificacao.findOne({
+              where: {
+                agenda_id: agenda.id,
+                data_notificacao: trintaMinAntesInicio
+              }
+            });
+  
+            if (!notificationExists) {
+              const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a começar em 30 minutos. Confirme sua presença clicando no ícone "Editar".`;
+              await criarNotificacaoInicio(agenda, trintaMinAntesInicio, configTrintaMinAntes.id, mensagem, agenda.usuario.id);
+            }
+          } else {
+            console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+          }
+        }));
+      }
+  
+      // Notificar somente quando a agenda começar
+      if (configNoInicio) {
+        await Promise.all(agendasInicializadas.map(async (agenda) => {
+          if (agenda.usuario) { // Verifica se o usuário existe
+            const notificationExists = await Notificacao.findOne({
+              where: {
+                agenda_id: agenda.id,
+                data_notificacao: agenda.data_horario_inicio
+              }
+            });
+  
+            if (!notificationExists) {
+              const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já começou. Confirme sua presença clicando no ícone "Editar".`;
+              await criarNotificacaoInicio(agenda, agenda.data_horario_inicio, configNoInicio.id, mensagem, agenda.usuario.id);
+            }
+          } else {
+            console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+          }
+        }));
+      }
+    } catch (error) {
+      console.error(error);
+      // HTTP 500: Internal Server Error
+      res.status(500).send('Erro interno do servidor.');
+    }
+  }; 
+
+  controller.createAutomaticFinishNotifications = async (req, res) => {
+    try {
+      const agendasPrestesFin = await Agenda.findAll({
+        where: {
+          data_horario_fim: { [Op.gte]: new Date() }
+        },
+        include: ['usuario']
+      });
+  
+      const agendaTerminadas = await Agenda.findAll({
+        where: {
+          data_horario_fim: { [Op.lte]: new Date() }
+        },
+        include: ['usuario']
+      });
+  
+      const configUmaHoraAntesFin = await Configuracao.findOne({
+        where: {
+          horario_notif_fim: '1 Hora Antes'
+        },
+        include: ['usuario']
+      });
+  
+      const configTrintaMinAntesFin = await Configuracao.findOne({
+        where: {
+          horario_notif_fim: '30 minutos antes'
+        },
+        include: ['usuario']
+      });
+  
+      const configNoFim = await Configuracao.findOne({
+        where: {
+          horario_notif_fim: 'No Fim (Padrão)'
+        },
+        include: ['usuario']
+      });
+    
+      const criarNotificacaoFinalizacao = async (agenda, dataNotificacao, configId, mensagem, usuarioId) => {
         await Notificacao.create({
           agenda_id: agenda.id,
           usuario_id: agenda.usuario_id,
-          config_id: agenda.usuario_id,
-          data_notificacao: agenda.p_data_horario_fim,
-          mensagem: `Olá ${agenda.usuario.nome}, a pausa da sua agenda já finalizou!`
-        })
+          config_id: configId,
+          data_notificacao: dataNotificacao,
+          mensagem: mensagem,
+        });
+        const result = await send({ usuarioId: usuarioId, message: mensagem }); // Passa o usuarioId como argumento
+        if (result.status !== 201) {
+          console.error(`Falha ao enviar notificação: ${result.message}`); // Loga se a notificação falhar
+        }    
+      };
+  
+      // Notificar sobre o fim da agenda assim que a agenda finalizar (Padrão)
+      if (configNoFim) {
+        await Promise.all(agendaTerminadas.map(async (agenda) => {
+          if (agenda.usuario) { // Verifica se o usuário existe
+            const notificationEndExists = await Notificacao.findOne({
+              where: {
+                agenda_id: agenda.id,
+                data_notificacao: agenda.data_horario_fim
+              }
+            });
+  
+            if (!notificationEndExists) {
+              const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" já finalizou. Confirme a finalização clicando no ícone "Editar".`;
+              await criarNotificacaoFinalizacao(agenda, agenda.data_horario_fim, configNoFim.id, mensagem, agenda.usuario.id);
+            }
+          } else {
+            console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+          }
+        }));
       }
+  
+      // Notificar sobre o fim da agenda uma hora antes da agenda finalizar
+      if (configUmaHoraAntesFin) {
+        await Promise.all(agendasPrestesFin.map(async (agenda) => {
+          if (agenda.usuario) { // Verifica se o usuário existe
+            const umHoraAntesFim = new Date(agenda.data_horario_fim);
+            umHoraAntesFim.setHours(umHoraAntesFim.getHours() - 1);
+  
+            const notificationEndExists = await Notificacao.findOne({
+              where: {
+                agenda_id: agenda.id,
+                data_notificacao: umHoraAntesFim
+              }
+            });
+  
+            if (!notificationEndExists) {
+              const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 1 hora. Confirme a finalização clicando no ícone "Editar".`;
+              await criarNotificacaoFinalizacao(agenda, umHoraAntesFim, configUmaHoraAntesFin.id, mensagem, agenda.usuario.id);
+            }
+          } else {
+            console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+          }
+        }));
+      }
+  
+      // Notificar 30 minutos antes da agenda finalizar
+      if (configTrintaMinAntesFin) {
+        await Promise.all(agendasPrestesFin.map(async (agenda) => {
+          if (agenda.usuario) { // Verifica se o usuário existe
+            const trintaMinAntesFim = new Date(agenda.data_horario_fim);
+            trintaMinAntesFim.setMinutes(trintaMinAntesFim.getMinutes() - 30);
+  
+            const notificationEndExists = await Notificacao.findOne({
+              where: {
+                agenda_id: agenda.id,
+                data_notificacao: trintaMinAntesFim
+              }
+            });
+  
+            if (!notificationEndExists) {
+              const mensagem = `Olá ${agenda.usuario.nome}, sua agenda "${agenda.titulo_agenda}" está prestes a finalizar em 30 minutos. Confirme a finalização clicando no ícone "Editar".`;
+              await criarNotificacaoFinalizacao(agenda, trintaMinAntesFim, configTrintaMinAntesFin.id, mensagem, agenda.usuario.id);
+            }
+          } else {
+            console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+          }
+        }));
+      }
+  
+    } catch (error) {
+      console.error(error);
+      // HTTP 500: Internal Server Error
+      res.status(500).send('Erro interno do servidor.');
     }
-  }
-  catch (error) {
-    console.log(error)
-  }
-}
+  };
+  
+
+  controller.createAutoPauseStartNotifications = async (req, res) => {
+    try {
+      const PausaInicializadas = await Agenda.findAll({
+        where: {
+          p_data_horario_inicio: { [Op.gte]: new Date() }
+        },
+        include: ['usuario']
+      });
+  
+  
+      await Promise.all(PausaInicializadas.map(async (agenda) => {
+        if (agenda.usuario) { // Verifica se o usuário existe
+          const notificationExists = await Notificacao.findOne({
+            where: {
+              agenda_id: agenda.id,
+              data_notificacao: agenda.p_data_horario_inicio
+            }
+          });
+  
+          if (!notificationExists) {
+            const mensagem = `Olá ${agenda.usuario.nome}, a pausa da sua agenda já iniciou!`;
+            await Notificacao.create({
+              agenda_id: agenda.id,
+              usuario_id: agenda.usuario_id,
+              config_id: agenda.usuario_id, // Pode ser necessário revisar isso
+              data_notificacao: agenda.p_data_horario_inicio,
+              mensagem: mensagem
+            });
+            await send({ usuarioId: agenda.usuario.id, message: mensagem });
+          }
+        } else {
+          console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+        }
+      }));
+    } catch (error) {
+      console.error(error);
+      // HTTP 500: Internal Server Error (opcional: você pode retornar uma resposta ao cliente)
+      res.status(500).send('Erro interno do servidor.');
+    }
+  };
+  
+  controller.createAutoPauseFinishNotifications = async (req, res) => {
+    try {
+      const PausaTerminadas = await Agenda.findAll({
+        where: {
+          p_data_horario_fim: { [Op.lte]: new Date() }
+        },
+        include: ['usuario']
+      });
+  
+  
+      await Promise.all(PausaTerminadas.map(async (agenda) => {
+        if (agenda.usuario) { // Verifica se o usuário existe
+          const notificationEndExists = await Notificacao.findOne({
+            where: {
+              agenda_id: agenda.id,
+              data_notificacao: agenda.p_data_horario_fim
+            }
+          });
+  
+          if (!notificationEndExists) {
+            const mensagem = `Olá ${agenda.usuario.nome}, a pausa da sua agenda já terminou!`; // Corrigido para refletir o término
+            await Notificacao.create({
+              agenda_id: agenda.id,
+              usuario_id: agenda.usuario_id,
+              config_id: agenda.usuario_id, // Pode ser necessário revisar isso
+              data_notificacao: agenda.p_data_horario_fim,
+              mensagem: mensagem
+            });
+            await send({ usuarioId: agenda.usuario.id, message: mensagem });
+          }
+        } else {
+          console.warn(`Usuário não encontrado para a agenda: ${agenda.id}`);
+        }
+      }));
+    } catch (error) {
+      console.error(error);
+      // HTTP 500: Internal Server Error (opcional: você pode retornar uma resposta ao cliente)
+      res.status(500).send('Erro interno do servidor.');
+    }
+  };
+  
 
 cron.schedule('*/1 * * * *', controller.createAutomaticStartNotifications);
 cron.schedule('*/1 * * * *', controller.createAutomaticFinishNotifications);
@@ -487,19 +543,22 @@ controller.delete = async (req, res) => {
 
 controller.publicKey = async function (req, res) {
   try {
-    // Tenta encontrar a notificação associada ao usuário autenticado
-    let result = await Usuario.findOne({ where: { usuario_id: req.authUser.id } });
+    // Tenta encontrar o usuário autenticado
+    let result = await Usuario.findOne({ where: { id: req.authUser.id } });
 
-    // Verifica se a notificação foi encontrada
+    // Verifica se o usuário foi encontrado
     if (!result) {
-      res.status(404).send({ error: 'Public key not found' });
+      return res.status(404).send({ error: 'User not found' });
     }
 
-    // Obtém a chave pública do resultado
-    const publicKey = result.pushSubscription;
+    // Se o campo pushSubscription estiver null, retorne uma resposta sem erro
+    if (!result.pushSubscription) {
+      return res.status(200).json({ publicKey: null });
+    }
 
-    // Envia a chave pública como resposta
-    res.status(200).send(publicKey);
+    // Caso contrário, retorne a chave pública
+    const publicKey = result.pushSubscription;
+    res.status(200).json({ publicKey });
 
   } catch (error) {
     // Log do erro e resposta com erro 500
@@ -509,8 +568,8 @@ controller.publicKey = async function (req, res) {
 };
 
 
-controller.register = async function (request, res) {
-  const { subscription } = request.body;
+controller.register = async function (req, res) {
+  const { subscription } = req.body;
   const usuarioId = req.authUser.id // Supondo que o usuário já esteja autenticado
 
   try {
@@ -526,29 +585,6 @@ controller.register = async function (request, res) {
     res.status(500).send({ message: 'Erro ao registrar inscrição para WebPush' });
   }
 };
-
-
-
-controller.send = async (request, res) => {
-  const { usuarioId, message } = request.body;
-
-  try {
-    // Recuperar a assinatura do usuário
-    const usuario = await Usuario.findByPk(usuarioId);
-    if (!usuario || !usuario.pushSubscription) {
-      res.status(404).send({ message: 'Usuário ou assinatura não encontrada' });
-    }
-
-    // Enviar notificação
-    await WebPush.sendNotification(usuario.pushSubscription, JSON.stringify({ message }));
-
-    res.status(201).send({ message: 'Notificação enviada com sucesso!' });
-  } catch (error) {
-    console.error('Erro ao enviar notificação:', error);
-    res.status(500).send({ message: 'Erro ao enviar notificação' });
-  }
-};
-
 
 // Exporta o controlador
 module.exports = controller;  

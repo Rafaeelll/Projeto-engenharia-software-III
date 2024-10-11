@@ -8,14 +8,15 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/notificacao');
+const send = require('../controllers/pushNotification')
 
 
 // Define as rotas CRUD para o recurso "notificacao"
 router.post('/', controller.createAutomaticStartNotifications); // Rota para criar uma nova notificação
-router.post('/', controller.createAutomaticFinishNotifications);
+router.post('/', controller.createAutomaticFinishNotifications); 
 router.post('/atualizar_status/:agenda_id', controller.updateAgendaConfirmation);
 router.post('/push/register', controller.register)
-router.post('/push/send', controller.send)
+router.post('/push/send', send)
 router.post('/atualizar_notif', controller.updateNotificationCount);
 router.get('/contagem', controller.retrieveNotificationCount);
 router.get('/push/public_key', controller.publicKey)

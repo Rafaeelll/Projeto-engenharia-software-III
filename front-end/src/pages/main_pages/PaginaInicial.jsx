@@ -1,23 +1,52 @@
-import React from 'react'
-import ButtonBaseDemo from '../../components/ui/ButtonBaseDemo'
-import ButtonBaseDemoTwo from '../../components/ui/ButtonBaseDemoTwo'
-import './styles/main-pages-styles.css'
-import Box from '@mui/material/Box'
+import React from 'react';
+import ButtonBaseDemo from '../../components/ui/ButtonBaseDemo';
+import ButtonBaseDemoTwo from '../../components/ui/ButtonBaseDemoTwo';
+import './styles/main-pages-styles.css';
+import Box from '@mui/material/Box';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Typography from '@mui/material/Typography';
-import ConfirmDialogGreeting  from '../../components/ui/ConfirmDialogGretting'
+import ConfirmDialogGreeting from '../../components/ui/ConfirmDialogGretting';
 import myfetch from '../../utils/myfetch';
+import api from '../../../services/api'
 import FavoriteIcon from '@mui/icons-material/Favorite';
-
-
 
 export default function PaginaInicial() {
   const API_PATH_US = '/usuarios';
+  const API_PATH_NF_PUSH = '/notificacoes/push/public_key';
+  const API_PATH_NF_SAVE = '/notificacoes/push/register';
+
+
   const [userInfo, setUserInfo] = React.useState([]);
   const [showDialog, setShowDialog] = React.useState(false);
+
+  const registerServiceWorker = async () => {
+    if ('serviceWorker' in navigator) {
+      const serviceWorker = await navigator.serviceWorker.register('service-worker.js');
+      let subscription = await serviceWorker.pushManager.getSubscription();
+      
+      if (!subscription) {
+        const publicKeyResponse = await api.get(API_PATH_NF_PUSH);
+        
+        // Verifique se a chave pública é nula
+        if (publicKeyResponse.publicKey === null) {
+          console.log('Usuário ainda não tem uma chave pública, registrando...');
+  
+          // Continue o processo de inscrição
+          subscription = await serviceWorker.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: import.meta.env.VITE_VAPID_KEY
+          });
+  
+          // Enviar inscrição ao back-end
+          await api.post(API_PATH_NF_SAVE, { subscription });
+        }
+      }
+    }
+  };
+  
 
   const handleShowDialog = async () => {
     try {
@@ -42,6 +71,9 @@ export default function PaginaInicial() {
           setShowDialog(false);
         }
       }
+
+      // Após verificar o login, registre o service worker e cheque a permissão de notificação
+      await registerServiceWorker();
     } catch (error) {
       console.error(error);
     }
@@ -71,7 +103,7 @@ export default function PaginaInicial() {
             Antes de realizar as funções do sistema, orientamos a ver as instruções do sistema logo aqui na página inicial.
             <br />
             <br />
-            Agradecemos ter você como membro! <FavoriteIcon fontSize='small' color='error'/>
+            Agradecemos ter você como membro! <FavoriteIcon fontSize='small' color='error' />
           </Typography>
         }
       />
