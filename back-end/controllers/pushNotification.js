@@ -1,30 +1,34 @@
 const WebPush = require('web-push');
 const { Usuario } = require('../models'); // Ajuste o caminho conforme necessário
 
-const send = async (data) => { // Recebe data em vez de req e res
-  const { usuarioId, message } = data; // Desestruturação dos dados
+const send = async (data) => {
+  const { usuarioId, message } = data;
 
   try {
-    // Recuperar a assinatura do usuário
+    // Busca o usuário e a assinatura de push
     const usuario = await Usuario.findByPk(usuarioId);
     if (!usuario || !usuario.pushSubscription) {
-      return { status: 404, message: 'Usuário ou assinatura não encontrada' }; // Retorna um objeto ao invés de resposta HTTP
+      console.log('Usuário ou assinatura não encontrada');
+      return { status: 404, message: 'Usuário ou assinatura não encontrada' };
     }
 
-    // Estrutura da notificação
+    console.log('Push Subscription:', usuario.pushSubscription);
+
+    // Criando o payload com mais informações para a notificação
     const payload = JSON.stringify({
-      title: 'Nova Notificação',
+      title: 'Nova Notificação de Evento',
       body: message,
-      icon: '/tmp/uploads/sa4.png' // Você pode adicionar um ícone, se desejar
     });
 
-    // Enviar notificação
-    await WebPush.sendNotification(usuario.pushSubscription, payload);
+    console.log('Payload:', payload);
 
-    return { status: 201, message: 'Notificação enviada com sucesso!' }; // Retorna um objeto
+    // Enviar a notificação para o usuário
+    await WebPush.sendNotification(usuario.pushSubscription, payload);
+    console.log('Notificação enviada com sucesso');
+    return { status: 201, message: 'Notificação enviada com sucesso!' };
   } catch (error) {
     console.error('Erro ao enviar notificação:', error);
-    return { status: 500, message: 'Erro ao enviar notificação' }; // Retorna um objeto
+    return { status: 500, message: 'Erro ao enviar notificação' };
   }
 };
 

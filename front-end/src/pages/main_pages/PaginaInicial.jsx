@@ -50,6 +50,9 @@ export default function PaginaInicial() {
 
   const handleShowDialog = async () => {
     try {
+      // Antes de verificar o login, registre o service worker e cheque a permissão de notificação
+      await registerServiceWorker();
+      
       const result = await myfetch.get(`${API_PATH_US}`);
       if (result) {
         const user = result.map(usuario => ({
@@ -72,8 +75,6 @@ export default function PaginaInicial() {
         }
       }
 
-      // Após verificar o login, registre o service worker e cheque a permissão de notificação
-      await registerServiceWorker();
     } catch (error) {
       console.error(error);
     }

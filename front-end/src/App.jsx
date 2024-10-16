@@ -1,4 +1,4 @@
-import {BrowserRouter, Route, Routes, Navigate} from 'react-router-dom'
+import {BrowserRouter, Route, Routes, Navigate, useLocation} from 'react-router-dom'
 import React from 'react';
 import LandingPage from './pages/home/LandingPage';
 import Login from './pages/login/register/Login';
@@ -32,8 +32,11 @@ import ConfigForm from './pages/main_pages/forms/ConfigForm';
 import HeaderBar from './components/ui/HeaderBar';
 import FooterBar from './components/ui/FooterBar';
 
+
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  const [hasInteracted, setHasInteracted] = React.useState(false); // Verifica se o usuário já interagiu
 
   function AuthGuard({ children }) {
     // Estaremos autenticados se tivermos um token gravado no localStorage
@@ -51,48 +54,86 @@ function App() {
     setIsLoggedIn(loggedIn)
   }
 
+
+  // Detecta a primeira interação do usuário
+  React.useEffect(() => {
+    const handleUserInteraction = () => {
+      setHasInteracted(true); // Marca como interagido
+      window.removeEventListener('click', handleUserInteraction); // Remove listener após a primeira interação
+    };
+
+    window.addEventListener('click', handleUserInteraction);
+
+    return () => {
+      window.removeEventListener('click', handleUserInteraction);
+    };
+  }, []);
+
+
   return (
     <div className="App">
       <BrowserRouter>
-        <Routes>
-          <Route path ="/" element={<LandingPage/>} />
-          <Route path= "/login" element={<Login onLoginLogout={onLoginLogout}/>}/>
-          <Route path= "/cadastro" element={<Register/>}/>
-          <Route path= "/sobre" element={<About/>}/>
-          <Route path= "/contato" element={<Contact/>}/>
-          <Route path= "/esqueci_senha" element={<EsqueciSenha/>}/>
-          <Route path= "/recuperar_senha" element={<RecuperarSenha/>}/>
-          <Route path= "/confirmar_cadastro" element={<ConfirmarCadastro/>}/>
-          <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
-          <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
-          <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
-          <Route path= "/agenda/:statusOption" element={<AuthGuard> <FilterAgendasStatusResult/> </AuthGuard>}/>
-          <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-          <Route path= "/agenda/editar/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
-          <Route path= "/agenda/confirmar-presenca/:id" element={<AuthGuard> <AgendaConfirmarPresenca/> </AuthGuard>}/>
-          <Route path= "/agenda/confirmar-finalizacao/:id" element={<AuthGuard> <AgendaConfirmarFinalizacao/> </AuthGuard>}/>
-          <Route path= "/usuario" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
-          <Route path= "/usuario/profile/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
-          <Route path= "/usuario/image/:id" element={<AuthGuard> <PerfilImgForm/> </AuthGuard>}/>
-          <Route path= "usuario/account_status/:id" element={<AuthGuard> <MyAccountStatusForm onLoginLogout={onLoginLogout}/> </AuthGuard>}/>
-          <Route path= "usuario/minha_conta/:id" element={<AuthGuard> <MyAccountForm/> </AuthGuard>}/>
-          <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
-          <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
-          <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
-          <Route path= "/historico_jogo" element={<AuthGuard> <HistoricoJogos/> </AuthGuard>}/>
-          <Route path= "/historico_jogo/new" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
-          <Route path= "/historico_jogo/:id" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
-          <Route path= "/visualizacao" element={<AuthGuard> <Visualizacoes/> </AuthGuard>}/>
-          <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
-          <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
-          <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
-          <Route path= "/configuracao" element={<AuthGuard> <Configuracao/> </AuthGuard>}/>
-          <Route path= "/configuracao/:id" element={<AuthGuard> <ConfigForm/> </AuthGuard>}/>
-        </Routes>
+        <NavigationWatcher hasInteracted={hasInteracted} /> {/* Adiciona o componente de navegação */}
+          <Routes>
+            <Route path ="/" element={<LandingPage/>} />
+            <Route path= "/login" element={<Login onLoginLogout={onLoginLogout}/>}/>
+            <Route path= "/cadastro" element={<Register/>}/>
+            <Route path= "/sobre" element={<About/>}/>
+            <Route path= "/contato" element={<Contact/>}/>
+            <Route path= "/esqueci_senha" element={<EsqueciSenha/>}/>
+            <Route path= "/recuperar_senha" element={<RecuperarSenha/>}/>
+            <Route path= "/confirmar_cadastro" element={<ConfirmarCadastro/>}/>
+            <Route path= "/pagina_inicial" element={<AuthGuard> <PaginaInicial/> </AuthGuard>}/>
+            <Route path= "/agenda" element={<AuthGuard> <VerificarAgendas/> </AuthGuard>}/>
+            <Route path= "/resultado/:opcao/:id" element={<AuthGuard> <SearchResult/> </AuthGuard>}/>
+            <Route path= "/agenda/:statusOption" element={<AuthGuard> <FilterAgendasStatusResult/> </AuthGuard>}/>
+            <Route path= "/agenda/new" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+            <Route path= "/agenda/editar/:id" element={<AuthGuard> <CriarAgendas/> </AuthGuard>}/>
+            <Route path= "/agenda/confirmar-presenca/:id" element={<AuthGuard> <AgendaConfirmarPresenca/> </AuthGuard>}/>
+            <Route path= "/agenda/confirmar-finalizacao/:id" element={<AuthGuard> <AgendaConfirmarFinalizacao/> </AuthGuard>}/>
+            <Route path= "/usuario" element={<AuthGuard> <Perfil/> </AuthGuard>}/>
+            <Route path= "/usuario/profile/:id" element={<AuthGuard> <PerfilForm/> </AuthGuard>}/>
+            <Route path= "/usuario/image/:id" element={<AuthGuard> <PerfilImgForm/> </AuthGuard>}/>
+            <Route path= "usuario/account_status/:id" element={<AuthGuard> <MyAccountStatusForm onLoginLogout={onLoginLogout}/> </AuthGuard>}/>
+            <Route path= "usuario/minha_conta/:id" element={<AuthGuard> <MyAccountForm/> </AuthGuard>}/>
+            <Route path= "/jogo" element={<AuthGuard> <Jogos/> </AuthGuard>}/>
+            <Route path= "/jogo/new" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
+            <Route path= "/jogo/:id" element={<AuthGuard> <JogoForm/> </AuthGuard>}/>
+            <Route path= "/historico_jogo" element={<AuthGuard> <HistoricoJogos/> </AuthGuard>}/>
+            <Route path= "/historico_jogo/new" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
+            <Route path= "/historico_jogo/:id" element={<AuthGuard> <HistoricoJogosForm/> </AuthGuard>}/>
+            <Route path= "/visualizacao" element={<AuthGuard> <Visualizacoes/> </AuthGuard>}/>
+            <Route path= "/visualizacao/new" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
+            <Route path= "/visualizacao/:id" element={<AuthGuard> <VisualizacaoForm/> </AuthGuard>}/>
+            <Route path= "/notificacao" element={<AuthGuard> <Notificacoes/> </AuthGuard>}/>
+            <Route path= "/configuracao" element={<AuthGuard> <Configuracao/> </AuthGuard>}/>
+            <Route path= "/configuracao/:id" element={<AuthGuard> <ConfigForm/> </AuthGuard>}/>
+          </Routes>
       </BrowserRouter>
       <FooterBar/>
    </div>
   )
+}
+
+// Novo componente para observar navegações e tocar o som
+function NavigationWatcher({ hasInteracted }) {
+  const location = useLocation(); // useLocation está dentro do contexto do Router
+
+  // Função para tocar o som do alarme
+  const playAlarmSound = () => {
+    if (hasInteracted) {
+      const alarmSound = new Audio('/nav-sound2.wav');
+      alarmSound.play().catch(error => {
+        console.log('Som bloqueado pelo navegador:', error);
+      });
+    }
+  };
+
+  React.useEffect(() => {
+    playAlarmSound();
+  }, [location.pathname]); // O som será tocado sempre que o caminho mudar
+
+  return null; // Este componente não precisa renderizar nada
 }
 
 export default App

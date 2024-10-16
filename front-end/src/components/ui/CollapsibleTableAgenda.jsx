@@ -176,24 +176,21 @@ export default function CollapsibleTable() {
 
     const fetchVisualizacao = async () => {
       try {
-        const result = await myfetch.get(`${API_PATH_VS}`);
-        const agendaResult = await myfetch.get('/agendas');
-        const visualizacaoRelacionado = result.filter(item => item.agenda_id === agenda.id);
-        visualizacaoRelacionado.forEach(item => {
-          const agendaCorrespondente = agendaResult.find(agenda => agenda.id === item.agenda_id);
-          if (agendaCorrespondente) {
-            item.agenda_title = agendaCorrespondente.titulo_agenda;
-          }
-        });
-        setVisualizacoes(visualizacaoRelacionado);
+        const resultVisualizacoes = await myfetch.get(`${API_PATH_VS}`);
+        const visualizacaoRelacionado = resultVisualizacoes.find(item => item.agenda_id === agenda.id);
+        if (visualizacaoRelacionado) {
+          setVisualizacoes([visualizacaoRelacionado])
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
     React.useEffect(() => {
-      fetchVisualizacao();
-    }, []);
+      if (open) {
+        fetchVisualizacao();
+      }
+    }, [open]);
 
     const handleCollapseToggle = () => {
       setOpen(!open);
@@ -345,7 +342,7 @@ export default function CollapsibleTable() {
                   <TableHead>
                     <TableRow>
                       <TableCell size='small' align="center">Visualização ID</TableCell>
-                      <TableCell size='small' align="center">ID - Título da agenda</TableCell>
+                      <TableCell size='small' align="center">ID Agenda</TableCell>
                       <TableCell size='small' align="center">
                         Número de Visualizações
                       </TableCell>
@@ -362,7 +359,7 @@ export default function CollapsibleTable() {
                       visualizacoes.map((visualizacaoItem) => (
                         <TableRow key={visualizacaoItem.id}>
                           <TableCell size='small' align="center">{visualizacaoItem.id}</TableCell>
-                          <TableCell size='small' align="center">{visualizacaoItem.agenda_id} - {visualizacaoItem.agenda_title}</TableCell>
+                          <TableCell size='small' align="center">{visualizacaoItem.agenda_id}</TableCell>
                           <TableCell size='small' align="center"> 
                             {visualizacaoItem.numero_visualizacao}
                           </TableCell>
